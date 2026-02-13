@@ -1687,7 +1687,7 @@ const Views = {
             return;
         }
 
-        const groupOptions = availableGroups.map(g => ({ value: g.id, label: g.fullPath }));
+        const groupOptions = availableGroups.map(g => ({ value: g.id, label: g.name }));
         const roleOptions = ROLES_LIST.filter(r => r.level <= ROLES.MAINTAINER.level).map(r => ({ value: r.name, label: r.name }));
 
         const bodyHtml = `
@@ -1740,7 +1740,7 @@ const Views = {
             return;
         }
 
-        const groupOptions = availableGroups.map(g => ({ value: g.id, label: g.fullPath }));
+        const groupOptions = availableGroups.map(g => ({ value: g.id, label: g.name }));
         const roleOptions = ROLES_LIST.filter(r => r.level <= ROLES.MAINTAINER.level).map(r => ({ value: r.name, label: r.name }));
 
         const bodyHtml = `

@@ -6,6 +6,7 @@ const STORAGE_KEY = 'gitlabOrgAppState';
 
 function _loadSeedData() {
     return {
+        _seedVersion: SEED_DATA_VERSION,
         currentUser: JSON.parse(JSON.stringify(CURRENT_USER)),
         users: JSON.parse(JSON.stringify(USERS)),
         organizations: JSON.parse(JSON.stringify(ORGANIZATIONS)),
@@ -30,6 +31,12 @@ function _loadPersistedData() {
             return null;
         }
         const parsed = JSON.parse(raw);
+        // Invalidate stale localStorage when seed data has been updated
+        if (parsed._seedVersion !== SEED_DATA_VERSION) {
+            console.log('[AppState] Seed data version changed, discarding stale localStorage');
+            localStorage.removeItem(STORAGE_KEY);
+            return null;
+        }
         console.log('[AppState] Loaded persisted data — groups:', parsed.groups?.length, 'projects:', parsed.projects?.length);
         return parsed;
     } catch (e) {
@@ -50,6 +57,9 @@ const AppState = {
     projectMemberships: _initial.projectMemberships,
     groupShares: _initial.groupShares,
     projectShares: _initial.projectShares,
+
+    // Seed data version (persisted to detect stale localStorage)
+    _seedVersion: _initial._seedVersion,
 
     // UI state (transient — not persisted)
     currentRoute: '/',
@@ -84,6 +94,7 @@ const AppState = {
 
     _getPersistable() {
         return {
+            _seedVersion: this._seedVersion,
             currentUser: this.currentUser,
             users: this.users,
             organizations: this.organizations,
@@ -128,6 +139,7 @@ const AppState = {
         this.projectMemberships = seed.projectMemberships;
         this.groupShares = seed.groupShares;
         this.projectShares = seed.projectShares;
+        this._seedVersion = seed._seedVersion;
         this._nextUserId = seed._nextUserId;
         this._nextGroupId = seed._nextGroupId;
         this._nextProjectId = seed._nextProjectId;

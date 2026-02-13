@@ -2,6 +2,9 @@
 // data.js — Rich, realistic mock data for GitLab Organization
 // ============================================================
 
+// Bump this version whenever seed data changes to invalidate stale localStorage.
+const SEED_DATA_VERSION = 2;
+
 const RESERVED_NAMES = [
     'admin', 'api', 'assets', 'dashboard', 'explore', 'groups',
     'help', 'projects', 'search', 'snippets', 'uploads', 'users',

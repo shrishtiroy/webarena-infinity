@@ -303,6 +303,34 @@ All application data **must persist across page reloads** using browser-local st
 - Transient UI state (open modals, current route, toast messages, sidebar state)
 - Computed/derived data (inherited memberships, ancestor chains)
 
+#### Seed Data Versioning
+
+When seed data changes (e.g., fixing permissions, adding entities), browsers with stale `localStorage` will load outdated state and ignore the updated seed data. This causes subtle, hard-to-diagnose failures — for example, a permission that was added to seed data won't take effect because the browser is still using the old persisted state.
+
+To prevent this, the application must implement a **seed data version stamp**:
+
+1. Define a version constant (e.g., `SEED_DATA_VERSION = 2`) in the seed data module. Bump it whenever seed data changes.
+2. Include the version in the seed data object returned by the seed loader.
+3. On startup, when loading persisted state from `localStorage`, compare the stored version against the current `SEED_DATA_VERSION`. If they differ, discard the stale `localStorage` and fall back to fresh seed data.
+4. Include the version in the persistable state object so that newly persisted state carries the current version stamp.
+
+```javascript
+// In seed data module
+const SEED_DATA_VERSION = 2;
+
+// Loading persisted data
+function loadPersistedData() {
+    const saved = localStorage.getItem('appState');
+    if (!saved) return null;
+    const parsed = JSON.parse(saved);
+    if (parsed._seedVersion !== SEED_DATA_VERSION) {
+        localStorage.removeItem('appState');
+        return null; // falls back to fresh seed data
+    }
+    return parsed;
+}
+```
+
 **Example**
 ```javascript
 function saveState() {
@@ -377,3 +405,5 @@ This applies to any field that stores an object reference rather than a scalar v
 - [ ] Provide a reset-to-seed-data mechanism
 - [ ] Every inline state mutation calls the persistence/notify function
 - [ ] External consumers (verifiers, tests) dereference structured objects — never compare to strings
+- [ ] Seed data has a version stamp; persisted state is invalidated when seed data changes
+- [ ] Dropdown labels use human-readable display names, not internal paths or slugs

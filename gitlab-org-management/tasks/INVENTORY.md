@@ -72,6 +72,10 @@ Group settings use `subgroupCreationLevel` and `projectCreationLevel` (not `subg
 
 The H6 verifier expects `projectCreationLevel == "noone"`, so the project creation dropdown in `views.js` includes `{value: 'noone', label: 'No one'}`.
 
+### Share dropdown labels
+
+The invite-group dropdowns in `_showShareGroupModal` and `_showShareProjectModal` use `g.name` (human-readable, e.g., "Analytics Platform") as labels, not `g.fullPath` (path with hyphens, e.g., "datastream/analytics-platform"). This ensures the dropdown search matches task instruction language. All group names are unique in the seed data. This affected H7.
+
 ---
 
 ## Easy Tasks (E1–E8)
