@@ -14,7 +14,10 @@ wheels/
 
 # Run results
 results/
-gitlab-org-management/docs/
-linear/docs/
-shopify/docs/
 .notes.md
+
+# Infra worker logs and temp files
+infra/logs/
+*.log
+/tmp/mirror-mirror-logs/
+/tmp/mirror-mirror-infra.env

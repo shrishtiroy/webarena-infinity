@@ -110,8 +110,8 @@ class BrowserUseAgent:
         from browser_use import Agent
 
         instruction = (
-            f"You are interacting with a GitLab organization management web "
-            f"application at {server_url}. Your task: {task}"
+            f"You are interacting with a web application at {server_url}. "
+            f"Your task: {task}"
         )
 
         agent = Agent(
