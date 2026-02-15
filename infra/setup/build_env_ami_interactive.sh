@@ -56,15 +56,19 @@ dnf install -y git gcc gcc-c++ make openssl-devel bzip2-devel \
 su - ec2-user -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
 su - ec2-user -c 'export PATH="$HOME/.local/bin:$PATH" && uv python install 3.12'
 
+# Create a venv and install deps via uv
+su - ec2-user -c 'export PATH="$HOME/.local/bin:$PATH" && uv venv $HOME/venv --python 3.12'
+su - ec2-user -c 'export PATH="$HOME/.local/bin:$PATH" && VIRTUAL_ENV=$HOME/venv uv pip install requests python-dotenv boto3'
+
+# Add venv to PATH in bashrc so workers use it
+echo 'export PATH="$HOME/venv/bin:$HOME/.local/bin:$PATH"' >> /home/ec2-user/.bashrc
+
 # Node.js 20
 curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
 dnf install -y nodejs
 
 # Claude Code CLI
 npm install -g @anthropic-ai/claude-code
-
-# Python deps
-su - ec2-user -c 'export PATH="$HOME/.local/bin:$PATH" && uv pip install --system requests python-dotenv boto3'
 
 # Git config
 su - ec2-user -c 'git config --global user.email "mirror-mirror-bot@example.com"'
