@@ -137,7 +137,7 @@ def main() -> None:
         "--total-envs",
         type=int,
         default=None,
-        help="Override env count for --monitor-only (default: read from manifest)",
+        help="Limit to first N manifest entries and set monitor target (default: all)",
     )
     args = parser.parse_args()
 
@@ -150,6 +150,9 @@ def main() -> None:
         if not manifest:
             log.error("Manifest is empty: %s", args.manifest)
             sys.exit(1)
+        if args.total_envs and args.total_envs < len(manifest):
+            log.info("Trimming manifest to first %d of %d entries", args.total_envs, len(manifest))
+            manifest = manifest[:args.total_envs]
         seed_jobs(manifest)
         return
 
@@ -162,6 +165,9 @@ def main() -> None:
         if not manifest:
             log.error("Manifest is empty: %s", args.manifest)
             sys.exit(1)
+        if args.total_envs and args.total_envs < len(manifest):
+            log.info("Trimming manifest to first %d of %d entries", args.total_envs, len(manifest))
+            manifest = manifest[:args.total_envs]
         seed_jobs(manifest)
         total = args.total_envs or len(manifest)
     else:

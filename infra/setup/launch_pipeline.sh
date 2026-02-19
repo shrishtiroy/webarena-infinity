@@ -108,7 +108,7 @@ cd $HOME
 # System packages
 dnf update -y
 dnf install -y git gcc gcc-c++ make openssl-devel bzip2-devel \
-  libffi-devel zlib-devel readline-devel sqlite-devel
+  libffi-devel zlib-devel readline-devel sqlite-devel tmux
 
 # Python via uv
 su - ec2-user -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'

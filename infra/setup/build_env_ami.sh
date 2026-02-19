@@ -14,7 +14,7 @@ echo "=== Building Env Generator AMI ==="
 # System packages
 sudo dnf update -y
 sudo dnf install -y git gcc gcc-c++ make openssl-devel bzip2-devel \
-  libffi-devel zlib-devel readline-devel sqlite-devel
+  libffi-devel zlib-devel readline-devel sqlite-devel tmux
 
 # Python 3.12 via uv
 curl -LsSf https://astral.sh/uv/install.sh | sh

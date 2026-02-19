@@ -80,8 +80,28 @@ def _handle_signal(signum, frame):
 # Git helpers (worktree-aware)
 # ---------------------------------------------------------------------------
 
-# Lock for git operations on the main repo — git doesn't handle concurrency
-_git_lock = multiprocessing.Lock()
+# File-based lock for git operations on the main repo — git doesn't handle
+# concurrency.  A file lock works across fork/spawn and auto-releases if the
+# holder crashes.
+import fcntl
+
+_GIT_LOCK_PATH = os.path.join(REPO_DIR, ".git", "mirror-mirror.lock")
+
+
+class _GitLock:
+    """Context manager using fcntl file locking."""
+
+    def __enter__(self):
+        self._fd = open(_GIT_LOCK_PATH, "w")
+        fcntl.flock(self._fd, fcntl.LOCK_EX)
+        return self
+
+    def __exit__(self, *exc):
+        fcntl.flock(self._fd, fcntl.LOCK_UN)
+        self._fd.close()
+
+
+_git_lock = _GitLock()
 
 
 def git(*args: str, cwd: str = REPO_DIR) -> subprocess.CompletedProcess:
