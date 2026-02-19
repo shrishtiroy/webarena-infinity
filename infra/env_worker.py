@@ -219,18 +219,79 @@ LIVE_LOG_DIR = os.path.join(LOG_DIR, "live")
 def run_claude_code(
     prompt: str, app_dir: str, worker_id: int = 0, timeout: int = 3600
 ) -> subprocess.CompletedProcess:
+    """Run claude --print inside a tmux session for PTY + live observability.
+
+    Claude requires a TTY to produce output.  We run it inside a named tmux
+    session so that (a) it gets a real PTY and (b) the user can
+    ``tmux attach -t claude-W<id>`` to watch progress live.
+
+    Output is also tee'd to a log file for post-hoc inspection.
+    A marker file signals completion so we can poll for it.
+    """
     log_path = os.path.join(LIVE_LOG_DIR, f"env-W{worker_id}-claude.log")
+    done_path = os.path.join(LIVE_LOG_DIR, f"env-W{worker_id}-done")
+    rc_path = os.path.join(LIVE_LOG_DIR, f"env-W{worker_id}-rc")
     os.makedirs(os.path.dirname(log_path), exist_ok=True)
-    cmd = (
+
+    # Clean up markers from previous run
+    for p in (done_path, rc_path, log_path):
+        if os.path.exists(p):
+            os.remove(p)
+
+    session_name = f"claude-W{worker_id}"
+
+    # Kill any leftover tmux session with this name
+    subprocess.run(["tmux", "kill-session", "-t", session_name],
+                   capture_output=True)
+
+    # Build the command to run inside tmux.
+    # Tee output to log, write exit code to rc file, touch done marker.
+    inner = (
         f"claude --print --dangerously-skip-permissions {shlex.quote(prompt)}"
-        f" 2>&1 | tee -a {shlex.quote(log_path)}"
+        f" 2>&1 | tee {shlex.quote(log_path)}"
+        f"; echo ${{PIPESTATUS[0]}} > {shlex.quote(rc_path)}"
+        f"; touch {shlex.quote(done_path)}"
     )
-    return subprocess.run(
-        ["bash", "-c", cmd],
-        cwd=app_dir,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
+
+    # Launch tmux session (detached)
+    subprocess.run(
+        ["tmux", "new-session", "-d", "-s", session_name, "-c", app_dir,
+         "bash", "-c", inner],
+        check=True,
+    )
+    log.info("[W%d] tmux session '%s' started — attach with: tmux attach -t %s",
+             worker_id, session_name, session_name)
+
+    # Poll for completion
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        if os.path.exists(done_path):
+            break
+        time.sleep(5)
+    else:
+        # Timeout — kill the session
+        subprocess.run(["tmux", "kill-session", "-t", session_name],
+                       capture_output=True)
+        return subprocess.CompletedProcess(
+            args=inner, returncode=1,
+            stdout="", stderr="Timeout after %ds" % timeout,
+        )
+
+    # Read output and exit code
+    stdout = ""
+    if os.path.exists(log_path):
+        with open(log_path) as f:
+            stdout = f.read()
+    returncode = 0
+    if os.path.exists(rc_path):
+        try:
+            returncode = int(open(rc_path).read().strip())
+        except (ValueError, OSError):
+            returncode = 1
+
+    return subprocess.CompletedProcess(
+        args=inner, returncode=returncode,
+        stdout=stdout, stderr="",
     )
 
 
