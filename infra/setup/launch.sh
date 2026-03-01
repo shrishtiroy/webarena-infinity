@@ -13,6 +13,7 @@
 #
 # Usage:
 #   bash infra/setup/launch.sh --manifest infra/env_manifest.jsonl --model gemini
+#   bash infra/setup/launch.sh --manifest infra/env_manifest.jsonl --ami ami-0abc123 --model gemini
 #   bash infra/setup/launch.sh --manifest infra/env_manifest.jsonl --instance-type m5.2xlarge --key-pair my-key
 #   bash infra/setup/launch.sh --manifest infra/env_manifest.jsonl --model gpt --workers 8 --repetitions 5
 
@@ -29,6 +30,7 @@ MAX_ITERATIONS="5"
 REGION="${AWS_REGION:-us-east-1}"
 SG_ID=""
 SUBNET_ID=""
+CUSTOM_AMI=""
 
 # --- Parse arguments ---
 while [[ $# -gt 0 ]]; do
@@ -43,6 +45,7 @@ while [[ $# -gt 0 ]]; do
     --region)         REGION="$2";         shift 2 ;;
     --security-group) SG_ID="$2";          shift 2 ;;
     --subnet)         SUBNET_ID="$2";      shift 2 ;;
+    --ami)            CUSTOM_AMI="$2";     shift 2 ;;
     *)
       echo "Unknown argument: $1"
       echo "Usage: bash infra/setup/launch.sh --manifest FILE [OPTIONS]"
@@ -96,13 +99,18 @@ echo "  Max iterations:  $MAX_ITERATIONS"
 echo "  Region:          $REGION"
 echo ""
 
-# --- Find latest Amazon Linux 2023 AMI ---
-AL2023_AMI=$(aws ec2 describe-images \
-  --owners amazon \
-  --filters "Name=name,Values=al2023-ami-2023*-x86_64" "Name=state,Values=available" \
-  --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
-  --output text --region "$REGION")
-echo "  Base AMI:        $AL2023_AMI"
+# --- Resolve AMI ---
+if [ -n "$CUSTOM_AMI" ]; then
+  LAUNCH_AMI="$CUSTOM_AMI"
+  echo "  Custom AMI:      $LAUNCH_AMI (pre-built base)"
+else
+  LAUNCH_AMI=$(aws ec2 describe-images \
+    --owners amazon \
+    --filters "Name=name,Values=al2023-ami-2023*-x86_64" "Name=state,Values=available" \
+    --query 'Images | sort_by(@, &CreationDate) | [-1].ImageId' \
+    --output text --region "$REGION")
+  echo "  Base AMI:        $LAUNCH_AMI (Amazon Linux 2023 — full setup)"
+fi
 
 # --- Security group (create simple one if not provided) ---
 if [ -z "$SG_ID" ]; then
@@ -199,52 +207,12 @@ aws iam put-role-policy \
   }" 2>/dev/null || echo "  WARNING: Could not attach S3 policy (role may not exist yet)"
 
 # --- Build user-data ---
-build_userdata() {
+# Env-specific setup shared by both modes (clone repo, .claudeignore, env vars)
+build_env_setup() {
   local env_id="$1"
   local docs_path="$2"
 
-  cat <<USERDATA_EOF
-#!/bin/bash
-set -uo pipefail
-exec > /var/log/mirror-mirror-setup.log 2>&1
-
-export HOME=/home/ec2-user
-cd \$HOME
-
-# System packages
-dnf update -y
-dnf install -y git gcc gcc-c++ make openssl-devel bzip2-devel \
-  libffi-devel zlib-devel readline-devel sqlite-devel tmux
-
-# Chromium dependencies
-dnf install -y alsa-lib atk at-spi2-atk cups-libs libdrm mesa-libgbm \
-  pango libXcomposite libXdamage libXrandr libxkbcommon nss nspr
-
-# Python via uv
-su - ec2-user -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
-su - ec2-user -c 'export PATH="\$HOME/.local/bin:\$PATH" && uv python install 3.12'
-
-# Create venv
-su - ec2-user -c 'export PATH="\$HOME/.local/bin:\$PATH" && uv venv \$HOME/venv --python 3.12'
-echo 'export PATH="\$HOME/venv/bin:\$HOME/.local/bin:\$PATH"' >> /home/ec2-user/.bashrc
-
-# Node.js 20
-curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
-dnf install -y nodejs
-
-# Claude Code CLI
-npm install -g @anthropic-ai/claude-code
-
-# Python deps
-su - ec2-user -c 'export PATH="\$HOME/.local/bin:\$PATH" && VIRTUAL_ENV=\$HOME/venv uv pip install playwright "browser-use>=0.11.9" requests python-dotenv'
-
-# Playwright + Chromium
-su - ec2-user -c '\$HOME/venv/bin/python -m playwright install chromium'
-\$HOME/venv/bin/python -m playwright install-deps || true
-
-# Git config
-su - ec2-user -c 'git config --global user.email "mirror-mirror-bot@example.com"'
-su - ec2-user -c 'git config --global user.name "mirror-mirror-bot"'
+  cat <<ENVSETUP_EOF
 
 # Clone repo and checkout branch
 su - ec2-user -c 'git clone https://${GITHUB_TOKEN}@github.com/shuyanzhou/mirror-mirror.git /home/ec2-user/mirror-mirror'
@@ -299,10 +267,8 @@ echo ""
 echo "======================================"
 echo "Setup complete for: ${env_id}"
 echo "======================================"
-echo "Next steps:"
-echo "  1. claude login"
-echo "  2. claude plugins install frontend-design"
-echo "  3. cd ~/mirror-mirror && nohup \\\$HOME/venv/bin/python infra/pipeline.py \\\\"
+echo "Run the pipeline:"
+echo "  cd ~/mirror-mirror && nohup \\\$HOME/venv/bin/python infra/pipeline.py \\\\"
 echo "       --app-name ${env_id} \\\\"
 echo "       --docs-path ${docs_path} \\\\"
 echo "       --model ${MODEL} \\\\"
@@ -313,7 +279,80 @@ echo "       --branch ${env_id} \\\\"
 echo "       --push \\\\"
 echo "       --s3-bucket \\\$MM_S3_BUCKET \\\\"
 echo "       > /tmp/mirror-mirror-logs/pipeline.log 2>&1 &"
-USERDATA_EOF
+ENVSETUP_EOF
+}
+
+build_userdata() {
+  local env_id="$1"
+  local docs_path="$2"
+
+  if [ -n "$CUSTOM_AMI" ]; then
+    # Pre-built AMI: only env-specific setup needed
+    cat <<HEADER_EOF
+#!/bin/bash
+set -uo pipefail
+exec > /var/log/mirror-mirror-setup.log 2>&1
+
+export HOME=/home/ec2-user
+cd \$HOME
+HEADER_EOF
+    build_env_setup "$env_id" "$docs_path"
+  else
+    # Fresh instance: full setup
+    cat <<HEADER_EOF
+#!/bin/bash
+set -uo pipefail
+exec > /var/log/mirror-mirror-setup.log 2>&1
+
+export HOME=/home/ec2-user
+cd \$HOME
+
+# System packages
+dnf update -y
+dnf install -y git gcc gcc-c++ make openssl-devel bzip2-devel \\
+  libffi-devel zlib-devel readline-devel sqlite-devel tmux
+
+# Chromium dependencies
+dnf install -y alsa-lib atk at-spi2-atk cups-libs libdrm mesa-libgbm \\
+  pango libXcomposite libXdamage libXrandr libxkbcommon nss nspr
+
+# Python via uv
+su - ec2-user -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
+su - ec2-user -c 'export PATH="\$HOME/.local/bin:\$PATH" && uv python install 3.12'
+
+# Create venv
+su - ec2-user -c 'export PATH="\$HOME/.local/bin:\$PATH" && uv venv \$HOME/venv --python 3.12'
+echo 'export PATH="\$HOME/venv/bin:\$HOME/.local/bin:\$PATH"' >> /home/ec2-user/.bashrc
+
+# Node.js 20
+curl -fsSL https://rpm.nodesource.com/setup_20.x | bash -
+dnf install -y nodejs
+
+# Claude Code CLI
+npm install -g @anthropic-ai/claude-code
+
+# Python deps
+su - ec2-user -c 'export PATH="\$HOME/.local/bin:\$PATH" && VIRTUAL_ENV=\$HOME/venv uv pip install playwright "browser-use>=0.11.9" requests python-dotenv'
+
+# Playwright + Chromium
+su - ec2-user -c '\$HOME/venv/bin/python -m playwright install chromium'
+\$HOME/venv/bin/python -m playwright install-deps || true
+
+# Git config
+su - ec2-user -c 'git config --global user.email "mirror-mirror-bot@example.com"'
+su - ec2-user -c 'git config --global user.name "mirror-mirror-bot"'
+HEADER_EOF
+    build_env_setup "$env_id" "$docs_path"
+
+    # Extra note for fresh instances
+    cat <<NOTE_EOF
+
+echo ""
+echo "NOTE: This is a fresh instance. You must also run:"
+echo "  1. claude login"
+echo "  2. claude plugins install frontend-design"
+NOTE_EOF
+  fi
 }
 
 # --- Launch instances ---
@@ -327,7 +366,7 @@ for entry in "${ENVS[@]}"; do
   docs_path=$(echo "$entry" | python3 -c "import sys,json; print(json.load(sys.stdin)['docs_path'])")
 
   INST_ID=$(aws ec2 run-instances \
-    --image-id "$AL2023_AMI" \
+    --image-id "$LAUNCH_AMI" \
     --instance-type "$INSTANCE_TYPE" \
     --key-name "$KEY_PAIR" \
     --subnet-id "$SUBNET_ID" \
@@ -385,8 +424,14 @@ echo "" >> "$LAUNCH_FILE"
 echo "# Per-instance details (env_id|instance_id|elastic_ip|eip_alloc_id)" >> "$LAUNCH_FILE"
 
 echo ""
-echo "=== ACTION REQUIRED ==="
-echo "SSH into each instance, run 'claude login', then start the pipeline:"
+if [ -n "$CUSTOM_AMI" ]; then
+  echo "=== ACTION REQUIRED ==="
+  echo "SSH into each instance and start the pipeline:"
+  echo "(Claude login + plugins are pre-configured in the AMI)"
+else
+  echo "=== ACTION REQUIRED ==="
+  echo "SSH into each instance, run 'claude login', then start the pipeline:"
+fi
 echo ""
 
 for INST_ID in $INSTANCE_IDS; do
@@ -401,8 +446,10 @@ for INST_ID in $INSTANCE_IDS; do
 
   echo "  ssh -i ~/.ssh/${KEY_PAIR}.pem ec2-user@${IP}"
   echo "    # Wait for setup: tail -f /var/log/mirror-mirror-setup.log"
-  echo "    # Then: claude login"
-  echo "    # Then: claude plugins install frontend-design"
+  if [ -z "$CUSTOM_AMI" ]; then
+    echo "    # Then: claude login"
+    echo "    # Then: claude plugins install frontend-design"
+  fi
   echo "    # Then: start pipeline (command shown at end of setup log)"
   echo ""
 done
