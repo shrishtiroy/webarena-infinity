@@ -26,7 +26,7 @@ KEY_PAIR="${KEY_PAIR_NAME:-}"
 MODEL="gemini"
 WORKERS="8"
 REPETITIONS="3"
-MAX_ITERATIONS="5"
+MAX_ITERATIONS="3"
 REGION="${AWS_REGION:-us-east-1}"
 SG_ID=""
 SUBNET_ID=""
@@ -267,19 +267,31 @@ echo ""
 echo "======================================"
 echo "Setup complete for: ${env_id}"
 echo "======================================"
-echo "Run the pipeline:"
-echo "  cd ~/mirror-mirror && nohup \\\$HOME/venv/bin/python infra/pipeline.py \\\\"
-echo "       --app-name ${env_id} \\\\"
-echo "       --docs-path ${docs_path} \\\\"
-echo "       --model ${MODEL} \\\\"
-echo "       --workers ${WORKERS} \\\\"
-echo "       --repetitions ${REPETITIONS} \\\\"
-echo "       --max-iterations ${MAX_ITERATIONS} \\\\"
-echo "       --branch ${env_id} \\\\"
-echo "       --push \\\\"
-echo "       --s3-bucket \\\$MM_S3_BUCKET \\\\"
-echo "       > /tmp/mirror-mirror-logs/pipeline.log 2>&1 &"
 ENVSETUP_EOF
+}
+
+# Appended after build_env_setup when using a pre-built AMI
+build_autostart() {
+  local env_id="$1"
+  local docs_path="$2"
+
+  cat <<AUTOSTART_EOF
+
+# Auto-start pipeline
+echo "Auto-starting pipeline for: ${env_id}"
+su - ec2-user -c 'cd ~/mirror-mirror && nohup \$HOME/venv/bin/python infra/pipeline.py \\
+  --app-name ${env_id} \\
+  --docs-path ${docs_path} \\
+  --model ${MODEL} \\
+  --workers ${WORKERS} \\
+  --repetitions ${REPETITIONS} \\
+  --max-iterations ${MAX_ITERATIONS} \\
+  --branch ${env_id} \\
+  --push \\
+  --s3-bucket \$MM_S3_BUCKET \\
+  > /tmp/mirror-mirror-logs/pipeline.log 2>&1 &'
+echo "Pipeline started (PID: \$!)"
+AUTOSTART_EOF
 }
 
 build_userdata() {
@@ -287,7 +299,7 @@ build_userdata() {
   local docs_path="$2"
 
   if [ -n "$CUSTOM_AMI" ]; then
-    # Pre-built AMI: only env-specific setup needed
+    # Pre-built AMI: env-specific setup + auto-start pipeline
     cat <<HEADER_EOF
 #!/bin/bash
 set -uo pipefail
@@ -297,6 +309,7 @@ export HOME=/home/ec2-user
 cd \$HOME
 HEADER_EOF
     build_env_setup "$env_id" "$docs_path"
+    build_autostart "$env_id" "$docs_path"
   else
     # Fresh instance: full setup
     cat <<HEADER_EOF
@@ -344,13 +357,20 @@ su - ec2-user -c 'git config --global user.name "mirror-mirror-bot"'
 HEADER_EOF
     build_env_setup "$env_id" "$docs_path"
 
-    # Extra note for fresh instances
+    # Fresh instances need manual claude login before pipeline can run
     cat <<NOTE_EOF
 
 echo ""
 echo "NOTE: This is a fresh instance. You must also run:"
 echo "  1. claude login"
 echo "  2. claude plugins install frontend-design"
+echo "  3. Start pipeline:"
+echo "     cd ~/mirror-mirror && nohup \\\$HOME/venv/bin/python infra/pipeline.py \\\\"
+echo "       --app-name ${env_id} --docs-path ${docs_path} \\\\"
+echo "       --model ${MODEL} --workers ${WORKERS} --repetitions ${REPETITIONS} \\\\"
+echo "       --max-iterations ${MAX_ITERATIONS} --branch ${env_id} \\\\"
+echo "       --push --s3-bucket \\\$MM_S3_BUCKET \\\\"
+echo "       > /tmp/mirror-mirror-logs/pipeline.log 2>&1 &"
 NOTE_EOF
   fi
 }
@@ -442,7 +462,7 @@ for INST_ID in $INSTANCE_IDS; do
   ALLOC_ID=$(aws ec2 describe-addresses --filters "Name=instance-id,Values=$INST_ID" \
     --query 'Addresses[0].AllocationId' --output text --region "$REGION")
 
-  echo "${ENV_ID}|${INST_ID}|${IP}|${ALLOC_ID}" >> "$LAUNCH_FILE"
+  echo "# ${ENV_ID}|${INST_ID}|${IP}|${ALLOC_ID}" >> "$LAUNCH_FILE"
 
   echo "  ssh -i ~/.ssh/${KEY_PAIR}.pem ec2-user@${IP}"
   echo "    # Wait for setup: tail -f /var/log/mirror-mirror-setup.log"
