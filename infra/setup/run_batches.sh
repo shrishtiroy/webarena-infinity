@@ -128,7 +128,7 @@ for (( batch=0; batch<NUM_BATCHES; batch++ )); do
   echo ""
 
   # Write temp manifest for this batch
-  BATCH_MANIFEST=$(mktemp /tmp/mm-batch-XXXXXX.jsonl)
+  BATCH_MANIFEST=$(mktemp /tmp/mm-batch-XXXXXX)
   for (( i=start; i<end; i++ )); do
     echo "${ALL_ENVS[$i]}" >> "$BATCH_MANIFEST"
   done
