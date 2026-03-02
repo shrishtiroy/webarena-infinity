@@ -1536,6 +1536,422 @@ def solve_task_h40(state):
     })
 
 
+# ---- Hardening Round 2 ----
+
+def solve_task_h41(state):
+    """Find PI matter with highest total damages, add $300K recovery + 33.33% fee."""
+    from collections import defaultdict
+    pi_ids = {m["id"] for m in state["matters"] if m["practiceAreaId"] == "pa_1"}
+    totals = defaultdict(float)
+    for d in state["damages"]:
+        if d["matterId"] in pi_ids:
+            totals[d["matterId"]] += d["amount"]
+    top_matter_id = max(totals, key=totals.get)  # matter_7
+    settlement = ensure_settlement(state, top_matter_id)
+    settlement["recoveries"].append({
+        "id": f"rec_{len(settlement['recoveries']) + 1}",
+        "amount": 300000,
+        "sourceContactId": None,
+        "sourceName": "Settlement Recovery",
+    })
+    settlement["legalFees"].append({
+        "id": f"lf_{len(settlement['legalFees']) + 1}",
+        "recoveryId": None,
+        "recipientId": "user_2",
+        "rate": 33.33,
+        "percentage": 33.33,
+        "flatAmount": 0,
+        "discount": 0,
+        "referralFees": [],
+    })
+
+
+def solve_task_h42(state):
+    """PI Investigation: damages→Demand, no damages→pending."""
+    damage_mids = set(d["matterId"] for d in state["damages"])
+    for m in state["matters"]:
+        if (m["practiceAreaId"] == "pa_1"
+                and m["stageId"] == "stage_1_2"
+                and m["status"] == "open"):
+            if m["id"] in damage_mids:
+                m["stageId"] = "stage_1_3"
+            else:
+                m["status"] = "pending"
+                m["pendingDate"] = TODAY
+
+
+def solve_task_h43(state):
+    """Rename PI-Auto Accident template, change billing to hourly, set as firm default."""
+    template = find_template(state, "Personal Injury - Auto Accident")
+    template["name"] = "Personal Injury - Motor Vehicle Collision"
+    template["billingMethod"] = "hourly"
+    state["firmSettings"]["defaultTemplateId"] = template["id"]
+
+
+def solve_task_h44(state):
+    """Find PA with most pending matters, add Administrative Review stage."""
+    from collections import Counter
+    counts = Counter()
+    for m in state["matters"]:
+        if m["status"] == "pending":
+            counts[m["practiceAreaId"]] += 1
+    top_pa_id = counts.most_common(1)[0][0]  # pa_1
+    pa = next(p for p in state["practiceAreas"] if p["id"] == top_pa_id)
+    pa["stages"].append({
+        "id": f"{top_pa_id.replace('pa', 'stage')}_{len(pa['stages']) + 1}",
+        "name": "Administrative Review",
+        "order": len(pa["stages"]),
+    })
+
+
+def solve_task_h45(state):
+    """Williams' open matters: Demand+ PI→Jackson, other→Reyes."""
+    advanced_stages = {"stage_1_3", "stage_1_4", "stage_1_5"}
+    for m in state["matters"]:
+        if m["responsibleAttorneyId"] == "user_2" and m["status"] == "open":
+            if m["practiceAreaId"] == "pa_1" and m["stageId"] in advanced_stages:
+                m["responsibleAttorneyId"] = "user_8"
+            else:
+                m["responsibleAttorneyId"] = "user_3"
+
+
+def solve_task_h46(state):
+    """Numbering: slash + 4-digit. Create Tax Law - Audit Defense template."""
+    state["numberingScheme"]["separator"] = "/"
+    state["numberingScheme"]["numberPadding"] = 4
+    max_num = max(int(t["id"].split("_")[1]) for t in state["matterTemplates"])
+    state["matterTemplates"].append({
+        "id": f"template_{max_num + 1}",
+        "name": "Tax Law - Audit Defense",
+        "isDefault": False,
+        "description": "Template for tax law audit defense matters",
+        "practiceAreaId": "pa_11",
+        "billable": True,
+        "billingMethod": "hourly",
+        "deductionOrder": None,
+        "customFields": {},
+        "documentFolders": [],
+        "createdDate": NOW,
+    })
+
+
+def solve_task_h47(state):
+    """Create Maritime Law PA with 3 stages, then create matter for Andrew Kim."""
+    max_num = max(int(pa["id"].split("_")[1]) for pa in state["practiceAreas"])
+    pa_id = f"pa_{max_num + 1}"
+    state["practiceAreas"].append({
+        "id": pa_id,
+        "name": "Maritime Law",
+        "stages": [
+            {"id": f"stage_{max_num + 1}_1", "name": "Investigation", "order": 0},
+            {"id": f"stage_{max_num + 1}_2", "name": "Filing", "order": 1},
+            {"id": f"stage_{max_num + 1}_3", "name": "Arbitration", "order": 2},
+        ],
+        "color": "#6366f1",
+        "createdDate": NOW,
+    })
+    mid = next_matter_id(state)
+    number = str(mid).zfill(5)
+    state["matters"].append({
+        "id": f"matter_{mid}",
+        "number": number,
+        "displayNumber": f"{number}-Kim",
+        "description": "Kim Maritime Shipping Dispute",
+        "status": "open",
+        "billingMethod": "hourly",
+        "clientId": "contact_43",
+        "responsibleAttorneyId": "user_1",
+        "originatingAttorneyId": None,
+        "responsibleStaffId": None,
+        "clientReferenceNumber": "",
+        "location": "",
+        "practiceAreaId": pa_id,
+        "stageId": None,
+        "openDate": TODAY,
+        "pendingDate": None,
+        "closedDate": None,
+        "createdDate": NOW,
+        "templateId": None,
+        "permissions": {"type": "everyone", "userIds": [], "groupIds": []},
+        "blockedUsers": [],
+        "relationships": [],
+        "customFields": {},
+        "billing": {
+            "billable": True, "method": "hourly", "currency": "USD",
+            "rates": [], "budget": 0, "budgetUsed": 0, "trustBalance": 0,
+            "minimumTrust": 0, "contingencyFee": None, "flatRate": None,
+        },
+        "personalInjury": None,
+        "notifications": [],
+        "documentFolders": [],
+        "reports": {"useFirmSettings": True, "originatingPct": 50, "responsiblePct": 50},
+        "deleted": False, "deletedAt": None,
+    })
+
+
+def solve_task_h48(state):
+    """Gonzalez divorce settlement: $175K recovery, 25% fee, $12K child support lien."""
+    m = find_matter_by_desc(state, "Gonzalez", "Divorce")
+    settlement = ensure_settlement(state, m["id"])
+    settlement["recoveries"].append({
+        "id": f"rec_{len(settlement['recoveries']) + 1}",
+        "amount": 175000,
+        "sourceContactId": None,
+        "sourceName": "Divorce settlement",
+    })
+    settlement["legalFees"].append({
+        "id": f"lf_{len(settlement['legalFees']) + 1}",
+        "recoveryId": None,
+        "recipientId": m["responsibleAttorneyId"],
+        "rate": 25,
+        "percentage": 25,
+        "flatAmount": 0,
+        "discount": 0,
+        "referralFees": [],
+    })
+    settlement["nonMedicalLiens"].append({
+        "id": f"nml_{len(settlement['nonMedicalLiens']) + 1}",
+        "holderContactId": None,
+        "description": "Child support lien",
+        "amount": 12000,
+        "reduction": 0,
+    })
+
+
+def solve_task_h49(state):
+    """Most recently opened PI matter: add $30K special damage, move to Investigation."""
+    pi_open = [
+        m for m in state["matters"]
+        if m["practiceAreaId"] == "pa_1" and m.get("openDate")
+    ]
+    most_recent = max(pi_open, key=lambda m: m["openDate"])
+    did = next_damage_id(state)
+    state["damages"].append({
+        "id": f"dmg_{did}",
+        "matterId": most_recent["id"],
+        "name": "Emergency medical treatment",
+        "amount": 30000,
+        "type": "special",
+        "date": None,
+        "notes": "",
+        "createdDate": NOW,
+        "updatedDate": NOW,
+    })
+    most_recent["stageId"] = "stage_1_2"
+
+
+def solve_task_h50(state):
+    """Add $10K State Farm lien to every open PI Demand matter's settlement."""
+    for m in state["matters"]:
+        if (m["practiceAreaId"] == "pa_1"
+                and m["stageId"] == "stage_1_3"
+                and m["status"] == "open"):
+            settlement = ensure_settlement(state, m["id"])
+            settlement["nonMedicalLiens"].append({
+                "id": f"nml_{len(settlement['nonMedicalLiens']) + 1}",
+                "holderContactId": "contact_58",
+                "description": "State Farm Insurance lien",
+                "amount": 10000,
+                "reduction": 0,
+            })
+
+
+def solve_task_h51(state):
+    """Matters opened before June 2024: PI→Settlement/Trial, FL→close."""
+    cutoff = "2024-06-01"
+    for m in state["matters"]:
+        if m["status"] == "open" and m.get("openDate", "9999") < cutoff:
+            if m["practiceAreaId"] == "pa_1":
+                m["stageId"] = "stage_1_5"
+            elif m["practiceAreaId"] == "pa_2":
+                m["status"] = "closed"
+                m["closedDate"] = TODAY
+
+
+def solve_task_h52(state):
+    """Brennan hotel: Investigation stage, Judge Assigned, $200K recovery."""
+    m = find_matter_by_desc(state, "Brennan", "Oceanview")
+    m["stageId"] = "stage_1_2"
+    m.setdefault("customFields", {})["cf_7"] = "Hon. Michael Rodriguez"
+    settlement = ensure_settlement(state, m["id"])
+    settlement["recoveries"].append({
+        "id": f"rec_{len(settlement['recoveries']) + 1}",
+        "amount": 200000,
+        "sourceContactId": None,
+        "sourceName": "Hotel insurance settlement",
+    })
+
+
+def solve_task_h53(state):
+    """Ababio PG&E: SF General provider, Court Case Number, $250K recovery."""
+    m = find_matter_by_desc(state, "Ababio", "Pacific Gas")
+    pid = next_provider_id(state)
+    state["medicalProviders"].append({
+        "id": f"mp_{pid}",
+        "matterId": m["id"],
+        "contactId": "contact_55",
+        "description": "SF General Hospital emergency treatment",
+        "firstTreatmentDate": None,
+        "lastTreatmentDate": None,
+        "treatmentComplete": False,
+        "recordRequestDate": None,
+        "recordFollowUpDate": None,
+        "recordStatus": "not_requested",
+        "billRequestDate": None,
+        "billFollowUpDate": None,
+        "billStatus": "not_requested",
+    })
+    m.setdefault("customFields", {})["cf_1"] = "SF-2024-PI-8821"
+    settlement = ensure_settlement(state, m["id"])
+    settlement["recoveries"].append({
+        "id": f"rec_{len(settlement['recoveries']) + 1}",
+        "amount": 250000,
+        "sourceContactId": None,
+        "sourceName": "PG&E liability settlement",
+    })
+
+
+def solve_task_h54(state):
+    """Mills motorcycle: Diana Reyes, contingency 35%, $175K recovery."""
+    m = find_matter_by_desc(state, "Mills", "Rodriguez")
+    m["responsibleAttorneyId"] = "user_3"
+    m["billingMethod"] = "contingency"
+    m["billing"]["method"] = "contingency"
+    m["billing"]["contingencyFee"] = {"userId": "user_3", "percentage": 35}
+    settlement = ensure_settlement(state, m["id"])
+    settlement["recoveries"].append({
+        "id": f"rec_{len(settlement['recoveries']) + 1}",
+        "amount": 175000,
+        "sourceContactId": None,
+        "sourceName": "Insurance settlement",
+    })
+
+
+def solve_task_h55(state):
+    """Delete FL-Divorce template, create FL-Dissolution, set as firm default."""
+    state["matterTemplates"] = [
+        t for t in state["matterTemplates"]
+        if t["name"] != "Family Law - Divorce"
+    ]
+    max_num = max(int(t["id"].split("_")[1]) for t in state["matterTemplates"])
+    template_id = f"template_{max_num + 1}"
+    state["matterTemplates"].append({
+        "id": template_id,
+        "name": "Family Law - Dissolution",
+        "isDefault": False,
+        "description": "Template for family law dissolution matters",
+        "practiceAreaId": "pa_2",
+        "billable": True,
+        "billingMethod": "hourly",
+        "deductionOrder": None,
+        "customFields": {},
+        "documentFolders": [],
+        "createdDate": NOW,
+    })
+    state["firmSettings"]["defaultTemplateId"] = template_id
+
+
+def solve_task_h56(state):
+    """Whitfield BART: contingency 40%, custom fields, Investigation stage."""
+    m = find_matter_by_desc(state, "Whitfield", "Bay Area Rapid Transit")
+    m["billingMethod"] = "contingency"
+    m["billing"]["method"] = "contingency"
+    m["billing"]["contingencyFee"] = {"userId": m["responsibleAttorneyId"], "percentage": 40}
+    m.setdefault("customFields", {})["cf_1"] = "SF-2025-PI-1212"
+    m["customFields"]["cf_7"] = "Hon. Patricia Chen"
+    m["stageId"] = "stage_1_2"
+
+
+def solve_task_h57(state):
+    """Doyle scaffolding + Mills motorcycle: $5K outstanding balance each."""
+    for desc_kws in [("Doyle", "Summit"), ("Mills", "Rodriguez")]:
+        m = find_matter_by_desc(state, *desc_kws)
+        settlement = ensure_settlement(state, m["id"])
+        settlement["outstandingBalances"].append({
+            "id": f"ob_{len(settlement['outstandingBalances']) + 1}",
+            "responsibility": "client",
+            "holderContactId": "contact_57",
+            "description": "Pacific Physical Therapy Center balance",
+            "balanceOwing": 5000,
+            "originalAmount": 5000,
+            "reduction": 0,
+        })
+
+
+def solve_task_h58(state):
+    """Create new PI matter for Angela Dimitriou with contingency + folder."""
+    mid = next_matter_id(state)
+    number = str(mid).zfill(5)
+    state["matters"].append({
+        "id": f"matter_{mid}",
+        "number": number,
+        "displayNumber": f"{number}-Dimitriou",
+        "description": "Dimitriou v. City of Oakland - Sidewalk fall",
+        "status": "open",
+        "billingMethod": "contingency",
+        "clientId": "contact_53",
+        "responsibleAttorneyId": "user_3",
+        "originatingAttorneyId": None,
+        "responsibleStaffId": None,
+        "clientReferenceNumber": "",
+        "location": "",
+        "practiceAreaId": "pa_1",
+        "stageId": None,
+        "openDate": TODAY,
+        "pendingDate": None,
+        "closedDate": None,
+        "createdDate": NOW,
+        "templateId": None,
+        "permissions": {"type": "everyone", "userIds": [], "groupIds": []},
+        "blockedUsers": [],
+        "relationships": [],
+        "customFields": {},
+        "billing": {
+            "billable": True, "method": "contingency", "currency": "USD",
+            "rates": [], "budget": 0, "budgetUsed": 0, "trustBalance": 0,
+            "minimumTrust": 0,
+            "contingencyFee": {"userId": "user_3", "percentage": 33.33},
+            "flatRate": None,
+        },
+        "personalInjury": {"deductionOrder": "fees_first"},
+        "notifications": [],
+        "documentFolders": [
+            {"id": f"folder_{mid}_1", "name": "Incident Photos", "category": "Evidence"},
+        ],
+        "reports": {"useFirmSettings": True, "originatingPct": 50, "responsiblePct": 50},
+        "deleted": False, "deletedAt": None,
+    })
+
+
+def solve_task_h59(state):
+    """Open EL matters: Intake→EEOC, Negotiation→Litigation."""
+    for m in state["matters"]:
+        if m["practiceAreaId"] == "pa_6" and m["status"] == "open":
+            if m["stageId"] == "stage_6_1":
+                m["stageId"] = "stage_6_2"
+            elif m["stageId"] == "stage_6_3":
+                m["stageId"] = "stage_6_4"
+
+
+def solve_task_h60(state):
+    """Washington: CAD currency, UCSF related contact, $30K CalComp lien."""
+    m = find_matter_by_desc(state, "Washington", "Pacific Steel")
+    m["billing"]["currency"] = "CAD"
+    m.setdefault("relationships", []).append({
+        "contactId": "contact_59",
+        "relationship": "Medical Provider",
+        "billRecipient": False,
+    })
+    settlement = ensure_settlement(state, m["id"])
+    settlement["nonMedicalLiens"].append({
+        "id": f"nml_{len(settlement['nonMedicalLiens']) + 1}",
+        "holderContactId": "contact_42",
+        "description": "CalComp Workers Compensation lien",
+        "amount": 30000,
+        "reduction": 0,
+    })
+
+
 # ---------------------------------------------------------------------------
 # SOLVERS dispatch map
 # ---------------------------------------------------------------------------
@@ -1568,6 +1984,13 @@ SOLVERS = {
     "task_h33": solve_task_h33, "task_h34": solve_task_h34, "task_h35": solve_task_h35,
     "task_h36": solve_task_h36, "task_h37": solve_task_h37, "task_h38": solve_task_h38,
     "task_h39": solve_task_h39, "task_h40": solve_task_h40,
+    "task_h41": solve_task_h41, "task_h42": solve_task_h42, "task_h43": solve_task_h43,
+    "task_h44": solve_task_h44, "task_h45": solve_task_h45, "task_h46": solve_task_h46,
+    "task_h47": solve_task_h47, "task_h48": solve_task_h48, "task_h49": solve_task_h49,
+    "task_h50": solve_task_h50, "task_h51": solve_task_h51, "task_h52": solve_task_h52,
+    "task_h53": solve_task_h53, "task_h54": solve_task_h54, "task_h55": solve_task_h55,
+    "task_h56": solve_task_h56, "task_h57": solve_task_h57, "task_h58": solve_task_h58,
+    "task_h59": solve_task_h59, "task_h60": solve_task_h60,
 }
 
 

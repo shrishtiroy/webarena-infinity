@@ -478,5 +478,125 @@
     "difficulty": "hard",
     "instruction": "On the Sullivan-Wright surgical error case, set up the settlement with a $450,000 recovery from Kaiser Permanente, a 40% contingency legal fee, a $35,000 health insurance subrogation lien, and a $12,000 outstanding balance for physical therapy, and change the deduction order to expenses first.",
     "verify": "tasks/task_h40.py"
+  },
+  {
+    "id": "task_h41",
+    "difficulty": "hard",
+    "instruction": "Identify the Personal Injury matter that has the highest total damages amount across all its recorded damages. Set up its settlement with a $300,000 recovery and a 33.33% contingency legal fee.",
+    "verify": "tasks/task_h41.py"
+  },
+  {
+    "id": "task_h42",
+    "difficulty": "hard",
+    "instruction": "For every open Personal Injury matter currently at the Investigation stage: if it has any recorded damages, advance it to the Demand stage. If it has no recorded damages, change its status to pending.",
+    "verify": "tasks/task_h42.py"
+  },
+  {
+    "id": "task_h43",
+    "difficulty": "hard",
+    "instruction": "Rename the Personal Injury - Auto Accident template to Personal Injury - Motor Vehicle Collision, change its billing method to hourly, and then set it as the firm's default template.",
+    "verify": "tasks/task_h43.py"
+  },
+  {
+    "id": "task_h44",
+    "difficulty": "hard",
+    "instruction": "Determine which practice area currently has the most matters in pending status. Add a new stage called Administrative Review at the end of that practice area's stage list.",
+    "verify": "tasks/task_h44.py"
+  },
+  {
+    "id": "task_h45",
+    "difficulty": "hard",
+    "instruction": "Marcus Williams is going on extended leave. Reassign all his open matters: for any Personal Injury matter at the Demand stage or beyond (Demand, Litigation, or Settlement/Trial), transfer to Robert Jackson. For all his other open matters, transfer to Diana Reyes.",
+    "verify": "tasks/task_h45.py"
+  },
+  {
+    "id": "task_h46",
+    "difficulty": "hard",
+    "instruction": "Update the matter numbering to use a slash separator with 4-digit padding. Then create a new template called Tax Law - Audit Defense for the Tax Law practice area with hourly billing.",
+    "verify": "tasks/task_h46.py"
+  },
+  {
+    "id": "task_h47",
+    "difficulty": "hard",
+    "instruction": "Create a new practice area called Maritime Law with three stages: Investigation, Filing, and Arbitration. Then create a new matter under Maritime Law for client Andrew Kim with description Kim Maritime Shipping Dispute and hourly billing.",
+    "verify": "tasks/task_h47.py"
+  },
+  {
+    "id": "task_h48",
+    "difficulty": "hard",
+    "instruction": "Set up a settlement for the Gonzalez divorce case — not the paternity matter or any other Gonzalez case. Add a $175,000 recovery, a 25% legal fee, and a $12,000 child support non-medical lien.",
+    "verify": "tasks/task_h48.py"
+  },
+  {
+    "id": "task_h49",
+    "difficulty": "hard",
+    "instruction": "Find the Personal Injury matter that was opened most recently. Add a $30,000 special damage for emergency medical treatment and move the matter to the Investigation stage.",
+    "verify": "tasks/task_h49.py"
+  },
+  {
+    "id": "task_h50",
+    "difficulty": "hard",
+    "instruction": "For every open Personal Injury matter currently at the Demand stage, add a $10,000 non-medical lien from State Farm Insurance to its settlement.",
+    "verify": "tasks/task_h50.py"
+  },
+  {
+    "id": "task_h51",
+    "difficulty": "hard",
+    "instruction": "For all open matters that were opened before June 2024: if the matter is a Personal Injury case, move it to the Settlement/Trial stage. If it is a Family Law case, close it. Leave matters in all other practice areas unchanged.",
+    "verify": "tasks/task_h51.py"
+  },
+  {
+    "id": "task_h52",
+    "difficulty": "hard",
+    "instruction": "On the Brennan hotel slip-and-fall case, advance it from Intake to the Investigation stage, set the Judge Assigned custom field to Hon. Michael Rodriguez, and add a $200,000 recovery to its settlement.",
+    "verify": "tasks/task_h52.py"
+  },
+  {
+    "id": "task_h53",
+    "difficulty": "hard",
+    "instruction": "On the Ababio v. Pacific Gas & Electric electrical shock case, add SF General Hospital as a medical provider, set the Court Case Number custom field to SF-2024-PI-8821, and add a $250,000 recovery to its settlement.",
+    "verify": "tasks/task_h53.py"
+  },
+  {
+    "id": "task_h54",
+    "difficulty": "hard",
+    "instruction": "On the Mills v. Rodriguez motorcycle collision case, change the responsible attorney to Diana Reyes, switch the billing to contingency at 35%, and add a $175,000 recovery to the settlement.",
+    "verify": "tasks/task_h54.py"
+  },
+  {
+    "id": "task_h55",
+    "difficulty": "hard",
+    "instruction": "Delete the Family Law - Divorce template. Create a replacement template called Family Law - Dissolution for the Family Law practice area with hourly billing. Then set this new template as the firm's default.",
+    "verify": "tasks/task_h55.py"
+  },
+  {
+    "id": "task_h56",
+    "difficulty": "hard",
+    "instruction": "On the Whitfield v. BART escalator injury case, change the billing to contingency at 40%, set the Court Case Number custom field to SF-2025-PI-1212 and the Judge Assigned custom field to Hon. Patricia Chen, and move it to the Investigation stage.",
+    "verify": "tasks/task_h56.py"
+  },
+  {
+    "id": "task_h57",
+    "difficulty": "hard",
+    "instruction": "On both the Doyle scaffolding fall case and the Mills motorcycle collision case, add a $5,000 outstanding balance owed to Pacific Physical Therapy Center to each of their settlements.",
+    "verify": "tasks/task_h57.py"
+  },
+  {
+    "id": "task_h58",
+    "difficulty": "hard",
+    "instruction": "Create a new Personal Injury matter for client Angela Dimitriou with description Dimitriou v. City of Oakland - Sidewalk fall. Assign Diana Reyes as responsible attorney, use contingency billing at 33.33%, and add a document folder named Incident Photos.",
+    "verify": "tasks/task_h58.py"
+  },
+  {
+    "id": "task_h59",
+    "difficulty": "hard",
+    "instruction": "For all open Employment Law matters: if the matter is at the Intake stage, advance it to EEOC/Admin Filing. If the matter is at the Negotiation stage, advance it to Litigation. Leave matters at other stages unchanged.",
+    "verify": "tasks/task_h59.py"
+  },
+  {
+    "id": "task_h60",
+    "difficulty": "hard",
+    "instruction": "On the Washington v. Pacific Steel workplace injury case, change the billing currency to Canadian Dollars, add UCSF Medical Center as a related contact with the Medical Provider relationship, and add a $30,000 non-medical lien from CalComp Workers Compensation to the settlement.",
+    "verify": "tasks/task_h60.py"
   }
 ]
