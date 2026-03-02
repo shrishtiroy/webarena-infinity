@@ -1,0 +1,277 @@
+[
+  {
+    "id": "task_1",
+    "instruction": "Disable the 'Klaviyo: Email Marketing & SMS' app.",
+    "verify": "function-tasks/task_1.py"
+  },
+  {
+    "id": "task_2",
+    "instruction": "Enable the 'SEO Manager' app.",
+    "verify": "function-tasks/task_2.py"
+  },
+  {
+    "id": "task_3",
+    "instruction": "Remove the 'Hotjar Heatmaps & Recordings' app.",
+    "verify": "function-tasks/task_3.py"
+  },
+  {
+    "id": "task_4",
+    "instruction": "Disable the 'Recharge Subscriptions' app.",
+    "verify": "function-tasks/task_4.py"
+  },
+  {
+    "id": "task_5",
+    "instruction": "Enable the 'Infinite Options' app.",
+    "verify": "function-tasks/task_5.py"
+  },
+  {
+    "id": "task_6",
+    "instruction": "Remove the 'Back in Stock Alerts' app.",
+    "verify": "function-tasks/task_6.py"
+  },
+  {
+    "id": "task_7",
+    "instruction": "Disable the 'Privy \u2011 Pop Ups, Email, & SMS' app.",
+    "verify": "function-tasks/task_7.py"
+  },
+  {
+    "id": "task_8",
+    "instruction": "Remove the 'Bold Product Options' app.",
+    "verify": "function-tasks/task_8.py"
+  },
+  {
+    "id": "task_9",
+    "instruction": "Activate the 'Pinterest Tag' in the tag manager.",
+    "verify": "function-tasks/task_9.py"
+  },
+  {
+    "id": "task_10",
+    "instruction": "Deactivate the 'Google Analytics 4' tag in the tag manager.",
+    "verify": "function-tasks/task_10.py"
+  },
+  {
+    "id": "task_11",
+    "instruction": "Remove the 'Snapchat Pixel' tag from the tag manager.",
+    "verify": "function-tasks/task_11.py"
+  },
+  {
+    "id": "task_12",
+    "instruction": "Activate the 'Lucky Orange' tag in the tag manager.",
+    "verify": "function-tasks/task_12.py"
+  },
+  {
+    "id": "task_13",
+    "instruction": "Deactivate the 'Hotjar Tracking' tag in the tag manager.",
+    "verify": "function-tasks/task_13.py"
+  },
+  {
+    "id": "task_14",
+    "instruction": "Remove the 'Affirm Messaging' tag from the tag manager.",
+    "verify": "function-tasks/task_14.py"
+  },
+  {
+    "id": "task_15",
+    "instruction": "Publish the 'Dawn (backup)' theme.",
+    "verify": "function-tasks/task_15.py"
+  },
+  {
+    "id": "task_16",
+    "instruction": "Publish the 'Prestige' theme.",
+    "verify": "function-tasks/task_16.py"
+  },
+  {
+    "id": "task_17",
+    "instruction": "Disable animations on the 'Horizon - Outdoors' theme.",
+    "verify": "function-tasks/task_17.py"
+  },
+  {
+    "id": "task_18",
+    "instruction": "Enable page transitions on the 'Horizon - Outdoors' theme.",
+    "verify": "function-tasks/task_18.py"
+  },
+  {
+    "id": "task_19",
+    "instruction": "Disable animations on the 'Prestige' theme.",
+    "verify": "function-tasks/task_19.py"
+  },
+  {
+    "id": "task_20",
+    "instruction": "Enable animations on the 'Dawn (backup)' theme.",
+    "verify": "function-tasks/task_20.py"
+  },
+  {
+    "id": "task_21",
+    "instruction": "Disable page transitions on the 'Prestige' theme.",
+    "verify": "function-tasks/task_21.py"
+  },
+  {
+    "id": "task_22",
+    "instruction": "Increase the number of sections on the homepage for the 'Horizon - Outdoors' theme by 1.",
+    "verify": "function-tasks/task_22.py"
+  },
+  {
+    "id": "task_23",
+    "instruction": "Decrease the number of sections on the product page for the 'Horizon - Outdoors' theme by 1.",
+    "verify": "function-tasks/task_23.py"
+  },
+  {
+    "id": "task_24",
+    "instruction": "Increase the number of sections on the blog page for the 'Prestige' theme by 1.",
+    "verify": "function-tasks/task_24.py"
+  },
+  {
+    "id": "task_25",
+    "instruction": "Decrease the number of sections on the homepage for the 'Prestige' theme by 1.",
+    "verify": "function-tasks/task_25.py"
+  },
+  {
+    "id": "task_26",
+    "instruction": "Increase the number of sections on the cart page for the 'Dawn (backup)' theme by 1.",
+    "verify": "function-tasks/task_26.py"
+  },
+  {
+    "id": "task_27",
+    "instruction": "Decrease the number of sections on the collection page for the 'Dawn (backup)' theme by 1.",
+    "verify": "function-tasks/task_27.py"
+  },
+  {
+    "id": "task_28",
+    "instruction": "Mark the recommendation 'Reduce the impact of third-party scripts' as resolved.",
+    "verify": "function-tasks/task_28.py"
+  },
+  {
+    "id": "task_29",
+    "instruction": "Dismiss the recommendation 'Optimize large hero images on homepage'.",
+    "verify": "function-tasks/task_29.py"
+  },
+  {
+    "id": "task_30",
+    "instruction": "Reopen the recommendation 'Audit tag manager for unused tags'.",
+    "verify": "function-tasks/task_30.py"
+  },
+  {
+    "id": "task_31",
+    "instruction": "Mark the recommendation 'Reserve space for Privy pop-up banner' as resolved.",
+    "verify": "function-tasks/task_31.py"
+  },
+  {
+    "id": "task_32",
+    "instruction": "Dismiss the recommendation 'Reduce homepage sections'.",
+    "verify": "function-tasks/task_32.py"
+  },
+  {
+    "id": "task_33",
+    "instruction": "Mark the recommendation 'Evaluate Privy pop-up timing' as resolved.",
+    "verify": "function-tasks/task_33.py"
+  },
+  {
+    "id": "task_34",
+    "instruction": "Dismiss the recommendation 'Preload web fonts'.",
+    "verify": "function-tasks/task_34.py"
+  },
+  {
+    "id": "task_35",
+    "instruction": "Change the date range filter to 'Last 30 days'.",
+    "verify": "function-tasks/task_35.py"
+  },
+  {
+    "id": "task_36",
+    "instruction": "Change the date range filter to 'Today'.",
+    "verify": "function-tasks/task_36.py"
+  },
+  {
+    "id": "task_37",
+    "instruction": "Change the device filter to 'Mobile'.",
+    "verify": "function-tasks/task_37.py"
+  },
+  {
+    "id": "task_38",
+    "instruction": "Change the device filter to 'Desktop'.",
+    "verify": "function-tasks/task_38.py"
+  },
+  {
+    "id": "task_39",
+    "instruction": "In the Performance Settings page, change the date grouping to 'Weekly'.",
+    "verify": "function-tasks/task_39.py"
+  },
+  {
+    "id": "task_40",
+    "instruction": "In the Performance Settings page, change the report percentile to 'P90'.",
+    "verify": "function-tasks/task_40.py"
+  },
+  {
+    "id": "task_41",
+    "instruction": "In the Performance Settings page, disable the 'Show event annotations' toggle.",
+    "verify": "function-tasks/task_41.py"
+  },
+  {
+    "id": "task_42",
+    "instruction": "In the Performance Settings page, disable the 'Compare with similar stores' toggle.",
+    "verify": "function-tasks/task_42.py"
+  },
+  {
+    "id": "task_43",
+    "instruction": "In the Performance Settings page, disable the 'Alert on poor ranking' toggle.",
+    "verify": "function-tasks/task_43.py"
+  },
+  {
+    "id": "task_44",
+    "instruction": "In the Performance Settings page, disable the 'Alert on degradation' toggle.",
+    "verify": "function-tasks/task_44.py"
+  },
+  {
+    "id": "task_45",
+    "instruction": "In the Performance Settings page, disable the 'Email alerts' toggle.",
+    "verify": "function-tasks/task_45.py"
+  },
+  {
+    "id": "task_46",
+    "instruction": "In the Performance Settings page, set the LCP threshold to 3000 ms.",
+    "verify": "function-tasks/task_46.py"
+  },
+  {
+    "id": "task_47",
+    "instruction": "In the Performance Settings page, set the INP threshold to 300 ms.",
+    "verify": "function-tasks/task_47.py"
+  },
+  {
+    "id": "task_48",
+    "instruction": "In the Performance Settings page, set the CLS threshold to 0.25.",
+    "verify": "function-tasks/task_48.py"
+  },
+  {
+    "id": "task_49",
+    "instruction": "In the Performance Settings page, set the degradation percentage to 25%.",
+    "verify": "function-tasks/task_49.py"
+  },
+  {
+    "id": "task_50",
+    "instruction": "Enable password protection for the store in the Performance Settings page.",
+    "verify": "function-tasks/task_50.py"
+  },
+  {
+    "id": "task_51",
+    "instruction": "Disable all three apps that have a 'high' performance impact: 'Recharge Subscriptions', 'Privy \u2011 Pop Ups, Email, & SMS', and 'Hotjar Heatmaps & Recordings'.",
+    "verify": "function-tasks/task_51.py"
+  },
+  {
+    "id": "task_52",
+    "instruction": "Activate all inactive tags in the tag manager: 'Pinterest Tag', 'Snapchat Pixel', and 'Lucky Orange'.",
+    "verify": "function-tasks/task_52.py"
+  },
+  {
+    "id": "task_53",
+    "instruction": "Resolve all high-priority recommendations.",
+    "verify": "function-tasks/task_53.py"
+  },
+  {
+    "id": "task_54",
+    "instruction": "In the Performance Settings page, change the date grouping to 'Monthly' and the report percentile to 'P95'.",
+    "verify": "function-tasks/task_54.py"
+  },
+  {
+    "id": "task_55",
+    "instruction": "Disable the 'Klaviyo: Email Marketing & SMS' app and then remove the 'Meta Pixel' tag from the tag manager.",
+    "verify": "function-tasks/task_55.py"
+  }
+]
