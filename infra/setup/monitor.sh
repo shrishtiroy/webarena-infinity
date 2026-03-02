@@ -11,7 +11,7 @@
 
 set -uo pipefail
 
-LAUNCH_FILE="/tmp/mirror-mirror-launch.env"
+LAUNCH_FILES=()
 WATCH=false
 INTERVAL=60
 
@@ -26,28 +26,40 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --launch-file)
-      LAUNCH_FILE="$2"
+      LAUNCH_FILES+=("$2")
       shift 2
       ;;
     *)
-      echo "Usage: bash infra/setup/monitor.sh [--watch [SECONDS]] [--launch-file FILE]"
+      echo "Usage: bash infra/setup/monitor.sh [--watch [SECONDS]] [--launch-file FILE ...]"
       exit 1
       ;;
   esac
 done
 
-if [ ! -f "$LAUNCH_FILE" ]; then
-  echo "ERROR: Launch file not found: $LAUNCH_FILE"
-  echo "Run launch.sh first."
+# Auto-discover launch files if none specified
+if [ ${#LAUNCH_FILES[@]} -eq 0 ]; then
+  for f in /tmp/mirror-mirror-launch*.env; do
+    [ -f "$f" ] && LAUNCH_FILES+=("$f")
+  done
+fi
+
+if [ ${#LAUNCH_FILES[@]} -eq 0 ]; then
+  echo "ERROR: No launch files found. Run launch.sh first."
   exit 1
 fi
 
-source "$LAUNCH_FILE"
+# Merge INSTANCE_IDS from all launch files
+ALL_INSTANCE_IDS=""
+for lf in "${LAUNCH_FILES[@]}"; do
+  source "$lf"
+  ALL_INSTANCE_IDS="$ALL_INSTANCE_IDS $INSTANCE_IDS"
+done
+INSTANCE_IDS="$ALL_INSTANCE_IDS"
 KEY_PAIR="${KEY_PAIR:-${KEY_PAIR_NAME:-}}"
 REGION="${REGION:-${AWS_REGION:-us-east-1}}"
 
 if [ -z "$KEY_PAIR" ]; then
-  echo "ERROR: KEY_PAIR not set (check $LAUNCH_FILE or set KEY_PAIR_NAME)"
+  echo "ERROR: KEY_PAIR not set (check launch files or set KEY_PAIR_NAME)"
   exit 1
 fi
 
@@ -78,7 +90,7 @@ check_status() {
 
     # Check if setup is complete
     SETUP_DONE=$(ssh -i "$HOME/.ssh/${KEY_PAIR}.pem" \
-      -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=yes \
+      -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 -o BatchMode=yes \
       "ec2-user@${IP}" "test -f ~/.setup-complete && echo yes || echo no" 2>/dev/null || echo "unreachable")
 
     if [ "$SETUP_DONE" = "unreachable" ]; then
@@ -93,7 +105,7 @@ check_status() {
 
     # Read pipeline status from log
     STATUS=$(ssh -i "$HOME/.ssh/${KEY_PAIR}.pem" \
-      -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=yes \
+      -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 -o BatchMode=yes \
       "ec2-user@${IP}" '
       LOG="/tmp/mirror-mirror-logs/pipeline.log"
       if [ ! -f "$LOG" ]; then
@@ -102,7 +114,7 @@ check_status() {
       fi
 
       # Check if pipeline is running
-      if pgrep -f "infra/pipeline.py" > /dev/null 2>&1; then
+      if pgrep -f "infra/pipeline[.]py" > /dev/null 2>&1; then
         RUNNING="RUNNING"
       else
         RUNNING="STOPPED"

@@ -140,10 +140,9 @@ for (( batch=0; batch<NUM_BATCHES; batch++ )); do
   done < "$BATCH_MANIFEST"
   echo ""
 
-  # Launch this batch
-  bash infra/setup/launch.sh --manifest "$BATCH_MANIFEST" "${LAUNCH_ARGS[@]}"
-
-  LAUNCH_FILE="/tmp/mirror-mirror-launch.env"
+  # Launch this batch (unique launch file per batch)
+  LAUNCH_FILE="/tmp/mirror-mirror-launch-batch${batch_num}.env"
+  bash infra/setup/launch.sh --manifest "$BATCH_MANIFEST" --launch-file "$LAUNCH_FILE" "${LAUNCH_ARGS[@]}"
 
   # Wait for all pipelines to complete
   echo ""
@@ -165,8 +164,9 @@ for (( batch=0; batch<NUM_BATCHES; batch++ )); do
   echo "=== Tearing down batch $batch_num ==="
   bash infra/setup/teardown.sh --release-eips
 
-  # Cleanup temp manifest
+  # Cleanup temp files
   rm -f "$BATCH_MANIFEST"
+  rm -f "$LAUNCH_FILE"
 
   echo ""
   if [ "$batch_num" -lt "$NUM_BATCHES" ]; then
