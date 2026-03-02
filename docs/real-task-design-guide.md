@@ -68,14 +68,14 @@ Design tasks with these constraints in mind. Every required action must be achie
 
 ## Task Schema
 
-Each task is a JSON object in `tasks.json`:
+Each task is a JSON object in `real-tasks.json`:
 
 ```json
 {
   "id": "task_e1",
   "difficulty": "easy",
   "instruction": "Turn off desktop notifications.",
-  "verify": "tasks/task_e1.py"
+  "verify": "real-tasks/task_e1.py"
 }
 ```
 

@@ -14,10 +14,10 @@ This module contains an evaluation harness used to measure a browser agent’s p
 For each web application (`./{web-app-name}`):
 
 - Task definitions are located at:  
-  ./{web-app-name}/tasks.json
+  ./{web-app-name}/real-tasks.json
 
-- Task verifiers are located at:  
-  ./{web-app-name}/tasks/task*.py
+- Task verifiers are located at:
+  ./{web-app-name}/real-tasks/task*.py
 
 Each `task*.py` file contains the logic required to verify whether the agent successfully completed the task.
 
@@ -26,7 +26,7 @@ Each `task*.py` file contains the logic required to verify whether the agent suc
 ## 3. Agent
 
 The agent is implemented using a browser automation framework ("browser use").  
-It interacts with the web applications to complete tasks defined in `tasks.json`.
+It interacts with the web applications to complete tasks defined in `real-tasks.json`.
 
 ---
 

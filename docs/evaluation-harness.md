@@ -71,7 +71,7 @@ By default, results are written to `{web-app}/results/`. Override with `--output
 
 ## Key Functions in `evaluation/tasks.py`
 
-- `load_tasks(web_app_dir)` — reads `{web_app_dir}/tasks.json`
+- `load_tasks(web_app_dir)` — reads `{web_app_dir}/real-tasks.json`
 - `filter_tasks(tasks, task_id, difficulty)` — filter by id or difficulty
 - `load_verifier(web_app_dir, verify_path)` — dynamic import of verifier module
 - `reset_state(server_url)` — POST /api/reset
@@ -89,7 +89,7 @@ By default, results are written to `{web-app}/results/`. Override with `--output
    ```bash
    python evaluation/run_eval.py --model gpt --web-app my-new-app
    ```
-3. The harness auto-discovers tasks from `{app-name}/tasks.json`
+3. The harness auto-discovers tasks from `{app-name}/real-tasks.json`
 
 ## Docker Scaling
 

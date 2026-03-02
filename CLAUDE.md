@@ -81,7 +81,7 @@ pipeline.py (one instance per environment)
 ├─ Phase 4: Task Hardening (N rounds, --hardening-rounds)
 │   └─ Per round:
 │       ├─ 4a: Analyze agent behavior + generate harder tasks (Claude)
-│       │   └─ Reads history.json from results/, appends to tasks.json
+│       │   └─ Reads history.json from results/, appends to real-tasks.json
 │       │   └─ Sanity check (fix if needed, revert if irrecoverable) → commit
 │       └─ 4b: Eval-Audit loop (new tasks only, via --task-id filter)
 │           └─ eval → audit failures (Claude) → sanity check → commit
@@ -109,8 +109,8 @@ Each app exposes a standard HTTP API consumed by the evaluation harness:
 ├── index.html         # Entry point
 ├── js/                # app.js, state.js, views.js, components.js, data.js
 ├── css/styles.css
-├── tasks.json         # 24 tasks: 8 easy, 8 medium, 8 hard
-├── tasks/             # Verifier scripts (task_e1.py .. task_h8.py)
+├── real-tasks.json    # 24 tasks: 8 easy, 8 medium, 8 hard
+├── real-tasks/        # Verifier scripts (task_e1.py .. task_h8.py)
 ├── sanity_check.py    # Automated verifier validation
 ├── Dockerfile
 └── results/           # Evaluation output per model run
@@ -118,7 +118,7 @@ Each app exposes a standard HTTP API consumed by the evaluation harness:
 
 ### Verifier Pattern
 
-Each `tasks/task_*.py` exports `verify(server_url: str) -> tuple[bool, str]`. Verifiers read `/api/state` and check conditions — they never interact with the UI.
+Each `real-tasks/task_*.py` exports `verify(server_url: str) -> tuple[bool, str]`. Verifiers read `/api/state` and check conditions — they never interact with the UI.
 
 ### Key Design Constraints for Apps
 

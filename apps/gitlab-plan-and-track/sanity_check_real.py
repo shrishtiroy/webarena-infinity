@@ -26,7 +26,7 @@ from pathlib import Path
 import requests
 
 APP_DIR = Path(__file__).resolve().parent
-TASKS_FILE = APP_DIR / "tasks.json"
+TASKS_FILE = APP_DIR / "real-tasks.json"
 
 # JS snippet to evaluate data.js and emit the seed state as JSON
 _SEED_STATE_JS = """
@@ -2610,7 +2610,7 @@ def stop_server(proc):
 # ── task runner ──────────────────────────────────────────────────────
 
 def load_tasks():
-    """Load task definitions from tasks.json."""
+    """Load task definitions from real-tasks.json."""
     with open(TASKS_FILE) as f:
         return json.load(f)
 

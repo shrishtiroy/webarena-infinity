@@ -16,14 +16,14 @@ The server serves both the static website and the API endpoints. The browser age
 
 ## Task Definitions
 
-All tasks are defined in `tasks.json` at the project root:
+All tasks are defined in `real-tasks.json` at the project root:
 
 ```json
 {
   "id": "task_e1",
   "difficulty": "easy",
   "instruction": "Natural language instruction for the agent.",
-  "verify": "tasks/task_e1.py"
+  "verify": "real-tasks/task_e1.py"
 }
 ```
 

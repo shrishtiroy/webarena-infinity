@@ -28,7 +28,7 @@ import requests
 
 
 def load_tasks(app_dir):
-    with open(Path(app_dir) / "tasks.json") as f:
+    with open(Path(app_dir) / "real-tasks.json") as f:
         return json.load(f)
 
 
@@ -196,8 +196,8 @@ def main():
     args = parser.parse_args()
 
     app_dir = Path(args.app_dir).resolve()
-    if not (app_dir / "tasks.json").exists():
-        print(f"Error: {app_dir / 'tasks.json'} not found.")
+    if not (app_dir / "real-tasks.json").exists():
+        print(f"Error: {app_dir / 'real-tasks.json'} not found.")
         sys.exit(1)
 
     server_url = f"http://localhost:{args.port}"

@@ -2,7 +2,7 @@
 In-browser test panel support.
 
 Call ``patch_handler_for_test_mode(handler_class, app_dir)`` to add:
-  GET  /api/tasks      — serves tasks.json
+  GET  /api/tasks      — serves real-tasks.json
   POST /api/verify     — runs a verifier, returns {task_id, passed, message}
   GET  /test_panel.js  — serves the test-panel UI script
   GET  / | /index.html — injects the panel <script> tag before </body>
@@ -21,9 +21,9 @@ def patch_handler_for_test_mode(handler_class, app_dir):
     """Monkey-patch *handler_class* to serve the test panel and verifier API."""
 
     app_dir = str(Path(app_dir).resolve())
-    tasks_json_path = os.path.join(app_dir, "tasks.json")
+    tasks_json_path = os.path.join(app_dir, "real-tasks.json")
 
-    # Cache tasks.json contents
+    # Cache real-tasks.json contents
     with open(tasks_json_path) as f:
         tasks_payload = f.read().encode()
 

@@ -11,7 +11,7 @@ Browse the subdirectories for history.json files from passed tasks to understand
 
 1. **Analyze the app.** Read the app code under `apps/{app-name}/` (index.html, js/, css/) to understand all UI features, navigation paths, and available actions.
 
-2. **Review existing tasks.** Read `apps/{app-name}/tasks.json` to see what's already covered. Do NOT modify existing tasks, verifiers, or solvers.
+2. **Review existing tasks.** Read `apps/{app-name}/real-tasks.json` to see what's already covered. Do NOT modify existing tasks, verifiers, or solvers.
 
 3. **Analyze agent behavior.** Browse `{results_path}` for history.json files from tasks that passed — especially those that passed easily (few steps, low elapsed time). Identify patterns the agent relies on and strategies it uses.
 
@@ -28,9 +28,9 @@ Browse the subdirectories for history.json files from passed tasks to understand
 
 5. **Continue task IDs** from the highest existing ID number. Never reuse an existing task ID.
 
-6. **Append** new tasks to `apps/{app-name}/tasks.json`. Do not remove or modify existing entries.
+6. **Append** new tasks to `apps/{app-name}/real-tasks.json`. Do not remove or modify existing entries.
 
-7. **Create verifiers** in `apps/{app-name}/tasks/` following the patterns in existing verifiers and `docs/real-task-design-guide.md`.
+7. **Create verifiers** in `apps/{app-name}/real-tasks/` following the patterns in existing verifiers and `docs/real-task-design-guide.md`.
 
 8. **Add solvers** to `apps/{app-name}/sanity_check_real.py` following `docs/verifier-sanity-check.md`. Each solver must programmatically produce the state that makes its verifier pass.
 

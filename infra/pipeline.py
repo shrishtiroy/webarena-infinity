@@ -254,7 +254,7 @@ def find_latest_results(app_dir: str | Path, task_suite: str) -> Path | None:
     if not results_dir.is_dir():
         return None
 
-    suite_tag = f"_{task_suite}" if task_suite != "tasks" else ""
+    suite_tag = f"_{task_suite}" if task_suite != "real-tasks" else ""
 
     # Find directories matching the pattern: {model}_{timestamp}{suite_tag}_parallel
     candidates = []
@@ -280,7 +280,7 @@ def find_partial_results(app_dir: str | Path, task_suite: str) -> Path | None:
     if not results_dir.is_dir():
         return None
 
-    suite_tag = f"_{task_suite}" if task_suite != "tasks" else ""
+    suite_tag = f"_{task_suite}" if task_suite != "real-tasks" else ""
 
     candidates = []
     for d in results_dir.iterdir():
@@ -546,7 +546,7 @@ def clear_state(app_name: str) -> None:
 
 
 def load_task_ids(tasks_file: Path) -> set[str]:
-    """Read tasks.json and return the set of task IDs."""
+    """Read real-tasks.json and return the set of task IDs."""
     if not tasks_file.exists():
         return set()
     with open(tasks_file) as f:
@@ -1036,7 +1036,7 @@ def main() -> None:
 
                 results_dir = run_eval(
                     app_dir,
-                    "tasks",
+                    "real-tasks",
                     args.model,
                     args.workers,
                     args.repetitions,
@@ -1121,7 +1121,7 @@ def main() -> None:
                 )
 
                 # Snapshot current task IDs before generation
-                known_ids = load_task_ids(app_dir / "tasks.json")
+                known_ids = load_task_ids(app_dir / "real-tasks.json")
 
                 # Build analysis from most comprehensive eval results
                 analysis = build_hardening_analysis(app_dir)
@@ -1145,7 +1145,7 @@ def main() -> None:
                     break
 
                 # Identify newly added task IDs
-                new_ids = get_new_task_ids(app_dir / "tasks.json", known_ids)
+                new_ids = get_new_task_ids(app_dir / "real-tasks.json", known_ids)
                 if not new_ids:
                     log.info("No new tasks generated — stopping hardening")
                     break
@@ -1193,7 +1193,7 @@ def main() -> None:
 
             results_dir = run_eval(
                 app_dir,
-                "tasks",
+                "real-tasks",
                 args.model,
                 args.workers,
                 args.repetitions,
@@ -1219,7 +1219,7 @@ def main() -> None:
                 audit_filter = ",".join(sorted(unaudited_ids))
                 results_dir = run_eval(
                     app_dir,
-                    "tasks",
+                    "real-tasks",
                     args.model,
                     args.workers,
                     args.repetitions,
@@ -1273,7 +1273,7 @@ def main() -> None:
                         # Re-eval all hardening tasks
                         results_dir = run_eval(
                             app_dir,
-                            "tasks",
+                            "real-tasks",
                             args.model,
                             args.workers,
                             args.repetitions,
@@ -1296,7 +1296,7 @@ def main() -> None:
                 log.info("Running full suite eval to check overall pass rate")
                 full_results_dir = run_eval(
                     app_dir,
-                    "tasks",
+                    "real-tasks",
                     args.model,
                     args.workers,
                     args.repetitions,
@@ -1343,12 +1343,12 @@ def main() -> None:
             )
 
         # Eval all real tasks (original + hardening)
-        tasks_file = app_dir / "tasks.json"
+        tasks_file = app_dir / "real-tasks.json"
         if tasks_file.exists():
             log.info("Phase 5: Evaluating real tasks (full suite)")
             real_results_dir = run_eval(
                 app_dir,
-                "tasks",
+                "real-tasks",
                 args.model,
                 args.workers,
                 args.repetitions,

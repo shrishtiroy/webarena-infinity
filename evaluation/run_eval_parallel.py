@@ -486,8 +486,8 @@ async def main():
     parser.add_argument("--output-dir", default=None,
                         help="Results directory (default: <web-app>/results)")
     parser.add_argument("--web-app", default="apps/gitlab-org-management")
-    parser.add_argument("--task-suite", default="tasks",
-                        help="Task suite name, e.g. 'tasks' or 'tasks-function-test' (loads <name>.json)")
+    parser.add_argument("--task-suite", default="real-tasks",
+                        help="Task suite name, e.g. 'real-tasks' or 'function-tasks' (loads <name>.json)")
     # Multi-run arguments
     parser.add_argument("--repetitions", type=int, default=1,
                         help="Number of times to repeat the evaluation (default: 1). "
@@ -525,7 +525,7 @@ async def main():
             )
         else:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            suite_tag = f"_{args.task_suite}" if args.task_suite != "tasks" else ""
+            suite_tag = f"_{args.task_suite}" if args.task_suite != "real-tasks" else ""
             run_dir = Path(output_dir) / f"{args.model}_{timestamp}{suite_tag}_parallel"
             run_dir.mkdir(parents=True, exist_ok=True)
             results, _ = await run_single_eval(tasks, args, run_dir, web_app_dir)
@@ -560,7 +560,7 @@ async def main():
         timestamp = parts[1] if len(parts) > 1 else datetime.now().strftime("%Y%m%d_%H%M%S")
     else:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        suite_tag = f"_{args.task_suite}" if args.task_suite != "tasks" else ""
+        suite_tag = f"_{args.task_suite}" if args.task_suite != "real-tasks" else ""
         parent_dir = Path(output_dir) / f"{args.model}_{timestamp}{suite_tag}_parallel"
     parent_dir.mkdir(parents=True, exist_ok=True)
 

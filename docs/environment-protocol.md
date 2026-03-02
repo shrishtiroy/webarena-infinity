@@ -7,8 +7,8 @@ Every new web application must follow this structure and API contract to work wi
 ```
 {app-name}/
 ├── server.py           # HTTP server with standard API (see below)
-├── tasks.json          # Task definitions (see format below)
-├── tasks/              # Verifier scripts (one .py per task)
+├── real-tasks.json     # Task definitions (see format below)
+├── real-tasks/         # Verifier scripts (one .py per task)
 │   ├── task_e1.py
 │   ├── task_e2.py
 │   └── ...
@@ -54,7 +54,7 @@ _clients_lock = threading.Lock()
 python server.py --port PORT   # Default: 8000
 ```
 
-## Task Definition Format (tasks.json)
+## Task Definition Format (real-tasks.json)
 
 ```json
 [
@@ -62,7 +62,7 @@ python server.py --port PORT   # Default: 8000
     "id": "task_e1",
     "difficulty": "easy",
     "instruction": "Human-readable task description for the agent.",
-    "verify": "tasks/task_e1.py"
+    "verify": "real-tasks/task_e1.py"
   }
 ]
 ```
@@ -142,10 +142,10 @@ eventSource.onmessage = (e) => {
 ```dockerfile
 FROM python:3.12-slim
 WORKDIR /app
-COPY server.py index.html tasks.json ./
+COPY server.py index.html real-tasks.json ./
 COPY js/ ./js/
 COPY css/ ./css/
-COPY tasks/ ./tasks/
+COPY real-tasks/ ./real-tasks/
 EXPOSE 8000
 CMD ["python", "server.py"]
 ```
