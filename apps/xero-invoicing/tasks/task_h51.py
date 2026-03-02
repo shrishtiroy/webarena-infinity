@@ -16,7 +16,7 @@ def verify(server_url: str) -> tuple[bool, str]:
         return False, "Could not retrieve application state."
     state = resp.json()
 
-    # INV-0049 (Coastal Living Interiors, $3,715) is the only outstanding invoice
+    # INV-0049 (Coastal Living Interiors, $2,996) is the only outstanding invoice
     # using the Simple Clean template. A copy should exist with Professional Services.
     new_inv = None
     for inv in state.get("invoices", []):
@@ -44,9 +44,9 @@ def verify(server_url: str) -> tuple[bool, str]:
         )
 
     total = float(new_inv.get("total", 0))
-    if abs(total - 3715.00) > 100.00:
+    if abs(total - 2996.00) > 100.00:
         return False, (
-            f"New invoice total is ${total:.2f}, expected ~$3,715 (copy of INV-0049)."
+            f"New invoice total is ${total:.2f}, expected ~$2,996 (copy of INV-0049)."
         )
 
     return True, (

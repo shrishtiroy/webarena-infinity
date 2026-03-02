@@ -10,7 +10,7 @@ def verify(server_url: str) -> tuple[bool, str]:
     # Overdue invoices (awaiting_payment, dueDate < 2026-03-02) with no prior payments:
     # INV-0046 (Baxter, due 2026-02-01, $6,655)
     # INV-0047 (CloudNine, due 2026-02-15, $18,652.70)
-    # INV-0049 (Coastal Living, due 2026-02-24, $3,715)
+    # INV-0049 (Coastal Living, due 2026-02-24, $2,996)
     # INV-0051 (Summit Health, due 2026-03-01, $6,060)
     #
     # INV-0045 (Pinnacle, due 2026-02-19) is overdue but has a partial payment — excluded.
@@ -18,7 +18,7 @@ def verify(server_url: str) -> tuple[bool, str]:
     expected = {
         "INV-0046": 6655.00,
         "INV-0047": 18652.70,
-        "INV-0049": 3715.00,
+        "INV-0049": 2996.00,
         "INV-0051": 6060.00,
     }
 

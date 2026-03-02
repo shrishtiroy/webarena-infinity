@@ -12,7 +12,7 @@ def verify(server_url: str) -> tuple[bool, str]:
     # 2. INV-0045: $10,890.00 (Pinnacle, partial payment already)
     # 3. INV-0046: $6,655.00 (Baxter)
     # 4. INV-0051: $6,060.00 (Summit Health)
-    # 5. INV-0049: $3,715.00 (Coastal Living)
+    # 5. INV-0049: $2,996.00 (Coastal Living)
     target_invoices = {
         "INV-0047": {"seed_paid": 0, "seed_due": 18652.70},
         "INV-0045": {"seed_paid": 4950.00, "seed_due": 10890.00},

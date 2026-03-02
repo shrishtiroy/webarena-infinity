@@ -190,7 +190,7 @@ const INVOICES = [
     { id: 'li_015', itemId: 'item_011', description: 'Widget Type A', quantity: 50, unitPrice: 24.95, discountPercent: 0, accountId: 'acc_200', taxRateId: 'tax_gst', trackingRegion: 'reg_nsw', trackingDept: 'dept_sales' },
     { id: 'li_016', itemId: 'item_012', description: 'Widget Type B - Premium', quantity: 30, unitPrice: 49.95, discountPercent: 0, accountId: 'acc_200', taxRateId: 'tax_gst', trackingRegion: 'reg_nsw', trackingDept: 'dept_sales' },
     { id: 'li_017', itemId: 'item_013', description: 'USB-C Cable 2m', quantity: 20, unitPrice: 12.50, discountPercent: 0, accountId: 'acc_200', taxRateId: 'tax_gst', trackingRegion: 'reg_nsw', trackingDept: 'dept_sales' }
-  ], subtotal: 3377.27, taxTotal: 337.73, total: 3715.00, amountDue: 3715.00, amountPaid: 0, payments: [], notes: [], sentAt: '2026-02-10T15:00:00Z', title: '', summary: '' },
+  ], subtotal: 2723.64, taxTotal: 272.36, total: 2996.00, amountDue: 2996.00, amountPaid: 0, payments: [], notes: [], sentAt: '2026-02-10T15:00:00Z', title: '', summary: '' },
 
   { id: 'inv_009', number: 'INV-0050', contactId: 'con_012', status: 'awaiting_payment', date: '2026-02-12', dueDate: '2026-03-14', reference: 'ALI-2026-Q1', currency: 'AUD', brandingThemeId: 'theme_standard', taxMode: 'exclusive', lineItems: [
     { id: 'li_018', itemId: 'item_002', description: 'Consulting - Supply Chain Optimization', quantity: 24, unitPrice: 250.00, discountPercent: 0, accountId: 'acc_260', taxRateId: 'tax_gst', trackingRegion: 'reg_vic', trackingDept: 'dept_sales' },
