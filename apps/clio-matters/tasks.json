@@ -358,5 +358,125 @@
     "difficulty": "hard",
     "instruction": "Set up the Fitzgerald medical malpractice settlement: add a $375,000 recovery, a 40% contingency legal fee, a $20,000 health insurance subrogation lien, and a $5,000 outstanding balance for follow-up care.",
     "verify": "tasks/task_h20.py"
+  },
+  {
+    "id": "task_h21",
+    "difficulty": "hard",
+    "instruction": "Find the Personal Injury matter that has the most medical providers listed and add a $50,000 general damage for long-term disability to that matter.",
+    "verify": "tasks/task_h21.py"
+  },
+  {
+    "id": "task_h22",
+    "difficulty": "hard",
+    "instruction": "For the more recently opened of the two Doyle Personal Injury cases, add a $5,000 special damage for the initial emergency room visit and change the responsible attorney to Marcus Williams.",
+    "verify": "tasks/task_h22.py"
+  },
+  {
+    "id": "task_h23",
+    "difficulty": "hard",
+    "instruction": "On the Okafor burn injury case, mark all of its medical providers as treatment complete and move the matter to the Settlement/Trial stage.",
+    "verify": "tasks/task_h23.py"
+  },
+  {
+    "id": "task_h24",
+    "difficulty": "hard",
+    "instruction": "Close all Personal Injury matters that are currently at the Intake stage and were opened before January 2025.",
+    "verify": "tasks/task_h24.py"
+  },
+  {
+    "id": "task_h25",
+    "difficulty": "hard",
+    "instruction": "Change the billing method on the Chen-Ramirez criminal case that is currently at the Arraignment stage to hourly billing with a $15,000 budget.",
+    "verify": "tasks/task_h25.py"
+  },
+  {
+    "id": "task_h26",
+    "difficulty": "hard",
+    "instruction": "Recover the two duplicate matters from the recovery bin — the TechStartup contract review and the Brennan v. Oceanview duplicate — and then close both of them.",
+    "verify": "tasks/task_h26.py"
+  },
+  {
+    "id": "task_h27",
+    "difficulty": "hard",
+    "instruction": "Find the attorney who handles the most Criminal Defense matters and create a new Criminal Defense matter for client Marcus Thompson with that attorney as responsible, using flat rate billing at $8,000.",
+    "verify": "tasks/task_h27.py"
+  },
+  {
+    "id": "task_h28",
+    "difficulty": "hard",
+    "instruction": "On the Patterson bus accident matter, add Bay Area Orthopedic Associates as a related contact with the Medical Provider relationship, and add a $2,500 outstanding balance owed to Bay Area Orthopedic Associates to the settlement.",
+    "verify": "tasks/task_h28.py"
+  },
+  {
+    "id": "task_h29",
+    "difficulty": "hard",
+    "instruction": "Reassign all of Marcus Williams' open Personal Injury matters that are at the Investigation stage to Diana Reyes and move them to the Demand stage.",
+    "verify": "tasks/task_h29.py"
+  },
+  {
+    "id": "task_h30",
+    "difficulty": "hard",
+    "instruction": "On the McCarthy pedestrian case, update the chiropractic provider's medical record status to received and the bill status to received, and set the first treatment date to October 15, 2024.",
+    "verify": "tasks/task_h30.py"
+  },
+  {
+    "id": "task_h31",
+    "difficulty": "hard",
+    "instruction": "Create a new practice area called Securities Law with stages Investigation, SEC Filing, and Litigation. Then move the Franklin securities fraud case to use this new practice area at the SEC Filing stage.",
+    "verify": "tasks/task_h31.py"
+  },
+  {
+    "id": "task_h32",
+    "difficulty": "hard",
+    "instruction": "For every Criminal Defense matter currently at the Plea Negotiation stage: if the matter is pending, change it to open; if it is open, move it to the Trial stage instead.",
+    "verify": "tasks/task_h32.py"
+  },
+  {
+    "id": "task_h33",
+    "difficulty": "hard",
+    "instruction": "Set up the Doyle scaffolding fall settlement: add a $350,000 recovery from Summit Construction Insurance, a 33.33% contingency legal fee for the responsible attorney, a $15,000 non-medical lien from State Farm Insurance, and an $8,500 outstanding balance to SF General Hospital.",
+    "verify": "tasks/task_h33.py"
+  },
+  {
+    "id": "task_h34",
+    "difficulty": "hard",
+    "instruction": "Identify the practice area that currently has the most open matters and add a new stage called Appeal at the end of its stage list.",
+    "verify": "tasks/task_h34.py"
+  },
+  {
+    "id": "task_h35",
+    "difficulty": "hard",
+    "instruction": "On the Gonzalez divorce case — not the paternity matter — add Thomas O'Brien as a notification recipient and restrict the matter's permissions to the Family Law Division group only.",
+    "verify": "tasks/task_h35.py"
+  },
+  {
+    "id": "task_h36",
+    "difficulty": "hard",
+    "instruction": "For all pending Real Estate matters, close them. For all open Real Estate matters that are at the Due Diligence stage, move them to Contract Review.",
+    "verify": "tasks/task_h36.py"
+  },
+  {
+    "id": "task_h37",
+    "difficulty": "hard",
+    "instruction": "On the Patterson bus accident case, update the first listed medical provider's record status to certified and bill status to received, then add a document folder called Settlement Documents to the matter.",
+    "verify": "tasks/task_h37.py"
+  },
+  {
+    "id": "task_h38",
+    "difficulty": "hard",
+    "instruction": "There are two Simmons Personal Injury matters. For the one with the higher budget, add a $100,000 general damage for pain and suffering. For the one with the lower budget, delete the matter.",
+    "verify": "tasks/task_h38.py"
+  },
+  {
+    "id": "task_h39",
+    "difficulty": "hard",
+    "instruction": "Create a new matter template called Medical Malpractice - Standard with contingency billing and the Medical Malpractice practice area, then set it as the firm's default template.",
+    "verify": "tasks/task_h39.py"
+  },
+  {
+    "id": "task_h40",
+    "difficulty": "hard",
+    "instruction": "On the Sullivan-Wright surgical error case, set up the settlement with a $450,000 recovery from Kaiser Permanente, a 40% contingency legal fee, a $35,000 health insurance subrogation lien, and a $12,000 outstanding balance for physical therapy, and change the deduction order to expenses first.",
+    "verify": "tasks/task_h40.py"
   }
 ]

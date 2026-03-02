@@ -1142,6 +1142,400 @@ def solve_task_h20(state):
     })
 
 
+# ---- Hardening Round 1 ----
+
+def solve_task_h21(state):
+    """Find PI matter with most medical providers, add $50K general damage."""
+    from collections import Counter
+    pi_ids = {m["id"] for m in state["matters"] if m["practiceAreaId"] == "pa_1"}
+    counts = Counter()
+    for mp in state["medicalProviders"]:
+        if mp["matterId"] in pi_ids:
+            counts[mp["matterId"]] += 1
+    top_matter_id = counts.most_common(1)[0][0]  # matter_1
+    did = next_damage_id(state)
+    state["damages"].append({
+        "id": f"dmg_{did}",
+        "matterId": top_matter_id,
+        "name": "Long-term disability",
+        "amount": 50000,
+        "type": "general",
+        "date": None,
+        "notes": "",
+        "createdDate": NOW,
+        "updatedDate": NOW,
+    })
+
+
+def solve_task_h22(state):
+    """Newer of two Doyle PI matters: add $5K damage, change attorney to Marcus Williams."""
+    doyle_matters = [
+        m for m in state["matters"]
+        if "doyle" in m["description"].lower() and m["practiceAreaId"] == "pa_1"
+    ]
+    doyle_matters.sort(key=lambda m: m["openDate"])
+    newer = doyle_matters[-1]  # matter_22 (opened 2025-01-20)
+    newer["responsibleAttorneyId"] = "user_2"
+    did = next_damage_id(state)
+    state["damages"].append({
+        "id": f"dmg_{did}",
+        "matterId": newer["id"],
+        "name": "Initial emergency room visit",
+        "amount": 5000,
+        "type": "special",
+        "date": None,
+        "notes": "",
+        "createdDate": NOW,
+        "updatedDate": NOW,
+    })
+
+
+def solve_task_h23(state):
+    """Okafor burn: mark all providers treatment complete, move to Settlement/Trial."""
+    m = find_matter_by_desc(state, "Okafor", "burn")
+    for mp in state["medicalProviders"]:
+        if mp["matterId"] == m["id"]:
+            mp["treatmentComplete"] = True
+    m["stageId"] = "stage_1_5"
+
+
+def solve_task_h24(state):
+    """Close PI Intake matters opened before January 2025."""
+    cutoff = "2025-01-01"
+    for m in state["matters"]:
+        if (m["practiceAreaId"] == "pa_1"
+                and m["stageId"] == "stage_1_1"
+                and m["status"] == "open"
+                and m.get("openDate", "9999") < cutoff):
+            m["status"] = "closed"
+            m["closedDate"] = TODAY
+
+
+def solve_task_h25(state):
+    """Chen-Ramirez at Arraignment: change to hourly, budget $15K."""
+    m = next(m for m in state["matters"] if m["id"] == "matter_51")
+    m["billingMethod"] = "hourly"
+    m["billing"]["method"] = "hourly"
+    m["billing"]["budget"] = 15000
+    m["billing"]["flatRate"] = None
+
+
+def solve_task_h26(state):
+    """Recover two duplicate matters from bin, close them."""
+    target_ids = ["del_matter_1", "del_matter_4"]
+    for tid in target_ids:
+        idx = next(i for i, dm in enumerate(state["deletedMatters"]) if dm["id"] == tid)
+        matter = state["deletedMatters"].pop(idx)
+        matter["status"] = "closed"
+        matter["closedDate"] = TODAY
+        state["matters"].append(matter)
+
+
+def solve_task_h27(state):
+    """Find attorney with most CD matters, create CD matter for Thompson."""
+    from collections import Counter
+    cd_matters = [m for m in state["matters"] if m["practiceAreaId"] == "pa_3"]
+    counts = Counter(m["responsibleAttorneyId"] for m in cd_matters)
+    top_atty = counts.most_common(1)[0][0]  # user_8
+    mid = next_matter_id(state)
+    number = str(mid).zfill(5)
+    state["matters"].append({
+        "id": f"matter_{mid}",
+        "number": number,
+        "displayNumber": f"{number}-Thompson",
+        "description": "People v. Thompson - New Criminal Defense Matter",
+        "status": "open",
+        "billingMethod": "flat_rate",
+        "clientId": "contact_9",
+        "responsibleAttorneyId": top_atty,
+        "originatingAttorneyId": None,
+        "responsibleStaffId": None,
+        "clientReferenceNumber": "",
+        "location": "",
+        "practiceAreaId": "pa_3",
+        "stageId": None,
+        "openDate": TODAY,
+        "pendingDate": None,
+        "closedDate": None,
+        "createdDate": NOW,
+        "templateId": None,
+        "permissions": {"type": "everyone", "userIds": [], "groupIds": []},
+        "blockedUsers": [],
+        "relationships": [],
+        "customFields": {},
+        "billing": {
+            "billable": True, "method": "flat_rate", "currency": "USD",
+            "rates": [], "budget": 0, "budgetUsed": 0, "trustBalance": 0,
+            "minimumTrust": 0, "contingencyFee": None,
+            "flatRate": {"amount": 8000, "userId": top_atty},
+        },
+        "personalInjury": None,
+        "notifications": [],
+        "documentFolders": [],
+        "reports": {"useFirmSettings": True, "originatingPct": 50, "responsiblePct": 50},
+        "deleted": False, "deletedAt": None,
+    })
+
+
+def solve_task_h28(state):
+    """Patterson bus: add Bay Area Ortho relationship + $2500 outstanding balance."""
+    m = find_matter_by_desc(state, "Patterson", "Metro Transit")
+    m.setdefault("relationships", []).append({
+        "contactId": "contact_56",
+        "relationship": "Medical Provider",
+        "billRecipient": False,
+    })
+    settlement = ensure_settlement(state, m["id"])
+    next_id = len(settlement["outstandingBalances"]) + 1
+    settlement["outstandingBalances"].append({
+        "id": f"ob_{next_id}",
+        "responsibility": "client",
+        "holderContactId": "contact_56",
+        "description": "Bay Area Orthopedic Associates balance",
+        "balanceOwing": 2500,
+        "originalAmount": 2500,
+        "reduction": 0,
+    })
+
+
+def solve_task_h29(state):
+    """Transfer Marcus Williams' open PI Investigation matters to Diana Reyes + Demand."""
+    for m in state["matters"]:
+        if (m["practiceAreaId"] == "pa_1"
+                and m["stageId"] == "stage_1_2"
+                and m["status"] == "open"
+                and m["responsibleAttorneyId"] == "user_2"):
+            m["responsibleAttorneyId"] = "user_3"
+            m["stageId"] = "stage_1_3"
+
+
+def solve_task_h30(state):
+    """McCarthy chiropractic provider: set record/bill status, first treatment date."""
+    m = find_matter_by_desc(state, "McCarthy", "pedestrian")
+    for mp in state["medicalProviders"]:
+        if mp["matterId"] == m["id"] and mp.get("contactId") == "contact_60":
+            mp["recordStatus"] = "received"
+            mp["billStatus"] = "received"
+            mp["firstTreatmentDate"] = "2024-10-15"
+
+
+def solve_task_h31(state):
+    """Create Securities Law PA with 3 stages, move Franklin case."""
+    max_num = max(int(pa["id"].split("_")[1]) for pa in state["practiceAreas"])
+    pa_id = f"pa_{max_num + 1}"
+    sec_filing_stage_id = f"stage_{max_num + 1}_2"
+    state["practiceAreas"].append({
+        "id": pa_id,
+        "name": "Securities Law",
+        "stages": [
+            {"id": f"stage_{max_num + 1}_1", "name": "Investigation", "order": 0},
+            {"id": sec_filing_stage_id, "name": "SEC Filing", "order": 1},
+            {"id": f"stage_{max_num + 1}_3", "name": "Litigation", "order": 2},
+        ],
+        "color": "#6366f1",
+        "createdDate": NOW,
+    })
+    m = find_matter_by_desc(state, "Franklin", "Securities fraud")
+    m["practiceAreaId"] = pa_id
+    m["stageId"] = sec_filing_stage_id
+
+
+def solve_task_h32(state):
+    """CD Plea Negotiation: pending→open, open→Trial stage."""
+    for m in state["matters"]:
+        if m["practiceAreaId"] == "pa_3" and m["stageId"] == "stage_3_3":
+            if m["status"] == "open":
+                m["stageId"] = "stage_3_4"
+            elif m["status"] == "pending":
+                m["status"] = "open"
+                m["pendingDate"] = None
+
+
+def solve_task_h33(state):
+    """Doyle scaffolding settlement: $350K recovery, 33.33% fee, $15K lien, $8.5K balance."""
+    m = find_matter_by_desc(state, "Doyle", "scaffolding")
+    settlement = ensure_settlement(state, m["id"])
+    settlement["recoveries"].append({
+        "id": f"rec_{len(settlement['recoveries']) + 1}",
+        "amount": 350000,
+        "sourceContactId": None,
+        "sourceName": "Summit Construction Insurance",
+    })
+    settlement["legalFees"].append({
+        "id": f"lf_{len(settlement['legalFees']) + 1}",
+        "recoveryId": None,
+        "recipientId": m["responsibleAttorneyId"],
+        "rate": 33.33,
+        "percentage": 33.33,
+        "flatAmount": 0,
+        "discount": 0,
+        "referralFees": [],
+    })
+    settlement["nonMedicalLiens"].append({
+        "id": f"nml_{len(settlement['nonMedicalLiens']) + 1}",
+        "holderContactId": "contact_58",
+        "description": "State Farm Insurance lien",
+        "amount": 15000,
+        "reduction": 0,
+    })
+    settlement["outstandingBalances"].append({
+        "id": f"ob_{len(settlement['outstandingBalances']) + 1}",
+        "responsibility": "client",
+        "holderContactId": "contact_55",
+        "description": "SF General Hospital outstanding balance",
+        "balanceOwing": 8500,
+        "originalAmount": 8500,
+        "reduction": 0,
+    })
+
+
+def solve_task_h34(state):
+    """Find PA with most open matters, add Appeal stage."""
+    from collections import Counter
+    counts = Counter()
+    for m in state["matters"]:
+        if m["status"] == "open":
+            counts[m["practiceAreaId"]] += 1
+    top_pa_id = counts.most_common(1)[0][0]  # pa_1
+    pa = next(p for p in state["practiceAreas"] if p["id"] == top_pa_id)
+    pa["stages"].append({
+        "id": f"{top_pa_id.replace('pa', 'stage')}_{len(pa['stages']) + 1}",
+        "name": "Appeal",
+        "order": len(pa["stages"]),
+    })
+
+
+def solve_task_h35(state):
+    """Gonzalez divorce (not paternity): add O'Brien notification, restrict to FL Division."""
+    m = find_matter_by_desc(state, "Gonzalez", "Divorce")
+    m.setdefault("notifications", []).append({
+        "userId": "user_4",
+        "types": ["matter_updates"],
+    })
+    m["permissions"] = {
+        "type": "specific",
+        "userIds": [],
+        "groupIds": ["group_2"],
+    }
+
+
+def solve_task_h36(state):
+    """RE: close pending, move open Due Diligence to Contract Review."""
+    for m in state["matters"]:
+        if m["practiceAreaId"] == "pa_4":
+            if m["status"] == "pending":
+                m["status"] = "closed"
+                m["closedDate"] = TODAY
+            elif m["status"] == "open" and m["stageId"] == "stage_4_1":
+                m["stageId"] = "stage_4_2"
+
+
+def solve_task_h37(state):
+    """Patterson bus: update first provider statuses, add Settlement Documents folder."""
+    m = find_matter_by_desc(state, "Patterson", "Metro Transit")
+    providers = [mp for mp in state["medicalProviders"] if mp["matterId"] == m["id"]]
+    if providers:
+        providers[0]["recordStatus"] = "certified"
+        providers[0]["billStatus"] = "received"
+    m.setdefault("documentFolders", []).append({
+        "id": f"folder_{m['id'].split('_')[1]}_{len(m.get('documentFolders', [])) + 1}",
+        "name": "Settlement Documents",
+        "category": "Settlement",
+    })
+
+
+def solve_task_h38(state):
+    """Two Simmons PI matters: higher budget→add damage, lower budget→delete."""
+    simmons = [
+        m for m in state["matters"]
+        if "simmons" in m["description"].lower() and m["practiceAreaId"] == "pa_1"
+    ]
+    simmons.sort(key=lambda m: m.get("billing", {}).get("budget", 0))
+    lower = simmons[0]  # matter_19 (budget=20000)
+    higher = simmons[-1]  # matter_13 (budget=55000)
+
+    # Add damage to higher budget
+    did = next_damage_id(state)
+    state["damages"].append({
+        "id": f"dmg_{did}",
+        "matterId": higher["id"],
+        "name": "Pain and suffering",
+        "amount": 100000,
+        "type": "general",
+        "date": None,
+        "notes": "",
+        "createdDate": NOW,
+        "updatedDate": NOW,
+    })
+
+    # Delete lower budget
+    idx = next(i for i, x in enumerate(state["matters"]) if x["id"] == lower["id"])
+    matter = state["matters"].pop(idx)
+    matter["deletedDate"] = NOW
+    state["deletedMatters"].append(matter)
+
+
+def solve_task_h39(state):
+    """Create MedMal template, set as firm default."""
+    max_num = max(int(t["id"].split("_")[1]) for t in state["matterTemplates"])
+    template_id = f"template_{max_num + 1}"
+    state["matterTemplates"].append({
+        "id": template_id,
+        "name": "Medical Malpractice - Standard",
+        "isDefault": False,
+        "description": "Template for standard medical malpractice cases",
+        "practiceAreaId": "pa_12",
+        "billable": True,
+        "billingMethod": "contingency",
+        "deductionOrder": "fees_first",
+        "customFields": {},
+        "documentFolders": [],
+        "createdDate": NOW,
+    })
+    state["firmSettings"]["defaultTemplateId"] = template_id
+
+
+def solve_task_h40(state):
+    """Sullivan-Wright: settlement with recovery, fee, lien, balance + deduction order."""
+    m = find_matter_by_desc(state, "Sullivan-Wright")
+    if m.get("personalInjury") is None:
+        m["personalInjury"] = {}
+    m["personalInjury"]["deductionOrder"] = "expenses_first"
+    settlement = ensure_settlement(state, m["id"])
+    settlement["recoveries"].append({
+        "id": f"rec_{len(settlement['recoveries']) + 1}",
+        "amount": 450000,
+        "sourceContactId": None,
+        "sourceName": "Kaiser Permanente",
+    })
+    settlement["legalFees"].append({
+        "id": f"lf_{len(settlement['legalFees']) + 1}",
+        "recoveryId": None,
+        "recipientId": m["responsibleAttorneyId"],
+        "rate": 40,
+        "percentage": 40,
+        "flatAmount": 0,
+        "discount": 0,
+        "referralFees": [],
+    })
+    settlement["nonMedicalLiens"].append({
+        "id": f"nml_{len(settlement['nonMedicalLiens']) + 1}",
+        "holderContactId": None,
+        "description": "Health insurance subrogation lien",
+        "amount": 35000,
+        "reduction": 0,
+    })
+    settlement["outstandingBalances"].append({
+        "id": f"ob_{len(settlement['outstandingBalances']) + 1}",
+        "responsibility": "client",
+        "holderContactId": None,
+        "description": "Physical therapy outstanding balance",
+        "balanceOwing": 12000,
+        "originalAmount": 12000,
+        "reduction": 0,
+    })
+
+
 # ---------------------------------------------------------------------------
 # SOLVERS dispatch map
 # ---------------------------------------------------------------------------
@@ -1167,6 +1561,13 @@ SOLVERS = {
     "task_h13": solve_task_h13, "task_h14": solve_task_h14, "task_h15": solve_task_h15,
     "task_h16": solve_task_h16, "task_h17": solve_task_h17, "task_h18": solve_task_h18,
     "task_h19": solve_task_h19, "task_h20": solve_task_h20,
+    "task_h21": solve_task_h21, "task_h22": solve_task_h22, "task_h23": solve_task_h23,
+    "task_h24": solve_task_h24, "task_h25": solve_task_h25, "task_h26": solve_task_h26,
+    "task_h27": solve_task_h27, "task_h28": solve_task_h28, "task_h29": solve_task_h29,
+    "task_h30": solve_task_h30, "task_h31": solve_task_h31, "task_h32": solve_task_h32,
+    "task_h33": solve_task_h33, "task_h34": solve_task_h34, "task_h35": solve_task_h35,
+    "task_h36": solve_task_h36, "task_h37": solve_task_h37, "task_h38": solve_task_h38,
+    "task_h39": solve_task_h39, "task_h40": solve_task_h40,
 }
 
 
