@@ -598,5 +598,125 @@
     "difficulty": "hard",
     "instruction": "On the Washington v. Pacific Steel workplace injury case, change the billing currency to Canadian Dollars, add UCSF Medical Center as a related contact with the Medical Provider relationship, and add a $30,000 non-medical lien from CalComp Workers Compensation to the settlement.",
     "verify": "tasks/task_h60.py"
+  },
+  {
+    "id": "task_h61",
+    "difficulty": "hard",
+    "instruction": "Identify the matter with the most total billable hours recorded (visible in each matter's financial summary). Change that matter's status to pending and set its Court Case Number custom field to HIGH-PRIORITY-2026.",
+    "verify": "tasks/task_h61.py"
+  },
+  {
+    "id": "task_h62",
+    "difficulty": "hard",
+    "instruction": "On the Patterson bus accident matter, find the total outstanding balance across all medical bills on the Medical Records tab. Add a non-medical lien to the settlement for exactly that total amount from State Farm Insurance.",
+    "verify": "tasks/task_h62.py"
+  },
+  {
+    "id": "task_h63",
+    "difficulty": "hard",
+    "instruction": "Priya Sharma is transferring her caseload. For each of her open matters: if the billing method is contingency, reassign to Marcus Williams. For all others, reassign to Robert Jackson.",
+    "verify": "tasks/task_h63.py"
+  },
+  {
+    "id": "task_h64",
+    "difficulty": "hard",
+    "instruction": "Create a new practice area called Admiralty Law with stages Pre-Filing, Discovery, and Trial. Create a template called Admiralty - Cargo Dispute for that practice area with hourly billing. Then create a new matter under Admiralty Law for Pacific Rim Imports & Exports with William Park as responsible attorney and a $60,000 budget.",
+    "verify": "tasks/task_h64.py"
+  },
+  {
+    "id": "task_h65",
+    "difficulty": "hard",
+    "instruction": "Determine which practice area has the highest total budget across all its open matters. Add a new stage called Financial Review at the end of that practice area's stage list.",
+    "verify": "tasks/task_h65.py"
+  },
+  {
+    "id": "task_h66",
+    "difficulty": "hard",
+    "instruction": "On the Fitzgerald medical malpractice case, set Court Case Number to SF-2025-MM-7734, Judge Assigned to Hon. Richard Alvarez, Insurance Company to Kaiser Permanente, and Policy Limit to $1,000,000.",
+    "verify": "tasks/task_h66.py"
+  },
+  {
+    "id": "task_h67",
+    "difficulty": "hard",
+    "instruction": "Duplicate the Patterson bus accident matter. On the copy, change the description to Patterson v. Metro Transit Authority - Supplemental claim, the responsible attorney to Diana Reyes, the billing method to hourly, and the budget to $25,000.",
+    "verify": "tasks/task_h67.py"
+  },
+  {
+    "id": "task_h68",
+    "difficulty": "hard",
+    "instruction": "On the Doyle scaffolding fall case: add a $20,000 special damage for shoulder surgery, add Bay Area Orthopedic Associates as a medical provider, and add a $100,000 recovery from Summit Construction Insurance to the settlement.",
+    "verify": "tasks/task_h68.py"
+  },
+  {
+    "id": "task_h69",
+    "difficulty": "hard",
+    "instruction": "Find the attorney who serves as originating attorney on the most open matters. Create a new Corporate matter for Redwood Financial Services with that attorney as both responsible and originating attorney, hourly billing, and a $40,000 budget.",
+    "verify": "tasks/task_h69.py"
+  },
+  {
+    "id": "task_h70",
+    "difficulty": "hard",
+    "instruction": "Recover the Test Matter, the old template matter, and the Jones inquiry from the recovery bin, then close all three.",
+    "verify": "tasks/task_h70.py"
+  },
+  {
+    "id": "task_h71",
+    "difficulty": "hard",
+    "instruction": "Set up a complete settlement for the Chen-Ramirez Amazon delivery truck case: add a $180,000 recovery, a 33.33% contingency legal fee, a $12,000 non-medical lien from ABC Insurance Co., a $4,500 outstanding balance owed to SF General Hospital, and switch the deduction order to expenses first.",
+    "verify": "tasks/task_h71.py"
+  },
+  {
+    "id": "task_h72",
+    "difficulty": "hard",
+    "instruction": "Among all open Personal Injury matters at the Litigation stage, find the one opened earliest. Add a $150,000 recovery to its settlement and advance it to the Settlement/Trial stage.",
+    "verify": "tasks/task_h72.py"
+  },
+  {
+    "id": "task_h73",
+    "difficulty": "hard",
+    "instruction": "On the Johnson v. Whole Foods case, for the UCSF Medical Center provider: add a medical record dated 2025-03-15 for a follow-up MRI scan with status received, and a medical bill dated 2025-03-15 for $3,500 with status outstanding.",
+    "verify": "tasks/task_h73.py"
+  },
+  {
+    "id": "task_h74",
+    "difficulty": "hard",
+    "instruction": "Add Pacific Physical Therapy Center as a medical provider to both the Doyle scaffolding fall case and the Washington workplace crush injury case.",
+    "verify": "tasks/task_h74.py"
+  },
+  {
+    "id": "task_h75",
+    "difficulty": "hard",
+    "instruction": "There are two open Personal Injury matters at the Litigation stage. On the one that was opened first, add a $15,000 outstanding balance owed to Pacific Physical Therapy Center to its settlement. On the other, add a $10,000 non-medical lien from ABC Insurance Co. to its settlement.",
+    "verify": "tasks/task_h75.py"
+  },
+  {
+    "id": "task_h76",
+    "difficulty": "hard",
+    "instruction": "Identify the three Personal Injury matters with the highest total recorded damages. Add a $10,000 non-medical lien from State Farm Insurance to each of their settlements.",
+    "verify": "tasks/task_h76.py"
+  },
+  {
+    "id": "task_h77",
+    "difficulty": "hard",
+    "instruction": "On the Okafor burn injury case, restrict the matter's permissions to the Litigation Team group only, block James Cooper from accessing the matter, and add Kevin Nakamura and Angela Martinez as notification recipients.",
+    "verify": "tasks/task_h77.py"
+  },
+  {
+    "id": "task_h78",
+    "difficulty": "hard",
+    "instruction": "For every open Estate Planning matter: if it is at the Initial Consultation stage, advance it to Document Preparation. If it is at the Document Preparation stage, advance it to Execution.",
+    "verify": "tasks/task_h78.py"
+  },
+  {
+    "id": "task_h79",
+    "difficulty": "hard",
+    "instruction": "On the McCarthy pedestrian case, delete all existing medical providers and their records. Then add UCSF Medical Center and Horizon Healthcare Partners as new medical providers.",
+    "verify": "tasks/task_h79.py"
+  },
+  {
+    "id": "task_h80",
+    "difficulty": "hard",
+    "instruction": "Add a new stage called Emergency Filing to both the Personal Injury and Medical Malpractice practice areas.",
+    "verify": "tasks/task_h80.py"
   }
 ]
