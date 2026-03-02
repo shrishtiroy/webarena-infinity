@@ -149,7 +149,7 @@ for i in "${!IPS[@]}"; do
     continue
   fi
 
-  PIPELINE_CMD="cd ~/mirror-mirror && nohup \$HOME/venv/bin/python infra/pipeline.py \
+  PIPELINE_CMD="cd ~/mirror-mirror && \$HOME/venv/bin/python infra/pipeline.py \
     --app-name ${ENV_ID} \
     --docs-path ${DOCS} \
     --model ${MODEL} \
@@ -159,9 +159,9 @@ for i in "${!IPS[@]}"; do
     --branch ${ENV_ID} \
     --push \
     --s3-bucket \$MM_S3_BUCKET \
-    > /tmp/mirror-mirror-logs/pipeline.log 2>&1 < /dev/null &"
+    > /tmp/mirror-mirror-logs/pipeline.log 2>&1"
 
-  ssh -n $SSH_OPTS "ec2-user@${IP}" "$PIPELINE_CMD" </dev/null
+  ssh -n $SSH_OPTS "ec2-user@${IP}" "screen -dm bash -c '$PIPELINE_CMD'" </dev/null
   echo "  STARTED $ENV_ID @ $IP"
 done
 
