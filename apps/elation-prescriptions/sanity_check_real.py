@@ -719,14 +719,214 @@ def solve_task_h20(state):
     _approve_refill(state, "Metoprolol Succinate ER 50mg tablet")
 
 
+# === HARDENING ROUND 1 (h21-h40) ===
+
+def solve_task_h21(state):
+    """Approve Atorvastatin→Rosuvastatin change request + discontinue Atorvastatin."""
+    req = find_entity(state["changeRequests"], originalMedication="Atorvastatin 20mg tablet")
+    req["status"] = "approved"
+    req["processedDate"] = NOW_ISO
+    req["processedBy"] = CURRENT_USER_NAME
+    _discontinue_med(state, "Atorvastatin 20mg tablet", "permanentRxMeds",
+                     "I want to discontinue this medication", "Switching to Rosuvastatin per pharmacy request")
+
+
+def solve_task_h22(state):
+    """Approve CVS refills with remaining refills, deny Gabapentin (0 remaining)."""
+    _approve_refill(state, "Lisinopril 10mg tablet")
+    _approve_refill(state, "Atorvastatin 20mg tablet")
+    _approve_refill(state, "Omeprazole 20mg capsule")
+    _approve_refill(state, "Metoprolol Succinate ER 50mg tablet")
+    _deny_refill(state, "Gabapentin 300mg capsule", "No refills remaining, new prescription required")
+
+
+def solve_task_h23(state):
+    """Discontinue Losartan (prescribed by Dr. Michael Chen)."""
+    _discontinue_med(state, "Losartan 50mg tablet", "permanentRxMeds",
+                     "I want to discontinue this medication",
+                     "Consolidating BP management under one prescriber")
+
+
+def solve_task_h24(state):
+    """Discontinue Ciprofloxacin + change default pharmacy to Rite Aid #3456."""
+    _discontinue_med(state, "Ciprofloxacin 500mg tablet", "temporaryMeds",
+                     "I want to discontinue this medication")
+    state["settings"]["defaultPharmacyId"] = "pharm_005"
+
+
+def solve_task_h25(state):
+    """Approve both change requests."""
+    req1 = find_entity(state["changeRequests"], originalMedication="Atorvastatin 20mg tablet")
+    req1["status"] = "approved"
+    req1["processedDate"] = NOW_ISO
+    req1["processedBy"] = CURRENT_USER_NAME
+    req2 = find_entity(state["changeRequests"], medicationName="Gabapentin 300mg capsule")
+    req2["status"] = "approved"
+    req2["processedDate"] = NOW_ISO
+    req2["processedBy"] = CURRENT_USER_NAME
+
+
+def solve_task_h26(state):
+    """Approve Omeprazole (GERD med) refill with refills bumped to 5."""
+    _approve_refill(state, "Omeprazole 20mg capsule",
+                    modifications={"refills": 5})
+
+
+def solve_task_h27(state):
+    """Remove Codeine + Latex allergies, add Tramadol allergy."""
+    allergies = state["currentPatient"]["allergies"]
+    remove_entity(allergies, allergen="Codeine")
+    remove_entity(allergies, allergen="Latex")
+    allergies.append({
+        "id": f"alg_{state['_nextAlgId']:03d}",
+        "allergen": "Tramadol",
+        "reaction": "Nausea and dizziness",
+        "severity": "Moderate",
+        "type": "drug",
+        "onsetDate": NOW_DATE,
+        "source": "provider-entered"
+    })
+    state["_nextAlgId"] += 1
+
+
+def solve_task_h28(state):
+    """Discontinue Melatonin (bedtime sleep OTC)."""
+    _discontinue_med(state, "Melatonin 3mg tablet", "permanentOtcMeds",
+                     "Patient stopped taking medication")
+
+
+def solve_task_h29(state):
+    """Delete all PRN category custom sig shortcuts."""
+    state["customSigs"] = [
+        s for s in state["customSigs"]
+        if s.get("category", "").lower() != "prn"
+    ]
+
+
+def solve_task_h30(state):
+    """Discontinue Amlodipine 5mg with cancel + prescribe Amlodipine 10mg."""
+    _discontinue_med(state, "Amlodipine 5mg tablet", "permanentRxMeds",
+                     "I want to discontinue this medication", send_cancel=True)
+    _add_prescription(state, "Amlodipine 10mg tablet",
+                      "Take 1 tablet by mouth once daily",
+                      30, "tablets", 3, 30, "permanent_rx", "CVS Pharmacy #4521",
+                      diagnosis=[{"code": "I10", "description": "Essential hypertension"}])
+
+
+def solve_task_h31(state):
+    """Reclassify Losartan (DAW=true) from permanent Rx to temporary."""
+    med = remove_entity(state["permanentRxMeds"], medicationName="Losartan 50mg tablet")
+    med["classification"] = "temporary"
+    state["temporaryMeds"].append(med)
+
+
+def solve_task_h32(state):
+    """Set default pharmacy to Express Scripts Mail Pharmacy."""
+    state["settings"]["defaultPharmacyId"] = "pharm_011"
+
+
+def solve_task_h33(state):
+    """Approve Sertraline + Metoprolol refills, deny Atorvastatin."""
+    _approve_refill(state, "Sertraline 50mg tablet")
+    _approve_refill(state, "Metoprolol Succinate ER 50mg tablet")
+    _deny_refill(state, "Atorvastatin 20mg tablet", "Patient needs lab work before renewal")
+
+
+def solve_task_h34(state):
+    """Discontinue Sertraline + prescribe Escitalopram 10mg to Walgreens."""
+    _discontinue_med(state, "Sertraline 50mg tablet", "permanentRxMeds",
+                     "I want to discontinue this medication", "Switching to Escitalopram")
+    _add_prescription(state, "Escitalopram 10mg tablet",
+                      "Take 1 tablet by mouth once daily in the morning",
+                      30, "tablets", 5, 30, "permanent_rx", "Walgreens #7892")
+
+
+def solve_task_h35(state):
+    """Set default pharmacy to patient's secondary pharmacy (Walgreens #7892)."""
+    state["settings"]["defaultPharmacyId"] = "pharm_003"
+
+
+def solve_task_h36(state):
+    """Create Gabapentin 300mg template from active medication details."""
+    tpl_id = f"tpl_{state['_nextTplId']:03d}"
+    state["rxTemplates"].append({
+        "id": tpl_id,
+        "medicationName": "Gabapentin 300mg capsule",
+        "sig": "Take 1 capsule by mouth three times daily",
+        "qty": 90,
+        "unit": "capsules",
+        "refills": 2,
+        "daysSupply": 30,
+        "ndc": "59762-5025-01",
+        "createdDate": NOW_DATE
+    })
+    state["_nextTplId"] += 1
+
+
+def solve_task_h37(state):
+    """Med rec + discontinue Prednisone and Ciprofloxacin (expired courses)."""
+    state["currentPatient"]["lastReconciledDate"] = NOW_ISO
+    _discontinue_med(state, "Prednisone 10mg tablet", "temporaryMeds",
+                     "I want to discontinue this medication")
+    _discontinue_med(state, "Ciprofloxacin 500mg tablet", "temporaryMeds",
+                     "I want to discontinue this medication")
+
+
+def solve_task_h38(state):
+    """Major-only alerts, disable allergy alerts, delete inhalation sigs."""
+    state["settings"]["drugDecisionSupport"]["drugToDrugLevel"] = "major_only"
+    state["settings"]["drugDecisionSupport"]["drugToAllergyEnabled"] = False
+    state["customSigs"] = [
+        s for s in state["customSigs"]
+        if s.get("category", "").lower() != "inhalation"
+    ]
+
+
+def solve_task_h39(state):
+    """Prescribe Metformin 1000mg to preferred pharmacy with diabetes diagnosis."""
+    _add_prescription(state, "Metformin 1000mg tablet",
+                      "Take 1 tablet by mouth twice daily with meals",
+                      60, "tablets", 5, 30, "permanent_rx", "CVS Pharmacy #4521",
+                      diagnosis=[{"code": "E11.9", "description": "Type 2 diabetes mellitus"}])
+
+
+def solve_task_h40(state):
+    """Create Doxycycline 100mg template + oral sig shortcut."""
+    tpl_id = f"tpl_{state['_nextTplId']:03d}"
+    state["rxTemplates"].append({
+        "id": tpl_id,
+        "medicationName": "Doxycycline 100mg capsule",
+        "sig": "Take 1 capsule by mouth twice daily for 14 days",
+        "qty": 28,
+        "unit": "capsules",
+        "refills": 0,
+        "daysSupply": 14,
+        "ndc": None,
+        "createdDate": NOW_DATE
+    })
+    state["_nextTplId"] += 1
+    sig_id = f"sig_{state['_nextSigId']:03d}"
+    state["customSigs"].append({
+        "id": sig_id,
+        "text": "Take 1 capsule by mouth twice daily for 14 days",
+        "category": "oral"
+    })
+    state["_nextSigId"] += 1
+
+
 # Map task IDs to solve functions
 SOLVE_MAP = {}
-for _prefix in ["e", "m", "h"]:
+for _prefix in ["e", "m"]:
     for _i in range(1, 21):
         _task_id = f"task_{_prefix}{_i}"
         _fn_name = f"solve_task_{_prefix}{_i}"
         if _fn_name in globals():
             SOLVE_MAP[_task_id] = globals()[_fn_name]
+for _i in range(1, 41):
+    _task_id = f"task_h{_i}"
+    _fn_name = f"solve_task_h{_i}"
+    if _fn_name in globals():
+        SOLVE_MAP[_task_id] = globals()[_fn_name]
 
 
 # ──────────────────────────────────────────────

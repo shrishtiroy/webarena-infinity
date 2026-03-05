@@ -358,5 +358,125 @@
     "difficulty": "hard",
     "instruction": "Approve all pending CVS refill requests except the Atorvastatin — deny that one, patient needs a lipid panel.",
     "verify": "real-tasks/task_h20.py"
+  },
+  {
+    "id": "task_h21",
+    "difficulty": "hard",
+    "instruction": "The pharmacy wants to switch James's Atorvastatin to Rosuvastatin — approve that change request, then discontinue the Atorvastatin from his active med list since it's being replaced.",
+    "verify": "real-tasks/task_h21.py"
+  },
+  {
+    "id": "task_h22",
+    "difficulty": "hard",
+    "instruction": "Go through the pending CVS refill requests. Approve any where the medication still has refills remaining on the original script. For the one that's out of refills, deny it — a new prescription is required.",
+    "verify": "real-tasks/task_h22.py"
+  },
+  {
+    "id": "task_h23",
+    "difficulty": "hard",
+    "instruction": "James is on a blood pressure medication that was prescribed by another provider. Discontinue it — we're consolidating his BP management under one prescriber.",
+    "verify": "real-tasks/task_h23.py"
+  },
+  {
+    "id": "task_h24",
+    "difficulty": "hard",
+    "instruction": "The Ciprofloxacin course is finished. Discontinue it, then switch the default pharmacy to the one where it was being filled.",
+    "verify": "real-tasks/task_h24.py"
+  },
+  {
+    "id": "task_h25",
+    "difficulty": "hard",
+    "instruction": "Approve both pending pharmacy change requests — the statin substitution and the sig clarification are both fine.",
+    "verify": "real-tasks/task_h25.py"
+  },
+  {
+    "id": "task_h26",
+    "difficulty": "hard",
+    "instruction": "James's GERD medication is running low on refills. Approve its pending refill but bump the refills to 5 this time.",
+    "verify": "real-tasks/task_h26.py"
+  },
+  {
+    "id": "task_h27",
+    "difficulty": "hard",
+    "instruction": "Remove the Codeine and Latex allergies — both were entered in error. Then add Tramadol as a moderate drug allergy with reaction 'nausea and dizziness'.",
+    "verify": "real-tasks/task_h27.py"
+  },
+  {
+    "id": "task_h28",
+    "difficulty": "hard",
+    "instruction": "James says he stopped taking his sleep supplement. Find the OTC he takes at bedtime for sleep and discontinue it.",
+    "verify": "real-tasks/task_h28.py"
+  },
+  {
+    "id": "task_h29",
+    "difficulty": "hard",
+    "instruction": "Delete all the custom sig shortcuts in the PRN category — we don't use those anymore.",
+    "verify": "real-tasks/task_h29.py"
+  },
+  {
+    "id": "task_h30",
+    "difficulty": "hard",
+    "instruction": "Discontinue the Amlodipine 5mg and send a cancel to the pharmacy, then prescribe Amlodipine 10mg daily to the same pharmacy — 30 tabs, 3 refills, with the hypertension diagnosis attached.",
+    "verify": "real-tasks/task_h30.py"
+  },
+  {
+    "id": "task_h31",
+    "difficulty": "hard",
+    "instruction": "Find the medication on James's permanent Rx list that has 'dispense as written' checked and reclassify it as temporary.",
+    "verify": "real-tasks/task_h31.py"
+  },
+  {
+    "id": "task_h32",
+    "difficulty": "hard",
+    "instruction": "James's insurance PBM is Express Scripts. Set the default pharmacy to the Express Scripts mail order pharmacy.",
+    "verify": "real-tasks/task_h32.py"
+  },
+  {
+    "id": "task_h33",
+    "difficulty": "hard",
+    "instruction": "Approve the Sertraline refill from Walgreens and the Metoprolol refill from CVS. Deny the Atorvastatin — he needs labs first. Leave the rest pending.",
+    "verify": "real-tasks/task_h33.py"
+  },
+  {
+    "id": "task_h34",
+    "difficulty": "hard",
+    "instruction": "The patient wants to switch from Sertraline to Escitalopram. Discontinue the Sertraline, then prescribe Escitalopram 10mg once daily in the morning, 30 tabs, 5 refills — send it to the same pharmacy the Sertraline was at.",
+    "verify": "real-tasks/task_h34.py"
+  },
+  {
+    "id": "task_h35",
+    "difficulty": "hard",
+    "instruction": "James's secondary pharmacy is noted in his patient info. Make that his new default pharmacy in settings.",
+    "verify": "real-tasks/task_h35.py"
+  },
+  {
+    "id": "task_h36",
+    "difficulty": "hard",
+    "instruction": "Create an Rx template from James's current Gabapentin prescription — copy the drug name, sig, qty, unit, refills, and days supply from his active medication.",
+    "verify": "real-tasks/task_h36.py"
+  },
+  {
+    "id": "task_h37",
+    "difficulty": "hard",
+    "instruction": "Run a medication reconciliation. The two temporary medications whose treatment duration has expired should be discontinued. The remaining temp med is still within its course — leave it alone.",
+    "verify": "real-tasks/task_h37.py"
+  },
+  {
+    "id": "task_h38",
+    "difficulty": "hard",
+    "instruction": "Tighten up the alert settings: only show major drug interaction alerts, turn off allergy cross-checking, and delete all the inhalation sig shortcuts while you're in settings.",
+    "verify": "real-tasks/task_h38.py"
+  },
+  {
+    "id": "task_h39",
+    "difficulty": "hard",
+    "instruction": "Write James a Metformin 1000mg script — twice daily with meals, 60 tablets, 5 refills, 30-day supply. Send it to his preferred pharmacy and attach the diabetes diagnosis.",
+    "verify": "real-tasks/task_h39.py"
+  },
+  {
+    "id": "task_h40",
+    "difficulty": "hard",
+    "instruction": "Add a new Rx template for Doxycycline 100mg: twice daily for 14 days, 28 capsules, no refills, 14-day supply. Then create a matching custom sig shortcut under the oral category.",
+    "verify": "real-tasks/task_h40.py"
   }
 ]
