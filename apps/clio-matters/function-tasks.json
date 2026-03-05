@@ -1,0 +1,277 @@
+[
+  {
+    "id": "task_1",
+    "instruction": "Change the status of matter '00001-Patterson' (Patterson v. Metro Transit Authority) from 'open' to 'pending'.",
+    "verify": "function-tasks/task_1.py"
+  },
+  {
+    "id": "task_2",
+    "instruction": "Close matter '00002-Johnson' (Johnson v. Whole Foods Market).",
+    "verify": "function-tasks/task_2.py"
+  },
+  {
+    "id": "task_3",
+    "instruction": "Reopen the closed matter '00003-Russo' (Russo v. Lyft Inc.).",
+    "verify": "function-tasks/task_3.py"
+  },
+  {
+    "id": "task_4",
+    "instruction": "Create a new matter with description 'Garcia v. Bay Area Taxi - Rear-end collision at stoplight' and set the client to James Patterson, the responsible attorney to Marcus Williams, the practice area to Personal Injury, and the billing method to contingency.",
+    "verify": "function-tasks/task_4.py"
+  },
+  {
+    "id": "task_5",
+    "instruction": "Change the responsible attorney on matter '00004-Washington' (Washington v. Pacific Steel Works) from Robert Jackson to Marcus Williams.",
+    "verify": "function-tasks/task_5.py"
+  },
+  {
+    "id": "task_6",
+    "instruction": "Change the practice area of matter '00005-Doyle' (Doyle v. Summit Construction) from Personal Injury to Employment Law.",
+    "verify": "function-tasks/task_6.py"
+  },
+  {
+    "id": "task_7",
+    "instruction": "Change the billing method of matter '00006-McCarthy' (McCarthy v. City of San Francisco) from contingency to hourly.",
+    "verify": "function-tasks/task_7.py"
+  },
+  {
+    "id": "task_8",
+    "instruction": "Delete matter '00008-Mills' (Mills v. Rodriguez). Confirm the deletion when prompted.",
+    "verify": "function-tasks/task_8.py"
+  },
+  {
+    "id": "task_9",
+    "instruction": "Recover the deleted matter '00099-TestMatter' (Test Matter - Created in error during system testing) from the Recovery Bin.",
+    "verify": "function-tasks/task_9.py"
+  },
+  {
+    "id": "task_10",
+    "instruction": "Duplicate matter '00001-Patterson' (Patterson v. Metro Transit Authority).",
+    "verify": "function-tasks/task_10.py"
+  },
+  {
+    "id": "task_11",
+    "instruction": "Update the description of matter '00007-Okafor' (Okafor v. HomeComfort Appliances) to 'Okafor v. HomeComfort Appliances - Defective space heater causing severe burns and smoke inhalation'.",
+    "verify": "function-tasks/task_11.py"
+  },
+  {
+    "id": "task_12",
+    "instruction": "Set the client reference number of matter '00010-Dimitriou' (Dimitriou v. Lawson) to 'PI-2024-0601-REV'.",
+    "verify": "function-tasks/task_12.py"
+  },
+  {
+    "id": "task_13",
+    "instruction": "Set the location of matter '00005-Doyle' (Doyle v. Summit Construction) to 'San Francisco County Superior Court'.",
+    "verify": "function-tasks/task_13.py"
+  },
+  {
+    "id": "task_14",
+    "instruction": "Change the open date of matter '00010-Dimitriou' (Dimitriou v. Lawson) to '2024-12-01'.",
+    "verify": "function-tasks/task_14.py"
+  },
+  {
+    "id": "task_15",
+    "instruction": "Set the permissions on matter '00002-Johnson' (Johnson v. Whole Foods Market) to 'Specific Users/Groups' and add user Diana Reyes.",
+    "verify": "function-tasks/task_15.py"
+  },
+  {
+    "id": "task_16",
+    "instruction": "Add Priya Sharma to the blocked users list on matter '00001-Patterson' (Patterson v. Metro Transit Authority).",
+    "verify": "function-tasks/task_16.py"
+  },
+  {
+    "id": "task_17",
+    "instruction": "On matter '00001-Patterson', add a related contact: Linda Patterson with the relationship type 'Parent'.",
+    "verify": "function-tasks/task_17.py"
+  },
+  {
+    "id": "task_18",
+    "instruction": "Set the custom field 'Court Case Number' on matter '00005-Doyle' (Doyle v. Summit Construction) to 'SM-2024-CV-19876'.",
+    "verify": "function-tasks/task_18.py"
+  },
+  {
+    "id": "task_19",
+    "instruction": "Change the budget on matter '00001-Patterson' (Patterson v. Metro Transit Authority) to 75000.",
+    "verify": "function-tasks/task_19.py"
+  },
+  {
+    "id": "task_20",
+    "instruction": "Set the minimum trust balance on matter '00004-Washington' (Washington v. Pacific Steel Works) to 5000.",
+    "verify": "function-tasks/task_20.py"
+  },
+  {
+    "id": "task_21",
+    "instruction": "Change the contingency fee percentage on matter '00007-Okafor' (Okafor v. HomeComfort Appliances) from 40% to 33.33%.",
+    "verify": "function-tasks/task_21.py"
+  },
+  {
+    "id": "task_22",
+    "instruction": "Change the deduction order on matter '00004-Washington' (Washington v. Pacific Steel Works) from 'Expenses First' to 'Fees First'.",
+    "verify": "function-tasks/task_22.py"
+  },
+  {
+    "id": "task_23",
+    "instruction": "Add a new damage to matter '00001-Patterson' (Patterson v. Metro Transit Authority) with name 'Lost Wages - Q1 2025', amount 12500, and type 'special'.",
+    "verify": "function-tasks/task_23.py"
+  },
+  {
+    "id": "task_24",
+    "instruction": "Delete the damage 'Emergency room visit - SF General Hospital' from matter '00001-Patterson' (Patterson v. Metro Transit Authority). Confirm the deletion when prompted.",
+    "verify": "function-tasks/task_24.py"
+  },
+  {
+    "id": "task_25",
+    "instruction": "Edit the damage 'Pain and suffering' on matter '00001-Patterson' (Patterson v. Metro Transit Authority) and change its amount to 200000.",
+    "verify": "function-tasks/task_25.py"
+  },
+  {
+    "id": "task_26",
+    "instruction": "Add a new medical provider to matter '00001-Patterson' (Patterson v. Metro Transit Authority) with contact 'Dr. Michael Reeves Chiropractic' and description 'Chiropractic evaluation for cervical spine'.",
+    "verify": "function-tasks/task_26.py"
+  },
+  {
+    "id": "task_27",
+    "instruction": "Delete the medical provider 'Bay Area Orthopedic Associates' from matter '00001-Patterson'. Confirm the deletion when prompted.",
+    "verify": "function-tasks/task_27.py"
+  },
+  {
+    "id": "task_28",
+    "instruction": "Add a recovery of $150,000 from 'State Farm Insurance - Liens' to the settlement of matter '00001-Patterson' (Patterson v. Metro Transit Authority).",
+    "verify": "function-tasks/task_28.py"
+  },
+  {
+    "id": "task_29",
+    "instruction": "Edit the legal fee on matter '00003-Russo' (Russo v. Lyft Inc.) settlement and change the rate from 33.33% to 40%.",
+    "verify": "function-tasks/task_29.py"
+  },
+  {
+    "id": "task_30",
+    "instruction": "Add a non-medical lien to the settlement of matter '00001-Patterson' with holder 'CalComp Workers Compensation', description 'Workers compensation lien', amount 15000, and reduction 3000.",
+    "verify": "function-tasks/task_30.py"
+  },
+  {
+    "id": "task_31",
+    "instruction": "Add an outstanding balance to the settlement of matter '00001-Patterson' with responsibility 'client', holder 'Meridian Radiology Associates', description 'Unpaid radiology balance', amount 2500, and reduction 500.",
+    "verify": "function-tasks/task_31.py"
+  },
+  {
+    "id": "task_32",
+    "instruction": "Create a new practice area called 'Civil Rights' in the Settings.",
+    "verify": "function-tasks/task_32.py"
+  },
+  {
+    "id": "task_33",
+    "instruction": "Delete the practice area 'Environmental Law' from Settings. Confirm the deletion when prompted.",
+    "verify": "function-tasks/task_33.py"
+  },
+  {
+    "id": "task_34",
+    "instruction": "Rename the practice area 'Corporate/Business' to 'Corporate & Transactional' in the Settings.",
+    "verify": "function-tasks/task_34.py"
+  },
+  {
+    "id": "task_35",
+    "instruction": "Add a new stage called 'Appeals' to the 'Criminal Defense' practice area in Settings.",
+    "verify": "function-tasks/task_35.py"
+  },
+  {
+    "id": "task_36",
+    "instruction": "Delete the stage 'Closing' from the 'Real Estate' practice area in Settings. Confirm the deletion when prompted.",
+    "verify": "function-tasks/task_36.py"
+  },
+  {
+    "id": "task_37",
+    "instruction": "Rename the stage 'Intake' under the 'Personal Injury' practice area to 'Case Intake' in Settings.",
+    "verify": "function-tasks/task_37.py"
+  },
+  {
+    "id": "task_38",
+    "instruction": "Create a new matter template called 'Immigration - Work Visa' with practice area 'Immigration' and billing method 'hourly'.",
+    "verify": "function-tasks/task_38.py"
+  },
+  {
+    "id": "task_39",
+    "instruction": "Delete the matter template 'Estate Planning - Comprehensive' from Settings. Confirm the deletion when prompted.",
+    "verify": "function-tasks/task_39.py"
+  },
+  {
+    "id": "task_40",
+    "instruction": "Set the 'Criminal Defense - Misdemeanor' template as the default matter template in Settings.",
+    "verify": "function-tasks/task_40.py"
+  },
+  {
+    "id": "task_41",
+    "instruction": "Change the matter numbering separator from '-' to '/' in the Matter Numbering settings.",
+    "verify": "function-tasks/task_41.py"
+  },
+  {
+    "id": "task_42",
+    "instruction": "Change the number padding in the Matter Numbering settings from 5 to 6.",
+    "verify": "function-tasks/task_42.py"
+  },
+  {
+    "id": "task_43",
+    "instruction": "Disable the 'Budget Threshold Alerts' notification in the Notification settings.",
+    "verify": "function-tasks/task_43.py"
+  },
+  {
+    "id": "task_44",
+    "instruction": "Disable the 'Matter Updates' notification and enable 'Trust Balance Alerts' (it should already be enabled) in the Notification settings. Save the settings.",
+    "verify": "function-tasks/task_44.py"
+  },
+  {
+    "id": "task_45",
+    "instruction": "Move matter '00010-Dimitriou' (Dimitriou v. Lawson) from the 'Intake' stage to the 'Investigation' stage in the Personal Injury practice area.",
+    "verify": "function-tasks/task_45.py"
+  },
+  {
+    "id": "task_46",
+    "instruction": "Set the currency on matter '00001-Patterson' (Patterson v. Metro Transit Authority) to 'EUR' (Euro).",
+    "verify": "function-tasks/task_46.py"
+  },
+  {
+    "id": "task_47",
+    "instruction": "Change the originating attorney on matter '00005-Doyle' (Doyle v. Summit Construction) from Robert Jackson to Sarah Chen.",
+    "verify": "function-tasks/task_47.py"
+  },
+  {
+    "id": "task_48",
+    "instruction": "Change the client on matter '00010-Dimitriou' (Dimitriou v. Lawson) from Angela Dimitriou to Nancy Whitfield.",
+    "verify": "function-tasks/task_48.py"
+  },
+  {
+    "id": "task_49",
+    "instruction": "Find the matter for client Christina Ababio (matter '00009-Ababio') and change its status from 'pending' to 'open'.",
+    "verify": "function-tasks/task_49.py"
+  },
+  {
+    "id": "task_50",
+    "instruction": "Set the custom field 'Judge Assigned' on matter '00001-Patterson' (Patterson v. Metro Transit Authority) to 'Hon. Patricia Williams'.",
+    "verify": "function-tasks/task_50.py"
+  },
+  {
+    "id": "task_51",
+    "instruction": "Create a new contact with first name 'Michael', last name 'Rivera', email 'mrivera@email.com', and phone '(555) 999-1234'.",
+    "verify": "function-tasks/task_51.py"
+  },
+  {
+    "id": "task_52",
+    "instruction": "Edit the damage 'Lumbar MRI and diagnostic imaging' on matter '00001-Patterson' (Patterson v. Metro Transit Authority) and change its type from 'special' to 'general'.",
+    "verify": "function-tasks/task_52.py"
+  },
+  {
+    "id": "task_53",
+    "instruction": "Navigate to matter '00003-Russo' (Russo v. Lyft Inc.) and view its settlement tab. Delete the existing recovery from 'ABC Insurance Co.' Confirm the deletion.",
+    "verify": "function-tasks/task_53.py"
+  },
+  {
+    "id": "task_54",
+    "instruction": "Edit the existing recovery on matter '00021-Okafor-2' (Okafor v. SF Municipal Railway) settlement and change the amount from $45,000 to $55,000.",
+    "verify": "function-tasks/task_54.py"
+  },
+  {
+    "id": "task_55",
+    "instruction": "Change the responsible staff on matter '00001-Patterson' (Patterson v. Metro Transit Authority) from Lisa Tran to Angela Martinez.",
+    "verify": "function-tasks/task_55.py"
+  }
+]
