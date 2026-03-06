@@ -1074,8 +1074,17 @@ dependencies = [
     { name = "browser-use" },
 ]
 
+[package.optional-dependencies]
+dashboard = [
+    { name = "rich" },
+]
+
 [package.metadata]
-requires-dist = [{ name = "browser-use", specifier = ">=0.11.9" }]
+requires-dist = [
+    { name = "browser-use", specifier = ">=0.11.9" },
+    { name = "rich", marker = "extra == 'dashboard'", specifier = ">=13.0" },
+]
+provides-extras = ["dashboard"]
 
 [[package]]
 name = "multidict"
