@@ -358,5 +358,125 @@
     "difficulty": "hard",
     "instruction": "Revoke the sessions from New York and Seattle, then register a new passkey called 'Security Key Backup'.",
     "verify": "real-tasks/task_h20.py"
+  },
+  {
+    "id": "task_h21",
+    "difficulty": "hard",
+    "instruction": "Update your email address to match your Google connected account's email, then disconnect the Google account.",
+    "verify": "real-tasks/task_h21.py"
+  },
+  {
+    "id": "task_h22",
+    "difficulty": "hard",
+    "instruction": "Revoke all sessions from locations outside of California, then create a new API key called 'West Coast Only'.",
+    "verify": "real-tasks/task_h22.py"
+  },
+  {
+    "id": "task_h23",
+    "difficulty": "hard",
+    "instruction": "Revoke the API key that was last used the longest ago, and revoke the OAuth app that was authorized the earliest.",
+    "verify": "real-tasks/task_h23.py"
+  },
+  {
+    "id": "task_h24",
+    "difficulty": "hard",
+    "instruction": "For every notification channel that is currently enabled, turn on cycle update notifications. Do not modify any disabled channels.",
+    "verify": "real-tasks/task_h24.py"
+  },
+  {
+    "id": "task_h25",
+    "difficulty": "hard",
+    "instruction": "Disconnect all connected accounts that are not source code management providers, and unsubscribe from all communication notifications.",
+    "verify": "real-tasks/task_h25.py"
+  },
+  {
+    "id": "task_h26",
+    "difficulty": "hard",
+    "instruction": "Revoke the OAuth application that has the most permissions, and remove the passkey that was registered most recently.",
+    "verify": "real-tasks/task_h26.py"
+  },
+  {
+    "id": "task_h27",
+    "difficulty": "hard",
+    "instruction": "Perform a full account lockdown: disable all four notification channels, disconnect all connected accounts, and revoke all authorized applications.",
+    "verify": "real-tasks/task_h27.py"
+  },
+  {
+    "id": "task_h28",
+    "difficulty": "hard",
+    "instruction": "Invert all email notification type settings — enable every type that is currently off, and disable every type that is currently on.",
+    "verify": "real-tasks/task_h28.py"
+  },
+  {
+    "id": "task_h29",
+    "difficulty": "hard",
+    "instruction": "Set your username to the local part of your current email address (the part before the @), then disable full name display.",
+    "verify": "real-tasks/task_h29.py"
+  },
+  {
+    "id": "task_h30",
+    "difficulty": "hard",
+    "instruction": "Revoke all non-current desktop-type sessions, then disable the desktop notification channel, and turn off all three desktop application settings in preferences.",
+    "verify": "real-tasks/task_h30.py"
+  },
+  {
+    "id": "task_h31",
+    "difficulty": "hard",
+    "instruction": "Revoke the two non-current sessions at the extremes: the one signed in the longest ago and the one signed in most recently.",
+    "verify": "real-tasks/task_h31.py"
+  },
+  {
+    "id": "task_h32",
+    "difficulty": "hard",
+    "instruction": "Revoke all OAuth applications that have permission to read team information, then leave the workspace with the fewest members.",
+    "verify": "real-tasks/task_h32.py"
+  },
+  {
+    "id": "task_h33",
+    "difficulty": "hard",
+    "instruction": "Create a new API key with a label matching your role at the Acme Corp workspace, then enable both auto-assign settings.",
+    "verify": "real-tasks/task_h33.py"
+  },
+  {
+    "id": "task_h34",
+    "difficulty": "hard",
+    "instruction": "Enable the Slack notification channel and turn on all six notification types for it, then disable the email notification channel.",
+    "verify": "real-tasks/task_h34.py"
+  },
+  {
+    "id": "task_h35",
+    "difficulty": "hard",
+    "instruction": "Disconnect the connected account that uses a different email domain than your Linear account, then set the default home view to Favorited Views.",
+    "verify": "real-tasks/task_h35.py"
+  },
+  {
+    "id": "task_h36",
+    "difficulty": "hard",
+    "instruction": "Revoke all API keys except the one that was used most recently, then revoke all OAuth apps that have only read permissions.",
+    "verify": "real-tasks/task_h36.py"
+  },
+  {
+    "id": "task_h37",
+    "difficulty": "hard",
+    "instruction": "Configure all four notification channels to only send notifications for mentions — enable any disabled channels first, then ensure only the mentions type is on for each.",
+    "verify": "real-tasks/task_h37.py"
+  },
+  {
+    "id": "task_h38",
+    "difficulty": "hard",
+    "instruction": "Remove the passkey that was used least recently, disconnect the source code provider that was connected most recently, and revoke the session from the device running Windows 10.",
+    "verify": "real-tasks/task_h38.py"
+  },
+  {
+    "id": "task_h39",
+    "difficulty": "hard",
+    "instruction": "Set up maximum notifications: enable all four channels, turn on every notification type for each channel, and subscribe to all three communication notifications.",
+    "verify": "real-tasks/task_h39.py"
+  },
+  {
+    "id": "task_h40",
+    "difficulty": "hard",
+    "instruction": "Revoke the two OAuth applications that were authorized most recently, then register a new passkey named after the workspace where you are an admin.",
+    "verify": "real-tasks/task_h40.py"
   }
 ]

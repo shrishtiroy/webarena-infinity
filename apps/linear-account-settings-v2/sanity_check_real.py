@@ -391,10 +391,185 @@ def solve_task_h20(state):
     })
     state["_nextPasskeyId"] = pk_id + 1
 
+# Hardening round 1 tasks (h21-h40)
+
+def solve_task_h21(state):
+    """Update email to Google account's email, disconnect Google."""
+    state["currentUser"]["email"] = "alex.morgan@gmail.com"
+    state["connectedAccounts"] = [a for a in state["connectedAccounts"]
+                                   if a["provider"] != "Google"]
+
+def solve_task_h22(state):
+    """Revoke non-California sessions, create 'West Coast Only' API key."""
+    state["sessions"] = [s for s in state["sessions"] if ", CA," in s.get("location", "")]
+    key_id = state.get("_nextApiKeyId", 10)
+    now = "2026-03-06T12:00:00.000Z"
+    state["apiKeys"].append({
+        "id": f"apikey_{key_id:02d}",
+        "label": "West Coast Only",
+        "keyPrefix": "lin_api_test",
+        "createdAt": now,
+        "lastUsedAt": None,
+        "expiresAt": None
+    })
+    state["_nextApiKeyId"] = key_id + 1
+
+def solve_task_h23(state):
+    """Revoke least recently used API key and earliest authorized OAuth app."""
+    state["apiKeys"] = [k for k in state["apiKeys"] if k["label"] != "Mobile App Testing"]
+    state["authorizedApps"] = [a for a in state["authorizedApps"] if a["name"] != "Zapier"]
+
+def solve_task_h24(state):
+    """Enable cycle updates for enabled channels (desktop, mobile, email)."""
+    for channel in ("desktop", "mobile", "email"):
+        state["notificationSettings"][channel]["cycleUpdated"] = True
+
+def solve_task_h25(state):
+    """Disconnect non-SCM accounts, unsubscribe from all comms."""
+    scm = {"GitHub", "GitLab"}
+    state["connectedAccounts"] = [a for a in state["connectedAccounts"]
+                                   if a["provider"] in scm]
+    state["notificationSettings"]["receiveChangelogs"] = False
+    state["notificationSettings"]["receiveDpaUpdates"] = False
+    state["notificationSettings"]["receiveProductUpdates"] = False
+
+def solve_task_h26(state):
+    """Revoke OAuth app with most permissions (Zapier), remove newest passkey (iPhone Face ID)."""
+    state["authorizedApps"] = [a for a in state["authorizedApps"] if a["name"] != "Zapier"]
+    state["passkeys"] = [p for p in state["passkeys"] if p["name"] != "iPhone Face ID"]
+
+def solve_task_h27(state):
+    """Full lockdown: disable all channels, disconnect all accounts, revoke all apps."""
+    for channel in ("desktop", "mobile", "email", "slack"):
+        state["notificationSettings"][channel]["enabled"] = False
+    state["connectedAccounts"] = []
+    state["authorizedApps"] = []
+
+def solve_task_h28(state):
+    """Invert all email notification types."""
+    email = state["notificationSettings"]["email"]
+    for key in ("issueAssigned", "issueStatusChanged", "issueCommented",
+                "issueMentioned", "projectUpdated", "cycleUpdated"):
+        email[key] = not email[key]
+
+def solve_task_h29(state):
+    """Set username to email local part, disable full names."""
+    email_addr = state["currentUser"]["email"]
+    local_part = email_addr.split("@")[0]
+    state["currentUser"]["username"] = local_part
+    state["preferences"]["displayFullNames"] = False
+
+def solve_task_h30(state):
+    """Revoke non-current desktop sessions, disable desktop notifs, turn off desktop app prefs."""
+    state["sessions"] = [s for s in state["sessions"]
+                         if s.get("deviceType") != "desktop" or s.get("isCurrent")]
+    state["notificationSettings"]["desktop"]["enabled"] = False
+    state["preferences"]["openInDesktopApp"] = False
+    state["preferences"]["desktopNotificationBadge"] = False
+    state["preferences"]["enableSpellCheck"] = False
+
+def solve_task_h31(state):
+    """Revoke sessions with earliest and most recent sign-in (non-current)."""
+    state["sessions"] = [s for s in state["sessions"]
+                         if s["deviceName"] not in ("Edge on Windows", "Firefox on Windows")]
+
+def solve_task_h32(state):
+    """Revoke OAuth apps with read:teams, leave workspace with fewest members."""
+    state["authorizedApps"] = [a for a in state["authorizedApps"]
+                                if "read:teams" not in a.get("permissions", [])]
+    state["workspaces"] = [w for w in state["workspaces"]
+                           if w["name"] != "Side Project Labs"]
+
+def solve_task_h33(state):
+    """Create API key labeled 'Admin' (Acme Corp role), enable both auto-assign."""
+    key_id = state.get("_nextApiKeyId", 10)
+    now = "2026-03-06T12:00:00.000Z"
+    state["apiKeys"].append({
+        "id": f"apikey_{key_id:02d}",
+        "label": "Admin",
+        "keyPrefix": "lin_api_test",
+        "createdAt": now,
+        "lastUsedAt": None,
+        "expiresAt": None
+    })
+    state["_nextApiKeyId"] = key_id + 1
+    state["preferences"]["autoAssignOnCreate"] = True
+    state["preferences"]["autoAssignOnStarted"] = True
+
+def solve_task_h34(state):
+    """Enable Slack with all types, disable email channel."""
+    slack = state["notificationSettings"]["slack"]
+    slack["enabled"] = True
+    for key in ("issueAssigned", "issueStatusChanged", "issueCommented",
+                "issueMentioned", "projectUpdated", "cycleUpdated"):
+        slack[key] = True
+    state["notificationSettings"]["email"]["enabled"] = False
+
+def solve_task_h35(state):
+    """Disconnect account with different email domain (Google), set home to Favorited Views."""
+    state["connectedAccounts"] = [a for a in state["connectedAccounts"]
+                                   if a["provider"] != "Google"]
+    state["preferences"]["defaultHomeView"] = "Favorited Views"
+
+def solve_task_h36(state):
+    """Keep only most recently used API key (CI/CD Pipeline), revoke read-only OAuth apps."""
+    state["apiKeys"] = [k for k in state["apiKeys"] if k["label"] == "CI/CD Pipeline"]
+    state["authorizedApps"] = [
+        a for a in state["authorizedApps"]
+        if any("write" in p for p in a.get("permissions", []))
+    ]
+
+def solve_task_h37(state):
+    """All 4 channels enabled, only mentions type on."""
+    for channel in ("desktop", "mobile", "email", "slack"):
+        ch = state["notificationSettings"][channel]
+        ch["enabled"] = True
+        ch["issueAssigned"] = False
+        ch["issueStatusChanged"] = False
+        ch["issueCommented"] = False
+        ch["issueMentioned"] = True
+        ch["projectUpdated"] = False
+        ch["cycleUpdated"] = False
+
+def solve_task_h38(state):
+    """Remove least used passkey (YubiKey), disconnect most recent SCM (GitLab), revoke Win10 session."""
+    state["passkeys"] = [p for p in state["passkeys"] if p["name"] != "YubiKey 5C NFC"]
+    state["connectedAccounts"] = [a for a in state["connectedAccounts"]
+                                   if a["provider"] != "GitLab"]
+    state["sessions"] = [s for s in state["sessions"] if "Windows 10" not in s.get("os", "")]
+
+def solve_task_h39(state):
+    """Maximum notifications: all channels, all types, all comms."""
+    notif_types = ("issueAssigned", "issueStatusChanged", "issueCommented",
+                   "issueMentioned", "projectUpdated", "cycleUpdated")
+    for channel in ("desktop", "mobile", "email", "slack"):
+        ch = state["notificationSettings"][channel]
+        ch["enabled"] = True
+        for key in notif_types:
+            ch[key] = True
+    state["notificationSettings"]["receiveChangelogs"] = True
+    state["notificationSettings"]["receiveDpaUpdates"] = True
+    state["notificationSettings"]["receiveProductUpdates"] = True
+
+def solve_task_h40(state):
+    """Revoke two most recently authorized OAuth apps, add passkey 'Acme Corp'."""
+    state["authorizedApps"] = [a for a in state["authorizedApps"]
+                                if a["name"] not in ("Screenful", "Marker.io")]
+    pk_id = state.get("_nextPasskeyId", 10)
+    now = "2026-03-06T12:00:00.000Z"
+    state["passkeys"].append({
+        "id": f"pk_{pk_id:02d}",
+        "name": "Acme Corp",
+        "createdAt": now,
+        "lastUsedAt": now,
+        "credentialType": "platform"
+    })
+    state["_nextPasskeyId"] = pk_id + 1
+
 
 SOLVERS = {}
 for _difficulty in ("e", "m", "h"):
-    for _i in range(1, 21):
+    for _i in range(1, 41):
         _task_id = f"task_{_difficulty}{_i}"
         _fn_name = f"solve_task_{_difficulty}{_i}"
         if _fn_name in globals():
