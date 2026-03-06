@@ -149,6 +149,18 @@ for i in "${!IPS[@]}"; do
     continue
   fi
 
+  # Run smoke test on the instance before starting pipeline
+  echo "  Smoke testing $ENV_ID @ $IP ..."
+  SMOKE_OUTPUT=$(ssh $SSH_OPTS "ec2-user@${IP}" \
+    "source ~/.bashrc && cd ~/mirror-mirror && bash infra/smoke_test.sh --model ${MODEL}" 2>&1)
+  SMOKE_RC=$?
+  if [ "$SMOKE_RC" -ne 0 ]; then
+    echo "  FAIL $ENV_ID — smoke test failed (ssh -i ~/.ssh/${KEY_PAIR}.pem ec2-user@${IP})"
+    echo "$SMOKE_OUTPUT" | sed 's/^/       /'
+    continue
+  fi
+  echo "  OK   $ENV_ID — smoke test passed"
+
   PIPELINE_CMD="cd ~/mirror-mirror && \$HOME/venv/bin/python infra/pipeline.py \
     --app-name ${ENV_ID} \
     --docs-path ${DOCS} \

@@ -451,12 +451,15 @@ def setup_branch(branch: str | None) -> None:
 
 
 def git_push() -> None:
-    """Push current branch to remote."""
-    # Get current branch name
+    """Push current branch to remote. Raises on failure."""
     result = git("rev-parse", "--abbrev-ref", "HEAD")
     branch = result.stdout.strip()
     log.info("Pushing branch %s to origin", branch)
-    git("push", "-u", "origin", branch)
+    result = git("push", "-u", "origin", branch)
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"git push failed (rc={result.returncode}): {result.stderr.strip()}"
+        )
 
 
 # ---------------------------------------------------------------------------

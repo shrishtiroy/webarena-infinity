@@ -14,7 +14,7 @@ set -euo pipefail
 
 MANIFEST=""
 BATCH_SIZE=3
-POLL_INTERVAL=120  # seconds between completion checks
+POLL_INTERVAL=1200  # seconds between completion checks
 LAUNCH_ARGS=()
 
 # --- Parse arguments ---
@@ -186,14 +186,27 @@ for (( batch=0; batch<NUM_BATCHES; batch++ )); do
     sleep "$POLL_INTERVAL"
   done
 
-  # # Tear down this batch (keep EIPs released, keep SG/IAM for reuse)
-  # echo ""
-  # echo "=== Tearing down batch $batch_num ==="
-  # bash infra/setup/teardown.sh --release-eips
+  # Only tear down if all pipelines succeeded — keep failed instances alive for debugging
+  if [ "$BATCH_HAD_FAILURES" -gt 0 ]; then
+    echo ""
+    echo "=== SKIPPING teardown for batch $batch_num — failed instances kept alive for debugging ==="
+    echo "  Investigate via: bash infra/setup/monitor.sh"
+    echo "  Tear down manually when done: bash infra/setup/teardown.sh"
+    echo ""
+    echo "=== Aborting remaining batches ==="
+    rm -f "$BATCH_MANIFEST"
+    rm -f "$LAUNCH_FILE"
+    exit 1
+  fi
 
-  # # Cleanup temp files
-  # rm -f "$BATCH_MANIFEST"
-  # rm -f "$LAUNCH_FILE"
+  # Tear down this batch (all succeeded) — keep EIPs pooled for Claude auth reuse
+  echo ""
+  echo "=== Tearing down batch $batch_num ==="
+  bash infra/setup/teardown.sh
+
+  # Cleanup temp files
+  rm -f "$BATCH_MANIFEST"
+  rm -f "$LAUNCH_FILE"
 # 
   echo ""
   if [ "$batch_num" -lt "$NUM_BATCHES" ]; then

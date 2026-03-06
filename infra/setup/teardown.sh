@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# Terminate pipeline EC2 instances. EIPs return to the pool for reuse.
+# Stop or terminate pipeline EC2 instances. EIPs return to the pool for reuse.
 #
-# Finds all instances tagged Project=mirror-mirror and terminates them.
-# EIPs are disassociated but kept in the pool so Claude auth sessions persist.
+# Finds all instances tagged Project=mirror-mirror and stops them (default)
+# or terminates them. Stopped instances preserve EBS volumes and can be
+# restarted for debugging.
 #
 # Usage:
-#   bash infra/setup/teardown.sh                   # terminate instances (EIPs return to pool)
-#   bash infra/setup/teardown.sh --release-eips    # terminate + release EIPs (destroys Claude auth)
+#   bash infra/setup/teardown.sh                   # stop instances (EIPs return to pool, EBS preserved)
+#   bash infra/setup/teardown.sh --terminate       # terminate instances (EBS deleted)
+#   bash infra/setup/teardown.sh --release-eips    # stop + release EIPs (destroys Claude auth)
 #   bash infra/setup/teardown.sh --all             # terminate + release EIPs + delete SG + IAM role
 
 set -euo pipefail
@@ -14,24 +16,30 @@ set -euo pipefail
 REGION="${AWS_REGION:-us-east-1}"
 RELEASE_EIPS=false
 DELETE_ALL=false
+TERMINATE=false
 
 for arg in "$@"; do
   case "$arg" in
+    --terminate)    TERMINATE=true ;;
     --release-eips) RELEASE_EIPS=true ;;
-    --all)          DELETE_ALL=true; RELEASE_EIPS=true ;;
+    --all)          DELETE_ALL=true; RELEASE_EIPS=true; TERMINATE=true ;;
     *) echo "Unknown flag: $arg"; exit 1 ;;
   esac
 done
 
-# --- Terminate instances ---
-echo "=== Terminating mirror-mirror EC2 instances ==="
+# --- Stop or terminate instances ---
+if $TERMINATE; then
+  echo "=== Terminating mirror-mirror EC2 instances ==="
+else
+  echo "=== Stopping mirror-mirror EC2 instances ==="
+fi
+
 INSTANCE_IDS=$(aws ec2 describe-instances \
   --filters "Name=tag:Project,Values=mirror-mirror" "Name=instance-state-name,Values=pending,running,stopping,stopped" \
   --query 'Reservations[].Instances[].InstanceId' \
   --output text --region "$REGION")
 
 if [ -n "$INSTANCE_IDS" ]; then
-  # Show what we're terminating
   for id in $INSTANCE_IDS; do
     ENV_ID=$(aws ec2 describe-instances --instance-ids "$id" \
       --query 'Reservations[0].Instances[0].Tags[?Key==`EnvId`].Value | [0]' --output text --region "$REGION")
@@ -40,10 +48,27 @@ if [ -n "$INSTANCE_IDS" ]; then
     echo "  $id  ${ENV_ID:-unknown}  ($STATE)"
   done
 
-  echo "  Terminating..."
-  aws ec2 terminate-instances --instance-ids $INSTANCE_IDS --region "$REGION" > /dev/null
-  echo "  Waiting for termination..."
-  aws ec2 wait instance-terminated --instance-ids $INSTANCE_IDS --region "$REGION"
+  if $TERMINATE; then
+    echo "  Terminating..."
+    aws ec2 terminate-instances --instance-ids $INSTANCE_IDS --region "$REGION" > /dev/null
+    echo "  Waiting for termination..."
+    aws ec2 wait instance-terminated --instance-ids $INSTANCE_IDS --region "$REGION"
+  else
+    # Only stop running instances (already-stopped ones are fine)
+    RUNNING_IDS=$(aws ec2 describe-instances \
+      --instance-ids $INSTANCE_IDS \
+      --filters "Name=instance-state-name,Values=pending,running" \
+      --query 'Reservations[].Instances[].InstanceId' \
+      --output text --region "$REGION")
+    if [ -n "$RUNNING_IDS" ]; then
+      echo "  Stopping..."
+      aws ec2 stop-instances --instance-ids $RUNNING_IDS --region "$REGION" > /dev/null
+      echo "  Waiting for instances to stop..."
+      aws ec2 wait instance-stopped --instance-ids $RUNNING_IDS --region "$REGION"
+    else
+      echo "  All instances already stopped."
+    fi
+  fi
   echo "  Done."
 else
   echo "  No instances found."
@@ -111,7 +136,11 @@ fi
 
 if ! $DELETE_ALL; then
   echo ""
-  echo "Security group, IAM role, and EIP pool preserved (re-use on next run)."
+  if $TERMINATE; then
+    echo "Instances terminated. Security group, IAM role, and EIP pool preserved."
+  else
+    echo "Instances stopped (EBS preserved). Restart with: aws ec2 start-instances --instance-ids ..."
+  fi
   echo "To delete everything: bash infra/setup/teardown.sh --all"
 fi
 
