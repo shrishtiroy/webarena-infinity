@@ -60,5 +60,26 @@
   {"id": "task_h17", "difficulty": "hard", "instruction": "Create a new branding theme called 'Government', disable payment advice on it, and then set it as the default.", "verify": "real-tasks/task_h17.py"},
   {"id": "task_h18", "difficulty": "hard", "instruction": "Copy the CloudNine Q1 data pipeline invoice to a new draft and change the contact to Cascade Software Solutions.", "verify": "real-tasks/task_h18.py"},
   {"id": "task_h19", "difficulty": "hard", "instruction": "Approve the Redback Mining Supplies draft invoice, then immediately record a partial payment of $1,000.", "verify": "real-tasks/task_h19.py"},
-  {"id": "task_h20", "difficulty": "hard", "instruction": "Delete the draft Pacific Freight Lines credit note and create a new one for $500 for the same contact.", "verify": "real-tasks/task_h20.py"}
+  {"id": "task_h20", "difficulty": "hard", "instruction": "Delete the draft Pacific Freight Lines credit note and create a new one for $500 for the same contact.", "verify": "real-tasks/task_h20.py"},
+
+  {"id": "task_h21", "difficulty": "hard", "instruction": "Record full payment on the CloudNine Analytics invoice that has the earliest due date.", "verify": "real-tasks/task_h21.py"},
+  {"id": "task_h22", "difficulty": "hard", "instruction": "Remove the partial payment from the Pinnacle Construction invoice and then void it.", "verify": "real-tasks/task_h22.py"},
+  {"id": "task_h23", "difficulty": "hard", "instruction": "Decline all sent quotes that have a total under $20,000.", "verify": "real-tasks/task_h23.py"},
+  {"id": "task_h24", "difficulty": "hard", "instruction": "Change all active repeating invoices to use the Professional Services branding theme.", "verify": "real-tasks/task_h24.py"},
+  {"id": "task_h25", "difficulty": "hard", "instruction": "Create a credit note for the contact with the largest outstanding balance, for 5 hours of consulting at the standard rate.", "verify": "real-tasks/task_h25.py"},
+  {"id": "task_h26", "difficulty": "hard", "instruction": "Accept the Metro Fabrication factory automation quote and then create an invoice from it.", "verify": "real-tasks/task_h26.py"},
+  {"id": "task_h27", "difficulty": "hard", "instruction": "Copy the Alpha Logistics supply chain optimization invoice to a new draft and update the reference to 'ALI-2026-Q2'.", "verify": "real-tasks/task_h27.py"},
+  {"id": "task_h28", "difficulty": "hard", "instruction": "Change the quote prefix to 'EST-' and create a new quote for Outback Adventures Tourism for 10 days of project management.", "verify": "real-tasks/task_h28.py"},
+  {"id": "task_h29", "difficulty": "hard", "instruction": "Change the Vanguard Security repeating invoice frequency to fortnightly and set an end date of June 2026.", "verify": "real-tasks/task_h29.py"},
+  {"id": "task_h30", "difficulty": "hard", "instruction": "Create a new branding theme called 'Minimal', disable both the tax number and payment advice displays, then set it as the default theme.", "verify": "real-tasks/task_h30.py"},
+  {"id": "task_h31", "difficulty": "hard", "instruction": "Void the TechVault Solutions invoice that includes a security audit line item.", "verify": "real-tasks/task_h31.py"},
+  {"id": "task_h32", "difficulty": "hard", "instruction": "Create a credit note for Sapphire Bay Resort for $500, approve it, and allocate it to their website development invoice.", "verify": "real-tasks/task_h32.py"},
+  {"id": "task_h33", "difficulty": "hard", "instruction": "Approve and send all invoices currently awaiting approval.", "verify": "real-tasks/task_h33.py"},
+  {"id": "task_h34", "difficulty": "hard", "instruction": "Change the default due date to 7 days after the end of invoice month, and update the credit note prefix to 'CREDIT-'.", "verify": "real-tasks/task_h34.py"},
+  {"id": "task_h35", "difficulty": "hard", "instruction": "Update the title of the Atlas Engineering collaboration platform quote to 'Engineering Hub Platform v2'.", "verify": "real-tasks/task_h35.py"},
+  {"id": "task_h36", "difficulty": "hard", "instruction": "Record a $10,000 partial payment on the TechVault cloud migration invoice and add the summary 'Partial payment received for Phase 2 development'.", "verify": "real-tasks/task_h36.py"},
+  {"id": "task_h37", "difficulty": "hard", "instruction": "Fully pay the Greenfield Organics February invoice and then void their paid January invoice.", "verify": "real-tasks/task_h37.py"},
+  {"id": "task_h38", "difficulty": "hard", "instruction": "Record full payment on both the Alpha Logistics supply chain invoice and the Summit Health Group license invoice.", "verify": "real-tasks/task_h38.py"},
+  {"id": "task_h39", "difficulty": "hard", "instruction": "Update the reference on the Greenfield Organics invoice that includes e-commerce development to 'GF-ECOM-2026'.", "verify": "real-tasks/task_h39.py"},
+  {"id": "task_h40", "difficulty": "hard", "instruction": "Create a new invoice for Outback Adventures Tourism for 5 days of on-site training with a 15% discount and 40 hours of development work, then approve it.", "verify": "real-tasks/task_h40.py"}
 ]
