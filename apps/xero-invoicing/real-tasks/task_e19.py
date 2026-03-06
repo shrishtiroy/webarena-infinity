@@ -5,11 +5,10 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    rem = next((r for r in state["invoiceReminders"] if r["timing"] == "after" and r["days"] == 14), None)
+    if rem is not None:
+        return False, "14-day overdue reminder still exists."
 
-    invoice_reminders = state.get("invoiceReminders", [])
-    for reminder in invoice_reminders:
-        if reminder.get("timing") == "after" and reminder.get("days") == 14:
-            return False, "Two-week overdue reminder (timing='after', days=14) still exists."
-
-    return True, "Two-week overdue reminder has been successfully deleted."
+    return True, "14-day overdue reminder deleted successfully."

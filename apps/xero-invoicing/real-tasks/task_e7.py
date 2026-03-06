@@ -14,4 +14,4 @@ def verify(server_url: str) -> tuple[bool, str]:
     if cn["status"] != "awaiting_payment":
         return False, f"Credit note CN-0011 status is '{cn['status']}', expected 'awaiting_payment'."
 
-    return True, "Credit note CN-0011 (Pacific Freight Lines) approved successfully (status is awaiting_payment)."
+    return True, "Credit note CN-0011 approved successfully."

@@ -14,4 +14,4 @@ def verify(server_url: str) -> tuple[bool, str]:
     if inv["status"] != "awaiting_payment":
         return False, f"Invoice INV-0058 status is '{inv['status']}', expected 'awaiting_payment'."
 
-    return True, "Invoice INV-0058 (Murray River Winery) approved successfully (status is awaiting_payment)."
+    return True, "Invoice INV-0058 approved successfully (status is awaiting_payment)."

@@ -5,20 +5,13 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    ri = next((r for r in state["repeatingInvoices"] if r["id"] == "rep_003"), None)
+    if not ri:
+        return False, "Repeating invoice rep_003 not found."
 
-    repeating = state.get("repeatingInvoices", [])
-    target = None
-    for inv in repeating:
-        if inv.get("id") == "rep_003":
-            target = inv
-            break
+    if ri["reference"] != "Cascade monthly license":
+        return False, f"Reference is '{ri['reference']}', expected 'Cascade monthly license'."
 
-    if target is None:
-        return False, "Could not find repeating invoice with id 'rep_003'."
-
-    reference = target.get("reference", "")
-    if reference != "Cascade monthly license":
-        return False, f"Expected reference 'Cascade monthly license' on rep_003, but found '{reference}'."
-
-    return True, "Repeating invoice rep_003 has reference 'Cascade monthly license'."
+    return True, "Cascade Software repeating invoice reference updated."

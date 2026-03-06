@@ -5,12 +5,11 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    settings = state.get("invoiceSettings", {})
 
-    invoice_settings = state.get("invoiceSettings", {})
-    show_item_code = invoice_settings.get("showItemCode")
+    if settings.get("showItemCode") is not False:
+        return False, f"showItemCode is {settings.get('showItemCode')}, expected False."
 
-    if show_item_code is not False:
-        return False, f"Item codes are still displayed. showItemCode is {show_item_code}."
-
-    return True, "Item codes have been successfully hidden on invoices."
+    return True, "Item codes hidden successfully."

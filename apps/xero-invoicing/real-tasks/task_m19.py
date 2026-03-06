@@ -5,29 +5,19 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    inv = next((i for i in state["invoices"] if i["number"] == "INV-0045"), None)
+    if not inv:
+        return False, "Invoice INV-0045 not found."
 
-    invoices = state.get("invoices", [])
-    target = None
-    for inv in invoices:
-        if inv.get("number") == "INV-0045":
-            target = inv
-            break
+    if inv["payments"]:
+        return False, f"Invoice INV-0045 still has {len(inv['payments'])} payment(s)."
 
-    if target is None:
-        return False, "Could not find invoice with number 'INV-0045'."
+    if inv["amountPaid"] != 0:
+        return False, f"Invoice INV-0045 amountPaid is {inv['amountPaid']}, expected 0."
 
-    payments = target.get("payments", [])
-    if len(payments) != 0:
-        return False, f"Expected payments to be empty after reversal, but found {len(payments)} payment(s)."
+    if abs(inv["amountDue"] - inv["total"]) > 0.01:
+        return False, f"Invoice INV-0045 amountDue ({inv['amountDue']}) does not match total ({inv['total']})."
 
-    amount_paid = target.get("amountPaid", -1)
-    if abs(amount_paid) >= 0.01:
-        return False, f"Expected amountPaid to be 0 after reversal, but found {amount_paid}."
-
-    total = target.get("total", 0)
-    amount_due = target.get("amountDue", 0)
-    if abs(amount_due - 15840.00) >= 0.01:
-        return False, f"Expected amountDue to be approximately 15840.00, but found {amount_due}."
-
-    return True, "Partial payment on INV-0045 has been reversed. Payments empty, amountPaid is 0, amountDue is 15840.00."
+    return True, "Partial payment on INV-0045 reversed."

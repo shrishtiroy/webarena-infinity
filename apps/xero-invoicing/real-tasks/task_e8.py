@@ -7,14 +7,11 @@ def verify(server_url: str) -> tuple[bool, str]:
         return False, "Could not retrieve application state."
 
     state = resp.json()
-    reminder = next(
-        (r for r in state["invoiceReminders"] if r["timing"] == "after" and r["days"] == 30),
-        None
-    )
-    if not reminder:
-        return False, "No invoice reminder found with timing 'after' and days 30."
+    rem = next((r for r in state["invoiceReminders"] if r["timing"] == "after" and r["days"] == 30), None)
+    if not rem:
+        return False, "30-day overdue reminder not found."
 
-    if reminder["enabled"] is not True:
-        return False, f"30-day overdue reminder enabled is {reminder['enabled']}, expected True."
+    if not rem["enabled"]:
+        return False, "30-day overdue reminder is not enabled."
 
-    return True, "30-day overdue invoice reminder is now enabled."
+    return True, "30-day overdue reminder enabled successfully."

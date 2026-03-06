@@ -14,4 +14,4 @@ def verify(server_url: str) -> tuple[bool, str]:
     if inv["status"] != "deleted":
         return False, f"Invoice INV-0059 status is '{inv['status']}', expected 'deleted'."
 
-    return True, "Invoice INV-0059 (Bright Spark Electrical) deleted successfully."
+    return True, "Invoice INV-0059 deleted successfully."

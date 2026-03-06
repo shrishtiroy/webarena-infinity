@@ -5,19 +5,16 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    inv = next((i for i in state["invoices"] if i["number"] == "INV-0057"), None)
+    if not inv:
+        return False, "Invoice INV-0057 not found."
 
-    invoices = state.get("invoices", [])
-    for invoice in invoices:
-        if invoice.get("number") == "INV-0057":
-            status = invoice.get("status")
-            sent_at = invoice.get("sentAt")
+    if inv["status"] != "awaiting_payment":
+        return False, f"Invoice INV-0057 status is '{inv['status']}', expected 'awaiting_payment'."
 
-            if status != "awaiting_payment":
-                return False, f"Invoice INV-0057 has status '{status}', expected 'awaiting_payment'."
-            if sent_at is None:
-                return False, "Invoice INV-0057 has sentAt as null, expected a non-null value."
+    if not inv.get("sentAt"):
+        return False, "Invoice INV-0057 has not been marked as sent (sentAt is null)."
 
-            return True, "Invoice INV-0057 (Stellar Education Services) has been successfully marked as sent."
-
-    return False, "Invoice INV-0057 (Stellar Education Services) not found."
+    return True, "Invoice INV-0057 marked as sent."

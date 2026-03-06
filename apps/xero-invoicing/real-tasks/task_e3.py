@@ -17,4 +17,4 @@ def verify(server_url: str) -> tuple[bool, str]:
     if inv["amountDue"] != 0:
         return False, f"Invoice INV-0054 amountDue is {inv['amountDue']}, expected 0."
 
-    return True, "Invoice INV-0054 (Sapphire Bay Resort) voided successfully with amountDue of 0."
+    return True, "Invoice INV-0054 voided successfully."

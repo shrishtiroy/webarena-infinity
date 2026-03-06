@@ -5,24 +5,16 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    quo = next((q for q in state["quotes"] if q["number"] == "QU-0025"), None)
+    if not quo:
+        return False, "Quote QU-0025 not found."
 
-    quotes = state.get("quotes", [])
-    target = None
-    for q in quotes:
-        if q.get("number") == "QU-0025":
-            target = q
-            break
+    if quo["status"] != "sent":
+        return False, f"Quote QU-0025 status is '{quo['status']}', expected 'sent'."
 
-    if target is None:
-        return False, "Could not find quote with number 'QU-0025'."
+    if not quo.get("sentAt"):
+        return False, "Quote QU-0025 sentAt is null."
 
-    status = target.get("status", "")
-    if status != "sent":
-        return False, f"Expected quote QU-0025 status 'sent', but found '{status}'."
-
-    sent_at = target.get("sentAt")
-    if sent_at is None:
-        return False, "Quote QU-0025 has status 'sent' but sentAt is None."
-
-    return True, "Quote QU-0025 has been sent."
+    return True, "Quote QU-0025 sent successfully."

@@ -7,20 +7,15 @@ def verify(server_url: str) -> tuple[bool, str]:
         return False, "Could not retrieve application state."
 
     state = resp.json()
-    themes = state.get("brandingThemes", [])
-    if not themes:
-        return False, "No branding themes found in state."
+    prof = next((t for t in state["brandingThemes"] if t["id"] == "theme_professional"), None)
+    if not prof:
+        return False, "Professional Services theme not found."
 
-    target = next((t for t in themes if t["id"] == "theme_professional"), None)
-    if not target:
-        return False, "Branding theme 'theme_professional' not found."
+    if not prof["isDefault"]:
+        return False, "Professional Services theme is not set as default."
 
-    if target["isDefault"] is not True:
-        return False, f"Theme 'Professional Services' isDefault is {target['isDefault']}, expected True."
+    others = [t for t in state["brandingThemes"] if t["id"] != "theme_professional" and t["isDefault"]]
+    if others:
+        return False, f"Other theme(s) are also marked as default: {[t['name'] for t in others]}"
 
-    others_with_default = [t for t in themes if t["id"] != "theme_professional" and t.get("isDefault") is True]
-    if others_with_default:
-        names = ", ".join(t["name"] for t in others_with_default)
-        return False, f"Other themes still have isDefault=True: {names}."
-
-    return True, "Professional Services is now the default branding theme, and all other themes have isDefault=False."
+    return True, "Professional Services is the default branding theme."

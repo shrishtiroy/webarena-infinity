@@ -5,42 +5,19 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    src = next((q for q in state["quotes"] if q["number"] == "QU-0024"), None)
+    if not src:
+        return False, "Original quote QU-0024 not found."
 
-    quotes = state.get("quotes", [])
+    copies = [q for q in state["quotes"]
+              if q["contactId"] == src["contactId"]
+              and q["status"] == "draft"
+              and q["number"] != "QU-0024"
+              and abs(q["total"] - src["total"]) < 0.01]
 
-    # Find the original Atlas Engineering quote
-    original = None
-    for q in quotes:
-        if q.get("number") == "QU-0024":
-            original = q
-            break
+    if not copies:
+        return False, "No draft copy of QU-0024 found for Atlas Engineering."
 
-    if original is None:
-        return False, "Could not find original quote with number 'QU-0024'."
-
-    atlas_contact_id = original.get("contactId", "")
-    if atlas_contact_id != "con_025":
-        return False, f"Expected original quote QU-0024 to have contactId 'con_025', but found '{atlas_contact_id}'."
-
-    # Find a new quote (not QU-0024) with the same contactId
-    duplicate = None
-    for q in quotes:
-        if q.get("number") == "QU-0024":
-            continue
-        if q.get("contactId") == "con_025":
-            duplicate = q
-            break
-
-    if duplicate is None:
-        return False, "Could not find a duplicated quote for Atlas Engineering (contactId 'con_025') other than QU-0024."
-
-    dup_status = duplicate.get("status", "")
-    if dup_status != "draft":
-        return False, f"Expected duplicated quote status 'draft', but found '{dup_status}'."
-
-    line_items = duplicate.get("lineItems", [])
-    if len(line_items) < 1:
-        return False, f"Expected duplicated quote to have at least one line item, but found {len(line_items)}."
-
-    return True, f"Atlas Engineering quote duplicated successfully. New quote '{duplicate.get('number')}' is a draft with {len(line_items)} line item(s)."
+    return True, f"Quote QU-0024 duplicated as {copies[0]['number']}."

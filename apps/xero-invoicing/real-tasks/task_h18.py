@@ -5,31 +5,19 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    quo = next((q for q in state["quotes"] if q["number"] == "QU-0025"), None)
+    if not quo:
+        return False, "Quote QU-0025 not found."
 
-    quotes = state.get("quotes", [])
-    target = None
-    for q in quotes:
-        if q.get("number") == "QU-0025":
-            target = q
-            break
+    if quo["expiryDate"] != "2026-04-30":
+        return False, f"Expiry date is '{quo['expiryDate']}', expected '2026-04-30'."
 
-    if target is None:
-        return False, "Could not find quote with number 'QU-0025'."
+    if quo["status"] != "sent":
+        return False, f"Quote status is '{quo['status']}', expected 'sent'."
 
-    # Check expiryDate is 2026-04-30
-    expiry_date = target.get("expiryDate", "")
-    if expiry_date != "2026-04-30":
-        return False, f"Quote QU-0025 expiryDate is '{expiry_date}', expected '2026-04-30'."
+    if not quo.get("sentAt"):
+        return False, "Quote sentAt is null."
 
-    # Check status is sent
-    status = target.get("status", "")
-    if status != "sent":
-        return False, f"Quote QU-0025 status is '{status}', expected 'sent'."
-
-    # Check sentAt is not None
-    sent_at = target.get("sentAt")
-    if sent_at is None:
-        return False, "Quote QU-0025 has status 'sent' but sentAt is None."
-
-    return True, "Quote QU-0025 (Fresh Start Catering) expiry extended to 2026-04-30 and sent."
+    return True, "Quote QU-0025 expiry extended to April 30 and sent."

@@ -5,12 +5,11 @@ def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    settings = state.get("invoiceSettings", {})
 
-    invoice_settings = state.get("invoiceSettings", {})
-    prefix = invoice_settings.get("creditNotePrefix")
+    if settings.get("creditNotePrefix") != "CR-":
+        return False, f"Credit note prefix is '{settings.get('creditNotePrefix')}', expected 'CR-'."
 
-    if prefix != "CR-":
-        return False, f"Credit note prefix is '{prefix}', expected 'CR-'."
-
-    return True, "Credit note prefix has been updated to 'CR-'."
+    return True, "Credit note prefix updated to CR-."

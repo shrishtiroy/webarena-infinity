@@ -1,49 +1,31 @@
 import requests
 
 
-# Atlas Engineering Consultants (con_025) has no existing invoices in seed data
-SEED_INVOICE_IDS = set()
-
-
 def verify(server_url: str) -> tuple[bool, str]:
     resp = requests.get(f"{server_url}/api/state")
     if resp.status_code != 200:
         return False, "Could not retrieve application state."
+
     state = resp.json()
+    contact = next((c for c in state["contacts"] if c["name"] == "Atlas Engineering Consultants"), None)
+    if not contact:
+        return False, "Contact Atlas Engineering Consultants not found."
 
-    # Atlas Engineering Consultants is con_025
-    target_contact_id = "con_025"
+    new_inv = next((i for i in state["invoices"]
+                    if i["contactId"] == contact["id"]
+                    and any(li.get("itemId") == "item_003" for li in i.get("lineItems", []))), None)
 
-    invoices = state.get("invoices", [])
-    new_invoice = None
-    for inv in invoices:
-        if inv.get("contactId") == target_contact_id and inv.get("id") not in SEED_INVOICE_IDS:
-            new_invoice = inv
-            break
+    if not new_inv:
+        return False, "No new invoice with PM days found for Atlas Engineering."
 
-    if new_invoice is None:
-        return False, "No new invoice found for Atlas Engineering Consultants (con_025)."
+    if new_inv["brandingThemeId"] != "theme_professional":
+        return False, f"Branding theme is '{new_inv['brandingThemeId']}', expected 'theme_professional'."
 
-    # Check brandingThemeId is theme_professional
-    branding_theme_id = new_invoice.get("brandingThemeId", "")
-    if branding_theme_id != "theme_professional":
-        return False, f"New invoice brandingThemeId is '{branding_theme_id}', expected 'theme_professional'."
+    pm_line = next((li for li in new_inv["lineItems"] if li.get("itemId") == "item_003"), None)
+    if pm_line["quantity"] != 5:
+        return False, f"PM days is {pm_line['quantity']}, expected 5."
 
-    # Check at least one line item with quantity == 5 and unitPrice approximately 1400.00 (PM-DAY)
-    line_items = new_invoice.get("lineItems", [])
-    if not line_items:
-        return False, "New invoice for Atlas Engineering has no line items."
+    if abs(pm_line["unitPrice"] - 1400.00) > 0.01:
+        return False, f"PM rate is {pm_line['unitPrice']}, expected 1400.00."
 
-    found_pm = False
-    for li in line_items:
-        quantity = li.get("quantity", 0)
-        unit_price = li.get("unitPrice", 0)
-        if quantity == 5 and abs(unit_price - 1400.00) < 10.00:
-            found_pm = True
-            break
-
-    if not found_pm:
-        items_info = [(li.get("quantity"), li.get("unitPrice")) for li in line_items]
-        return False, f"No line item with quantity=5 and unitPrice approximately $1,400.00 (project management day rate) found. Line items (qty, price): {items_info}."
-
-    return True, f"New invoice '{new_invoice.get('number')}' created for Atlas Engineering Consultants using Professional Services template with 5 days of project management at $1,400/day."
+    return True, f"Invoice {new_inv['number']} created for Atlas Engineering with Professional Services template."
