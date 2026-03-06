@@ -81,5 +81,26 @@
   {"id": "task_h37", "difficulty": "hard", "instruction": "Fully pay the Greenfield Organics February invoice and then void their paid January invoice.", "verify": "real-tasks/task_h37.py"},
   {"id": "task_h38", "difficulty": "hard", "instruction": "Record full payment on both the Alpha Logistics supply chain invoice and the Summit Health Group license invoice.", "verify": "real-tasks/task_h38.py"},
   {"id": "task_h39", "difficulty": "hard", "instruction": "Update the reference on the Greenfield Organics invoice that includes e-commerce development to 'GF-ECOM-2026'.", "verify": "real-tasks/task_h39.py"},
-  {"id": "task_h40", "difficulty": "hard", "instruction": "Create a new invoice for Outback Adventures Tourism for 5 days of on-site training with a 15% discount and 40 hours of development work, then approve it.", "verify": "real-tasks/task_h40.py"}
+  {"id": "task_h40", "difficulty": "hard", "instruction": "Create a new invoice for Outback Adventures Tourism for 5 days of on-site training with a 15% discount and 40 hours of development work, then approve it.", "verify": "real-tasks/task_h40.py"},
+
+  {"id": "task_h41", "difficulty": "hard", "instruction": "Record full payment on the Baxter & Associates overdue invoice, then copy it to a new draft and update the copy's reference to 'BAX-Q2-2026'.", "verify": "real-tasks/task_h41.py"},
+  {"id": "task_h42", "difficulty": "hard", "instruction": "Create an invoice from the most expensive accepted quote that hasn't been invoiced yet, then approve and send it.", "verify": "real-tasks/task_h42.py"},
+  {"id": "task_h43", "difficulty": "hard", "instruction": "Void the invoice that contains USB-C cables as a line item.", "verify": "real-tasks/task_h43.py"},
+  {"id": "task_h44", "difficulty": "hard", "instruction": "Allocate the Coastal Living Interiors credit note to their unpaid invoice, then record a $2,000 payment on that same invoice.", "verify": "real-tasks/task_h44.py"},
+  {"id": "task_h45", "difficulty": "hard", "instruction": "Create a new invoice for the Perth-based contact who is both a customer and supplier, for 8 hours of consulting and a data migration service, then submit it for approval.", "verify": "real-tasks/task_h45.py"},
+  {"id": "task_h46", "difficulty": "hard", "instruction": "Send all draft quotes and approve all draft invoices.", "verify": "real-tasks/task_h46.py"},
+  {"id": "task_h47", "difficulty": "hard", "instruction": "Copy the highest-value paid invoice to a new draft and change the reference to 'REBILL-2026'.", "verify": "real-tasks/task_h47.py"},
+  {"id": "task_h48", "difficulty": "hard", "instruction": "Approve the Pacific Freight Lines draft credit note and allocate it to their data migration invoice.", "verify": "real-tasks/task_h48.py"},
+  {"id": "task_h49", "difficulty": "hard", "instruction": "Create a new quote for Bright Spark Electrical for 20 hours of development and 2 days of on-site training with a 5% discount on the development only, then send it.", "verify": "real-tasks/task_h49.py"},
+  {"id": "task_h50", "difficulty": "hard", "instruction": "Update the Cascade Software repeating invoice: change the frequency to fortnightly, set an end date of September 2026, and change the save-as option to draft.", "verify": "real-tasks/task_h50.py"},
+  {"id": "task_h51", "difficulty": "hard", "instruction": "Enable tax number display on every branding theme and disable payment advice on those themes that currently show it.", "verify": "real-tasks/task_h51.py"},
+  {"id": "task_h52", "difficulty": "hard", "instruction": "Void the paid TechVault Solutions invoice that was issued before 2026.", "verify": "real-tasks/task_h52.py"},
+  {"id": "task_h53", "difficulty": "hard", "instruction": "Delete the Simple Clean and Retail branding themes, then create a new theme called 'Modern' with payment advice disabled.", "verify": "real-tasks/task_h53.py"},
+  {"id": "task_h54", "difficulty": "hard", "instruction": "Record full payment on the invoice with the smallest outstanding balance.", "verify": "real-tasks/task_h54.py"},
+  {"id": "task_h55", "difficulty": "hard", "instruction": "Create a new branding theme called 'NZ Export' with payment terms 'Net 60 days', then create a new invoice for Wellington & Partners in NZD using that theme for 8 hours of consulting.", "verify": "real-tasks/task_h55.py"},
+  {"id": "task_h56", "difficulty": "hard", "instruction": "Find the invoice titled 'Cloud Migration Phase 2' and record a $15,000 partial payment on it.", "verify": "real-tasks/task_h56.py"},
+  {"id": "task_h57", "difficulty": "hard", "instruction": "Accept the Redback Mining Supplies quote, create an invoice from it, and record a $5,000 partial payment on the new invoice.", "verify": "real-tasks/task_h57.py"},
+  {"id": "task_h58", "difficulty": "hard", "instruction": "Create a new reminder for 3 days before the due date, then disable all reminders that fire after the due date.", "verify": "real-tasks/task_h58.py"},
+  {"id": "task_h59", "difficulty": "hard", "instruction": "Find the active repeating invoice that saves generated invoices as drafts and change its contact to Bright Spark Electrical.", "verify": "real-tasks/task_h59.py"},
+  {"id": "task_h60", "difficulty": "hard", "instruction": "Create a credit note for Pinnacle Construction Group for 10 hours of development and 2 days of project management, approve it, and allocate it to their partially paid invoice.", "verify": "real-tasks/task_h60.py"}
 ]
