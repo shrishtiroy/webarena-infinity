@@ -168,7 +168,7 @@ for entry in "${ENVS[@]}"; do
   env_id=$(echo "$entry" | python3 -c "import sys,json; print(json.load(sys.stdin)['env_id'])")
 
   # Check if branch already exists on remote
-  if git ls-remote --heads origin "$env_id" | grep -q "$env_id"; then
+  if git ls-remote --heads origin "$env_id" | grep -q "refs/heads/${env_id}$"; then
     echo "  Branch exists: $env_id"
   else
     git branch "$env_id" 2>/dev/null || true
