@@ -718,5 +718,125 @@
     "difficulty": "hard",
     "instruction": "Follow all employers with 10,000 or more employees that you aren't already following, and save each of their active internship positions.",
     "verify": "real-tasks/task_h80.py"
+  },
+  {
+    "id": "task_h81",
+    "difficulty": "hard",
+    "instruction": "Your most recent unread message says you're a top-15% match for a position. Read that message, then save all of that employer's active jobs you haven't saved, RSVP to their upcoming tech talk, and bookmark their feed post.",
+    "verify": "real-tasks/task_h81.py"
+  },
+  {
+    "id": "task_h82",
+    "difficulty": "hard",
+    "instruction": "Find the career counselor who specializes in Resume Writing. Add a comment to your upcoming approved appointment with that counselor requesting they also review your LinkedIn headline, then schedule a separate LinkedIn Profile Review appointment with them for March 14, 2026 at 9:00 AM, in person.",
+    "verify": "real-tasks/task_h82.py"
+  },
+  {
+    "id": "task_h83",
+    "difficulty": "hard",
+    "instruction": "Add 'Full-time' to your job type preferences in career interests and save, then save all active full-time positions from employers in the Technology industry.",
+    "verify": "real-tasks/task_h83.py"
+  },
+  {
+    "id": "task_h84",
+    "difficulty": "hard",
+    "instruction": "Follow every employer that has sent you a message but does not host any upcoming events on Handshake.",
+    "verify": "real-tasks/task_h84.py"
+  },
+  {
+    "id": "task_h85",
+    "difficulty": "hard",
+    "instruction": "The student with the most-liked post in the feed also answered a Q&A question about system design interview resources. Submit your own answer to that same question with your recommendations, then like that student's feed post.",
+    "verify": "real-tasks/task_h85.py"
+  },
+  {
+    "id": "task_h86",
+    "difficulty": "hard",
+    "instruction": "RSVP to every upcoming in-person event hosted by an employer (not the career center), then save at least one active job from each of those event-hosting employers.",
+    "verify": "real-tasks/task_h86.py"
+  },
+  {
+    "id": "task_h87",
+    "difficulty": "hard",
+    "instruction": "You've decided to focus your job search on the East Coast. Remove all locations except 'New York, NY' from your preferred locations in career interests, and unfollow every employer headquartered in California. Save your career interest changes.",
+    "verify": "real-tasks/task_h87.py"
+  },
+  {
+    "id": "task_h88",
+    "difficulty": "hard",
+    "instruction": "Find the employer with the most followers on Handshake. Like their feed post, bookmark it, and save all their active internships you haven't saved.",
+    "verify": "real-tasks/task_h88.py"
+  },
+  {
+    "id": "task_h89",
+    "difficulty": "hard",
+    "instruction": "Read all your unread top-match messages. Two of those senders host upcoming events — one has a virtual info session and another has a tech talk. RSVP to both events and save all unsaved active jobs from those two employers.",
+    "verify": "real-tasks/task_h89.py"
+  },
+  {
+    "id": "task_h90",
+    "difficulty": "hard",
+    "instruction": "A student in the feed mentioned attending the NSBE conference. That student also answered a Q&A question about diversity programs in tech. Submit your own answer to that same question sharing your experience, then bookmark that student's feed post.",
+    "verify": "real-tasks/task_h90.py"
+  },
+  {
+    "id": "task_h91",
+    "difficulty": "hard",
+    "instruction": "Schedule a general career advising appointment with Dr. Patricia Williams for March 19, 2026 at 1:00 PM virtually, then add a comment to your completed January internship planning appointment noting that you followed her advice about applying broadly.",
+    "verify": "real-tasks/task_h91.py"
+  },
+  {
+    "id": "task_h92",
+    "difficulty": "hard",
+    "instruction": "Find the employer whose affiliated companies include GitHub. Save all their active jobs you haven't saved, leave a comment on their Imagine Cup post expressing interest, and add 'Cloud Engineer' to your preferred roles in career interests. Save your changes.",
+    "verify": "real-tasks/task_h92.py"
+  },
+  {
+    "id": "task_h93",
+    "difficulty": "hard",
+    "instruction": "Remove all non-California locations from your preferred locations in career interests, add 'San Jose, CA' and 'Los Angeles, CA' to your locations, save your changes, then save all active internships located in California.",
+    "verify": "real-tasks/task_h93.py"
+  },
+  {
+    "id": "task_h94",
+    "difficulty": "hard",
+    "instruction": "Like every student feed post written by someone who has also answered at least one Q&A question.",
+    "verify": "real-tasks/task_h94.py"
+  },
+  {
+    "id": "task_h95",
+    "difficulty": "hard",
+    "instruction": "You have a closed job in your saved list. Remove it, then save the active jobs from that same employer instead.",
+    "verify": "real-tasks/task_h95.py"
+  },
+  {
+    "id": "task_h96",
+    "difficulty": "hard",
+    "instruction": "Find the employer whose alumni testimonial mentions working on 'Azure'. Save all their active jobs you haven't saved, like their Imagine Cup feed post, and add 'IT & Infrastructure' to your job functions in career interests. Save your changes.",
+    "verify": "real-tasks/task_h96.py"
+  },
+  {
+    "id": "task_h97",
+    "difficulty": "hard",
+    "instruction": "Find the single most helpful answer across all Q&A questions and mark it helpful. Then find the most-viewed question and submit your own answer to it.",
+    "verify": "real-tasks/task_h97.py"
+  },
+  {
+    "id": "task_h98",
+    "difficulty": "hard",
+    "instruction": "Unfollow every employer whose industry is not Technology or Artificial Intelligence, then save all active internships from your remaining followed employers that you haven't saved yet.",
+    "verify": "real-tasks/task_h98.py"
+  },
+  {
+    "id": "task_h99",
+    "difficulty": "hard",
+    "instruction": "Read your unread Stripe message, save Stripe's active internship, leave a comment on Stripe's engineering blog post in the feed about their distributed systems work, and add 'Backend Developer' to your preferred roles in career interests. Save your changes.",
+    "verify": "real-tasks/task_h99.py"
+  },
+  {
+    "id": "task_h100",
+    "difficulty": "hard",
+    "instruction": "Cancel both of your requested appointments, then schedule a new behavioral mock interview with the interview coach for March 21, 2026 at 3:00 PM in person. Update your phone number to '(650) 555-0250' and create a school-audience post about preparing for upcoming interviews.",
+    "verify": "real-tasks/task_h100.py"
   }
 ]
