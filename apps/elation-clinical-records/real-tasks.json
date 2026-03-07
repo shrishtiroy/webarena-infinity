@@ -1,1 +1,362 @@
-[]
+[
+  {
+    "id": "task_e1",
+    "difficulty": "easy",
+    "instruction": "Remove the 'Smoker' tag from Marcus Johnson's chart.",
+    "verify": "real-tasks/task_e1.py"
+  },
+  {
+    "id": "task_e2",
+    "difficulty": "easy",
+    "instruction": "Mark Emily Nakamura's resolved plantar fasciitis as active again.",
+    "verify": "real-tasks/task_e2.py"
+  },
+  {
+    "id": "task_e3",
+    "difficulty": "easy",
+    "instruction": "Turn off coded visit note assessments in provider settings.",
+    "verify": "real-tasks/task_e3.py"
+  },
+  {
+    "id": "task_e4",
+    "difficulty": "easy",
+    "instruction": "Sign David Kowalski's draft visit note.",
+    "verify": "real-tasks/task_e4.py"
+  },
+  {
+    "id": "task_e5",
+    "difficulty": "easy",
+    "instruction": "Delete the Injectable Administration template.",
+    "verify": "real-tasks/task_e5.py"
+  },
+  {
+    "id": "task_e6",
+    "difficulty": "easy",
+    "instruction": "Add a 'Fall-Risk' tag to Helen Zhao's chart.",
+    "verify": "real-tasks/task_e6.py"
+  },
+  {
+    "id": "task_e7",
+    "difficulty": "easy",
+    "instruction": "Turn on the 'Show Dx Codes in Print' setting.",
+    "verify": "real-tasks/task_e7.py"
+  },
+  {
+    "id": "task_e8",
+    "difficulty": "easy",
+    "instruction": "Disable MIPS tracking for the Procedure category.",
+    "verify": "real-tasks/task_e8.py"
+  },
+  {
+    "id": "task_e9",
+    "difficulty": "easy",
+    "instruction": "Remove the 'Prenatal' tag from Emily Nakamura.",
+    "verify": "real-tasks/task_e9.py"
+  },
+  {
+    "id": "task_e10",
+    "difficulty": "easy",
+    "instruction": "Rename the Workers Comp category to Workers Compensation.",
+    "verify": "real-tasks/task_e10.py"
+  },
+  {
+    "id": "task_e11",
+    "difficulty": "easy",
+    "instruction": "Resolve Marcus Johnson's prediabetes.",
+    "verify": "real-tasks/task_e11.py"
+  },
+  {
+    "id": "task_e12",
+    "difficulty": "easy",
+    "instruction": "Enable MIPS for the Vaccination Only category.",
+    "verify": "real-tasks/task_e12.py"
+  },
+  {
+    "id": "task_e13",
+    "difficulty": "easy",
+    "instruction": "Change the default visit note format to Simple Note.",
+    "verify": "real-tasks/task_e13.py"
+  },
+  {
+    "id": "task_e14",
+    "difficulty": "easy",
+    "instruction": "Add a priority tag '*High-Risk' to William O'Brien's chart.",
+    "verify": "real-tasks/task_e14.py"
+  },
+  {
+    "id": "task_e15",
+    "difficulty": "easy",
+    "instruction": "Remove the 'Immunizations-Due' tag from Aaliyah Washington.",
+    "verify": "real-tasks/task_e15.py"
+  },
+  {
+    "id": "task_e16",
+    "difficulty": "easy",
+    "instruction": "Delete the Care Plan Review category.",
+    "verify": "real-tasks/task_e16.py"
+  },
+  {
+    "id": "task_e17",
+    "difficulty": "easy",
+    "instruction": "Mark Thomas Bergstrom's depression as active.",
+    "verify": "real-tasks/task_e17.py"
+  },
+  {
+    "id": "task_e18",
+    "difficulty": "easy",
+    "instruction": "Duplicate the Diabetes Management template.",
+    "verify": "real-tasks/task_e18.py"
+  },
+  {
+    "id": "task_e19",
+    "difficulty": "easy",
+    "instruction": "Rename the Telehealth Follow-Up template to Virtual Visit Follow-Up.",
+    "verify": "real-tasks/task_e19.py"
+  },
+  {
+    "id": "task_e20",
+    "difficulty": "easy",
+    "instruction": "Remove the 'Pediatric-Parent' tag from Priya Sharma.",
+    "verify": "real-tasks/task_e20.py"
+  },
+  {
+    "id": "task_m1",
+    "difficulty": "medium",
+    "instruction": "Add 'Acute Sinusitis' with ICD-10 code J01.90 to James Fitzgerald's problem list.",
+    "verify": "real-tasks/task_m1.py"
+  },
+  {
+    "id": "task_m2",
+    "difficulty": "medium",
+    "instruction": "Record an influenza vaccine for Emily Nakamura, administered intramuscularly in the left deltoid.",
+    "verify": "real-tasks/task_m2.py"
+  },
+  {
+    "id": "task_m3",
+    "difficulty": "medium",
+    "instruction": "Create a new visit note for Priya Sharma using the Simple Note format.",
+    "verify": "real-tasks/task_m3.py"
+  },
+  {
+    "id": "task_m4",
+    "difficulty": "medium",
+    "instruction": "Add historical vitals for Robert Henderson: blood pressure 126/78 and heart rate 72.",
+    "verify": "real-tasks/task_m4.py"
+  },
+  {
+    "id": "task_m5",
+    "difficulty": "medium",
+    "instruction": "Create a new template called 'Chronic Pain Follow-Up' with an HPI section.",
+    "verify": "real-tasks/task_m5.py"
+  },
+  {
+    "id": "task_m6",
+    "difficulty": "medium",
+    "instruction": "Change the Telehealth Visit appointment type to use the Follow-Up category.",
+    "verify": "real-tasks/task_m6.py"
+  },
+  {
+    "id": "task_m7",
+    "difficulty": "medium",
+    "instruction": "Add a new visit note category called 'Behavioral Health' with MIPS tracking enabled.",
+    "verify": "real-tasks/task_m7.py"
+  },
+  {
+    "id": "task_m8",
+    "difficulty": "medium",
+    "instruction": "Record a declined influenza vaccine for David Kowalski.",
+    "verify": "real-tasks/task_m8.py"
+  },
+  {
+    "id": "task_m9",
+    "difficulty": "medium",
+    "instruction": "Update the synopsis for Robert Henderson's Type 2 Diabetes to note his A1C improved to 6.8%.",
+    "verify": "real-tasks/task_m9.py"
+  },
+  {
+    "id": "task_m10",
+    "difficulty": "medium",
+    "instruction": "Set the Follow-Up appointment type to use the Hypertension Follow-Up template.",
+    "verify": "real-tasks/task_m10.py"
+  },
+  {
+    "id": "task_m11",
+    "difficulty": "medium",
+    "instruction": "Create a visit note for Helen Zhao using the Annual Exam category and the E* Annual Wellness Visit template.",
+    "verify": "real-tasks/task_m11.py"
+  },
+  {
+    "id": "task_m12",
+    "difficulty": "medium",
+    "instruction": "Record a Tdap vaccine for Sofia Rodriguez-Martinez with lot number TDP-5590.",
+    "verify": "real-tasks/task_m12.py"
+  },
+  {
+    "id": "task_m13",
+    "difficulty": "medium",
+    "instruction": "Add historical vitals for Marcus Johnson with a temperature of 37.2 degrees Celsius.",
+    "verify": "real-tasks/task_m13.py"
+  },
+  {
+    "id": "task_m14",
+    "difficulty": "medium",
+    "instruction": "Update the billing notes for the Pre-Operative Evaluation template to 'Pre-op clearance - ensure all required labs are completed prior to surgery.'",
+    "verify": "real-tasks/task_m14.py"
+  },
+  {
+    "id": "task_m15",
+    "difficulty": "medium",
+    "instruction": "Change Marcus Johnson's 'Chronic Low Back Pain' problem title to 'Chronic Low Back Pain with Lumbar Disc Degeneration'.",
+    "verify": "real-tasks/task_m15.py"
+  },
+  {
+    "id": "task_m16",
+    "difficulty": "medium",
+    "instruction": "Record a Ketorolac injection for Marcus Johnson, given intramuscularly in the left gluteal.",
+    "verify": "real-tasks/task_m16.py"
+  },
+  {
+    "id": "task_m17",
+    "difficulty": "medium",
+    "instruction": "Change the Office Visit appointment type to use the H&P Note (Single Column) format.",
+    "verify": "real-tasks/task_m17.py"
+  },
+  {
+    "id": "task_m18",
+    "difficulty": "medium",
+    "instruction": "Add vitals for Sofia Rodriguez-Martinez: blood pressure 110/68 and oxygen saturation 98%.",
+    "verify": "real-tasks/task_m18.py"
+  },
+  {
+    "id": "task_m19",
+    "difficulty": "medium",
+    "instruction": "Create a visit note for Thomas Bergstrom using the Telehealth category.",
+    "verify": "real-tasks/task_m19.py"
+  },
+  {
+    "id": "task_m20",
+    "difficulty": "medium",
+    "instruction": "Add the document tag 'Chronic-Pain' to the Diabetes Management template.",
+    "verify": "real-tasks/task_m20.py"
+  },
+  {
+    "id": "task_h1",
+    "difficulty": "hard",
+    "instruction": "Mark all of Marcus Johnson's active problems as controlled.",
+    "verify": "real-tasks/task_h1.py"
+  },
+  {
+    "id": "task_h2",
+    "difficulty": "hard",
+    "instruction": "Create a visit note for James Fitzgerald using the Pre-Op H&P format, Pre-Op Evaluation category, and the Pre-Operative Evaluation template, then sign it.",
+    "verify": "real-tasks/task_h2.py"
+  },
+  {
+    "id": "task_h3",
+    "difficulty": "hard",
+    "instruction": "Add 'Osteopenia' with ICD-10 code M85.80 to Helen Zhao's problem list, then mark her existing osteoporosis as controlled.",
+    "verify": "real-tasks/task_h3.py"
+  },
+  {
+    "id": "task_h4",
+    "difficulty": "hard",
+    "instruction": "Record Robert Henderson's second Shingrix dose: GlaxoSmithKline, intramuscular in the left deltoid, dose 2 in the series, with a 5-year recall.",
+    "verify": "real-tasks/task_h4.py"
+  },
+  {
+    "id": "task_h5",
+    "difficulty": "hard",
+    "instruction": "Create a visit note for Marcus Johnson about his elevated blood pressure, add an Assessment & Plan block, and add billing code 99214.",
+    "verify": "real-tasks/task_h5.py"
+  },
+  {
+    "id": "task_h6",
+    "difficulty": "hard",
+    "instruction": "Record complete vitals for William O'Brien: BP 138/86, heart rate 68, respiratory rate 18, SpO2 93%, temperature 97.6 F, weight 190 lbs, and pain level 4.",
+    "verify": "real-tasks/task_h6.py"
+  },
+  {
+    "id": "task_h7",
+    "difficulty": "hard",
+    "instruction": "Remove all existing tags from Sofia Rodriguez-Martinez and add a single tag 'Inhaler-Review'.",
+    "verify": "real-tasks/task_h7.py"
+  },
+  {
+    "id": "task_h8",
+    "difficulty": "hard",
+    "instruction": "Create a new category 'Chronic Disease Management' with MIPS enabled, then update the Follow-Up appointment type to use that new category.",
+    "verify": "real-tasks/task_h8.py"
+  },
+  {
+    "id": "task_h9",
+    "difficulty": "hard",
+    "instruction": "Record a COVID-19 Moderna vaccine for Thomas Bergstrom: dose 1, from Moderna, intramuscular in the right deltoid, with a 3-week recall, funded by private insurance.",
+    "verify": "real-tasks/task_h9.py"
+  },
+  {
+    "id": "task_h10",
+    "difficulty": "hard",
+    "instruction": "Create a visit note for Robert Henderson using the Diabetes Management template, then add a Care Plan block.",
+    "verify": "real-tasks/task_h10.py"
+  },
+  {
+    "id": "task_h11",
+    "difficulty": "hard",
+    "instruction": "Complete David Kowalski's draft note: add a Physical Exam block, add a Review of Systems block, add CPT code 99214 for billing, then sign it.",
+    "verify": "real-tasks/task_h11.py"
+  },
+  {
+    "id": "task_h12",
+    "difficulty": "hard",
+    "instruction": "Add two problems to Priya Sharma's chart: 'Urinary Tract Infection' (N39.0) and 'Iron Deficiency Anemia' (D50.9), both active.",
+    "verify": "real-tasks/task_h12.py"
+  },
+  {
+    "id": "task_h13",
+    "difficulty": "hard",
+    "instruction": "Change the default note format to Simple Note, then create a new visit note for Mei-Ling Wu.",
+    "verify": "real-tasks/task_h13.py"
+  },
+  {
+    "id": "task_h14",
+    "difficulty": "hard",
+    "instruction": "Add the tag 'Flu-Season' to every patient whose primary provider is Dr. Sarah Chen.",
+    "verify": "real-tasks/task_h14.py"
+  },
+  {
+    "id": "task_h15",
+    "difficulty": "hard",
+    "instruction": "Create a new template called 'Geriatric Assessment' with HPI, ROS, and Physical Exam sections, and add billing code 99205 with description 'New patient visit, high complexity'.",
+    "verify": "real-tasks/task_h15.py"
+  },
+  {
+    "id": "task_h16",
+    "difficulty": "hard",
+    "instruction": "Set the Urgent Same-Day appointment type to use the E* Problem-Focused Visit template, and change the COVID Vaccine appointment format to Non-Visit Note.",
+    "verify": "real-tasks/task_h16.py"
+  },
+  {
+    "id": "task_h17",
+    "difficulty": "hard",
+    "instruction": "Remove the 'Pediatric' tag from both Aaliyah Washington and Mei-Ling Wu.",
+    "verify": "real-tasks/task_h17.py"
+  },
+  {
+    "id": "task_h18",
+    "difficulty": "hard",
+    "instruction": "Add vitals for Mei-Ling Wu: BP 108/68, heart rate 76, temperature 98.6 F, weight 115 lbs, height 63 inches, and pain level 0.",
+    "verify": "real-tasks/task_h18.py"
+  },
+  {
+    "id": "task_h19",
+    "difficulty": "hard",
+    "instruction": "Create a visit note for William O'Brien using the Follow-Up category, add an HPI block, and add an Assessment & Plan block.",
+    "verify": "real-tasks/task_h19.py"
+  },
+  {
+    "id": "task_h20",
+    "difficulty": "hard",
+    "instruction": "Record a Hepatitis A vaccine for Priya Sharma from Merck, lot number HA-7721, subcutaneously in the left upper arm, dose 1, with a 6-month recall, funded by insurance.",
+    "verify": "real-tasks/task_h20.py"
+  }
+]
