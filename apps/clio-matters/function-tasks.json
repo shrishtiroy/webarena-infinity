@@ -1,0 +1,287 @@
+[
+  {
+    "id": "task_1",
+    "instruction": "Change the status of the matter 'Rodriguez v. Premier Auto - Auto Accident' from Open to Pending.",
+    "verify": "function-tasks/task_1.py"
+  },
+  {
+    "id": "task_2",
+    "instruction": "Change the status of the matter 'Nguyen - Divorce Proceedings' from Pending to Closed.",
+    "verify": "function-tasks/task_2.py"
+  },
+  {
+    "id": "task_3",
+    "instruction": "Reopen the matter 'Midwest Manufacturing - Employment Discrimination Claim' by changing its status from Closed to Open.",
+    "verify": "function-tasks/task_3.py"
+  },
+  {
+    "id": "task_4",
+    "instruction": "Delete the matter 'Baker - Residential Property Purchase'.",
+    "verify": "function-tasks/task_4.py"
+  },
+  {
+    "id": "task_5",
+    "instruction": "Duplicate the matter 'Cruz v. Metro Transit - Bus Accident'.",
+    "verify": "function-tasks/task_5.py"
+  },
+  {
+    "id": "task_6",
+    "instruction": "Change the description of the matter 'Singh Family Trust & Estate Plan' to 'Singh Family Revocable Living Trust'.",
+    "verify": "function-tasks/task_6.py"
+  },
+  {
+    "id": "task_7",
+    "instruction": "Change the responsible attorney on the matter 'Foster v. City of Evanston - Slip and Fall' to James Chen.",
+    "verify": "function-tasks/task_7.py"
+  },
+  {
+    "id": "task_8",
+    "instruction": "Change the originating attorney on the matter 'Mendez - Work Visa Application' to David Kim.",
+    "verify": "function-tasks/task_8.py"
+  },
+  {
+    "id": "task_9",
+    "instruction": "Change the responsible staff on the matter 'Harris v. ABC Construction - Workplace Injury' to Rachel Thompson.",
+    "verify": "function-tasks/task_9.py"
+  },
+  {
+    "id": "task_10",
+    "instruction": "Change the practice area of the matter 'Singh Family Trust & Estate Plan' to Tax Law.",
+    "verify": "function-tasks/task_10.py"
+  },
+  {
+    "id": "task_11",
+    "instruction": "Change the location of the matter 'Mendez - Work Visa Application' to 'Chicago'.",
+    "verify": "function-tasks/task_11.py"
+  },
+  {
+    "id": "task_12",
+    "instruction": "Change the client reference number of the matter 'Foster v. City of Evanston - Slip and Fall' to 'SLIP-2024-NEW'.",
+    "verify": "function-tasks/task_12.py"
+  },
+  {
+    "id": "task_13",
+    "instruction": "Change the billing method of the matter 'State v. Morales - Assault Charge' from Hourly to Flat Rate.",
+    "verify": "function-tasks/task_13.py"
+  },
+  {
+    "id": "task_14",
+    "instruction": "Change the stage of the matter 'Rodriguez v. Premier Auto - Auto Accident' from Discovery to Mediation.",
+    "verify": "function-tasks/task_14.py"
+  },
+  {
+    "id": "task_15",
+    "instruction": "Change the deduction order of the matter 'Rodriguez v. Premier Auto - Auto Accident' from Fees First to Expenses First.",
+    "verify": "function-tasks/task_15.py"
+  },
+  {
+    "id": "task_16",
+    "instruction": "Add a new damage to the matter 'Rodriguez v. Premier Auto - Auto Accident' with description 'Prescription medication costs', type 'Out-of-Pocket Expenses', category 'Special', and amount $2,500.",
+    "verify": "function-tasks/task_16.py"
+  },
+  {
+    "id": "task_17",
+    "instruction": "Edit the 'Emergency Room Visit' damage on the matter 'Rodriguez v. Premier Auto - Auto Accident' to change the amount from $15,800 to $18,500.",
+    "verify": "function-tasks/task_17.py"
+  },
+  {
+    "id": "task_18",
+    "instruction": "Delete the 'Vehicle repair costs' damage from the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_18.py"
+  },
+  {
+    "id": "task_19",
+    "instruction": "Add a new recovery of $50,000 from State Farm Insurance to the settlement of the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_19.py"
+  },
+  {
+    "id": "task_20",
+    "instruction": "Edit the recovery from Lakeside Insurance Co. on the matter 'Rodriguez v. Premier Auto - Auto Accident' to change the amount from $175,000 to $200,000.",
+    "verify": "function-tasks/task_20.py"
+  },
+  {
+    "id": "task_21",
+    "instruction": "Delete the recovery from Premier Auto Dealers on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_21.py"
+  },
+  {
+    "id": "task_22",
+    "instruction": "Add a legal fee to the Lakeside Insurance Co. recovery on the matter 'Rodriguez v. Premier Auto - Auto Accident' with recipient Michael Osei and a rate of 25%.",
+    "verify": "function-tasks/task_22.py"
+  },
+  {
+    "id": "task_23",
+    "instruction": "Edit the legal fee on the Lakeside Insurance Co. recovery on the matter 'Rodriguez v. Premier Auto - Auto Accident' to change the discount to 10%.",
+    "verify": "function-tasks/task_23.py"
+  },
+  {
+    "id": "task_24",
+    "instruction": "Delete the legal fee on the Premier Auto Dealers recovery on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_24.py"
+  },
+  {
+    "id": "task_25",
+    "instruction": "Add a lien to the matter 'Rodriguez v. Premier Auto - Auto Accident' with lien holder Northwestern Memorial Hospital, description 'Hospital treatment lien', and amount $12,000.",
+    "verify": "function-tasks/task_25.py"
+  },
+  {
+    "id": "task_26",
+    "instruction": "Edit the existing lien from Riverside Community Credit Union on the matter 'Rodriguez v. Premier Auto - Auto Accident' to set the reduction to $1,000.",
+    "verify": "function-tasks/task_26.py"
+  },
+  {
+    "id": "task_27",
+    "instruction": "Delete the lien from Riverside Community Credit Union on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_27.py"
+  },
+  {
+    "id": "task_28",
+    "instruction": "Add an outstanding balance to the matter 'Rodriguez v. Premier Auto - Auto Accident' with balance holder State Farm Insurance, responsible party 'Other', description 'Overpayment recovery', and balance owing $1,500.",
+    "verify": "function-tasks/task_28.py"
+  },
+  {
+    "id": "task_29",
+    "instruction": "Edit the outstanding balance from Riverside Community Credit Union on the matter 'Rodriguez v. Premier Auto - Auto Accident' to set the reduction to $500.",
+    "verify": "function-tasks/task_29.py"
+  },
+  {
+    "id": "task_30",
+    "instruction": "Delete the outstanding balance from Riverside Community Credit Union on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_30.py"
+  },
+  {
+    "id": "task_31",
+    "instruction": "Add a medical provider to the matter 'Harris v. ABC Construction - Workplace Injury' with provider Chicago Physical Therapy Center and description 'Post-surgical hand rehabilitation'.",
+    "verify": "function-tasks/task_31.py"
+  },
+  {
+    "id": "task_32",
+    "instruction": "Update the medical provider Dr. Amanda Reeves on the matter 'Rodriguez v. Premier Auto - Auto Accident' to set the treatment last date to 2026-01-15.",
+    "verify": "function-tasks/task_32.py"
+  },
+  {
+    "id": "task_33",
+    "instruction": "Mark treatment as complete for the medical provider Dr. Amanda Reeves on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_33.py"
+  },
+  {
+    "id": "task_34",
+    "instruction": "Delete the medical provider Advanced Imaging Associates from the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_34.py"
+  },
+  {
+    "id": "task_35",
+    "instruction": "Change the record request status to 'Received' for the medical provider Dr. Amanda Reeves on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_35.py"
+  },
+  {
+    "id": "task_36",
+    "instruction": "Add a medical record with file name 'Post_Op_Follow_Up.pdf' and received date '2026-01-10' to the Northwestern Memorial Hospital provider on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_36.py"
+  },
+  {
+    "id": "task_37",
+    "instruction": "Delete the medical record 'Surgical_Report_Lumbar.pdf' from the Northwestern Memorial Hospital provider on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_37.py"
+  },
+  {
+    "id": "task_38",
+    "instruction": "Add a medical bill with file name 'CPTC_Follow_Up_Bill.pdf' and bill amount $3,500 to the Chicago Physical Therapy Center provider on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_38.py"
+  },
+  {
+    "id": "task_39",
+    "instruction": "Edit the medical bill 'NM_Hospital_Bill.pdf' on the Northwestern Memorial Hospital provider on the matter 'Rodriguez v. Premier Auto - Auto Accident' to change the adjustment from $5,000 to $7,000.",
+    "verify": "function-tasks/task_39.py"
+  },
+  {
+    "id": "task_40",
+    "instruction": "Delete the medical bill 'AIA_Invoice_Aug.pdf' from the Advanced Imaging Associates provider on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_40.py"
+  },
+  {
+    "id": "task_41",
+    "instruction": "Add a comment with text 'Critical evidence for demand package' to the medical record 'ER_Admission_Report.pdf' on the Northwestern Memorial Hospital provider on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_41.py"
+  },
+  {
+    "id": "task_42",
+    "instruction": "Add a comment with text 'Insurance reimbursement pending review' to the medical bill 'CPTC_Bill_Full.pdf' on the Chicago Physical Therapy Center provider on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_42.py"
+  },
+  {
+    "id": "task_43",
+    "instruction": "Delete the comment 'Confirms L4-L5 disc herniation' from the medical record 'ER_Admission_Report.pdf' on the Northwestern Memorial Hospital provider on the matter 'Rodriguez v. Premier Auto - Auto Accident'.",
+    "verify": "function-tasks/task_43.py"
+  },
+  {
+    "id": "task_44",
+    "instruction": "Add a new practice area called 'Civil Litigation'.",
+    "verify": "function-tasks/task_44.py"
+  },
+  {
+    "id": "task_45",
+    "instruction": "Rename the practice area 'Insurance Defense' to 'Insurance Law'.",
+    "verify": "function-tasks/task_45.py"
+  },
+  {
+    "id": "task_46",
+    "instruction": "Delete the practice area 'Medical Malpractice'.",
+    "verify": "function-tasks/task_46.py"
+  },
+  {
+    "id": "task_47",
+    "instruction": "Set 'Criminal Law' as the primary practice area.",
+    "verify": "function-tasks/task_47.py"
+  },
+  {
+    "id": "task_48",
+    "instruction": "Add a new stage called 'Case Review' to the Personal Injury practice area.",
+    "verify": "function-tasks/task_48.py"
+  },
+  {
+    "id": "task_49",
+    "instruction": "Rename the stage 'Initial Consultation' in the Personal Injury practice area to 'Client Intake'.",
+    "verify": "function-tasks/task_49.py"
+  },
+  {
+    "id": "task_50",
+    "instruction": "Delete the stage 'Sentencing' from the Criminal Law practice area.",
+    "verify": "function-tasks/task_50.py"
+  },
+  {
+    "id": "task_51",
+    "instruction": "Create a new matter template named 'Immigration - Work Visa' with practice area Immigration and billing method Hourly.",
+    "verify": "function-tasks/task_51.py"
+  },
+  {
+    "id": "task_52",
+    "instruction": "Edit the template 'Criminal Defense - Misdemeanor' to set the responsible staff to Lisa Patel.",
+    "verify": "function-tasks/task_52.py"
+  },
+  {
+    "id": "task_53",
+    "instruction": "Set the template 'Flat Fee - Simple Will' as the default matter template.",
+    "verify": "function-tasks/task_53.py"
+  },
+  {
+    "id": "task_54",
+    "instruction": "Delete the template 'Corporate Transaction - M&A'.",
+    "verify": "function-tasks/task_54.py"
+  },
+  {
+    "id": "task_55",
+    "instruction": "Remove the default status from the 'Personal Injury - Auto Accident' template.",
+    "verify": "function-tasks/task_55.py"
+  },
+  {
+    "id": "task_56",
+    "instruction": "Change the matter numbering starting number to 200.",
+    "verify": "function-tasks/task_56.py"
+  },
+  {
+    "id": "task_57",
+    "instruction": "Enable the auto-update numbering setting in the matter numbering configuration.",
+    "verify": "function-tasks/task_57.py"
+  }
+]
