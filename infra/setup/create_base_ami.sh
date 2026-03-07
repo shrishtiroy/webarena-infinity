@@ -205,9 +205,25 @@ ssh -i "$HOME/.ssh/${KEY_PAIR}.pem" -o StrictHostKeyChecking=no -o ConnectTimeou
 import json
 with open('/home/ec2-user/.claude.json', 'r+') as f:
     d = json.load(f)
-    d.setdefault('projects', {}).setdefault('/home/ec2-user', {})['hasTrustDialogAccepted'] = True
+    for p in ['/home/ec2-user', '/home/ec2-user/mirror-mirror']:
+        d.setdefault('projects', {}).setdefault(p, {})['hasTrustDialogAccepted'] = True
     f.seek(0); json.dump(d, f, indent=2); f.truncate()
-print('Done: hasTrustDialogAccepted set')
+print('Done: hasTrustDialogAccepted set for both project paths')
+\""
+
+# Ensure ~/.claude/settings.json has skipDangerousModePermissionPrompt
+echo "=== Setting skipDangerousModePermissionPrompt in settings.json ==="
+ssh -i "$HOME/.ssh/${KEY_PAIR}.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
+  "ec2-user@${PUBLIC_IP}" \
+  "python3 -c \"
+import json, os
+p = os.path.expanduser('~/.claude/settings.json')
+d = {}
+if os.path.exists(p):
+    with open(p) as f: d = json.load(f)
+d['skipDangerousModePermissionPrompt'] = True
+with open(p, 'w') as f: json.dump(d, f, indent=2)
+print('Done: skipDangerousModePermissionPrompt set')
 \""
 
 # --- Delete previous base AMI ---

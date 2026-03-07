@@ -272,6 +272,30 @@ export OPENAI_API_KEY="${OPENAI_API_KEY:-}"
 export MM_S3_BUCKET="${S3_BUCKET}"
 ENVVARS
 
+# Pre-accept Claude trust dialog for mirror-mirror project path
+su - ec2-user -c 'python3 -c "
+import json, os
+p = os.path.expanduser(\"~/.claude.json\")
+if os.path.exists(p):
+    with open(p, \"r+\") as f:
+        d = json.load(f)
+        for proj in [\"/home/ec2-user\", \"/home/ec2-user/mirror-mirror\"]:
+            d.setdefault(\"projects\", {}).setdefault(proj, {})[\"hasTrustDialogAccepted\"] = True
+        f.seek(0); json.dump(d, f, indent=2); f.truncate()
+"'
+
+# Ensure skipDangerousModePermissionPrompt is set in settings.json
+su - ec2-user -c 'python3 -c "
+import json, os
+p = os.path.expanduser(\"~/.claude/settings.json\")
+os.makedirs(os.path.dirname(p), exist_ok=True)
+d = {}
+if os.path.exists(p):
+    with open(p) as f: d = json.load(f)
+d[\"skipDangerousModePermissionPrompt\"] = True
+with open(p, \"w\") as f: json.dump(d, f, indent=2)
+"'
+
 # Create logs directory
 mkdir -p /tmp/mirror-mirror-logs
 chown ec2-user:ec2-user /tmp/mirror-mirror-logs
