@@ -358,5 +358,125 @@
     "difficulty": "hard",
     "instruction": "Mark all answers about diversity programs and salary negotiation as helpful, then bookmark the posts by students who have answered questions in the Q&A community if their posts exist in the feed.",
     "verify": "real-tasks/task_h20.py"
+  },
+  {
+    "id": "task_h21",
+    "difficulty": "hard",
+    "instruction": "One of your unread messages is a top-match recruiting message from an employer that also hosts a tech talk on Handshake. Save all of that employer's active jobs and RSVP to their tech talk.",
+    "verify": "real-tasks/task_h21.py"
+  },
+  {
+    "id": "task_h22",
+    "difficulty": "hard",
+    "instruction": "Like the feed post written by the student who answered the question about transitioning from liberal arts to a tech career.",
+    "verify": "real-tasks/task_h22.py"
+  },
+  {
+    "id": "task_h23",
+    "difficulty": "hard",
+    "instruction": "Find the most-viewed question in the Q&A community and create a post visible only to your school recommending that topic to fellow students.",
+    "verify": "real-tasks/task_h23.py"
+  },
+  {
+    "id": "task_h24",
+    "difficulty": "hard",
+    "instruction": "RSVP to all upcoming events that are hosted by employers you currently follow.",
+    "verify": "real-tasks/task_h24.py"
+  },
+  {
+    "id": "task_h25",
+    "difficulty": "hard",
+    "instruction": "A student mentioned attending the NSBE conference in their feed post. Find their answer in the Q&A section and mark it as helpful.",
+    "verify": "real-tasks/task_h25.py"
+  },
+  {
+    "id": "task_h26",
+    "difficulty": "hard",
+    "instruction": "Save all active internships posted by private companies, and follow any private companies you aren't already following.",
+    "verify": "real-tasks/task_h26.py"
+  },
+  {
+    "id": "task_h27",
+    "difficulty": "hard",
+    "instruction": "Schedule an application review appointment for March 13, 2026 at 10:00 AM by phone, then post a question in Q&A asking about the best way to follow up after submitting job applications.",
+    "verify": "real-tasks/task_h27.py"
+  },
+  {
+    "id": "task_h28",
+    "difficulty": "hard",
+    "instruction": "Find the Q&A question about Google's interview process. Mark the non-anonymous answer as helpful, then bookmark Google's post in the feed.",
+    "verify": "real-tasks/task_h28.py"
+  },
+  {
+    "id": "task_h29",
+    "difficulty": "hard",
+    "instruction": "Save all active jobs labeled 'STEM' that are from employers you don't currently follow.",
+    "verify": "real-tasks/task_h29.py"
+  },
+  {
+    "id": "task_h30",
+    "difficulty": "hard",
+    "instruction": "Refocus your career entirely on finance: set your career community to 'Business & Finance', replace your roles with only 'Financial Analyst', 'Business Analyst', and 'Consultant', replace your industries with 'Finance' and 'Consulting', and replace 'Engineering' in your job functions with 'Finance & Accounting'. Save your changes.",
+    "verify": "real-tasks/task_h30.py"
+  },
+  {
+    "id": "task_h31",
+    "difficulty": "hard",
+    "instruction": "Find the student who wrote about their first week at Stripe in the feed. Leave a comment on their post asking about the onboarding process, then save any Stripe jobs you haven't saved yet.",
+    "verify": "real-tasks/task_h31.py"
+  },
+  {
+    "id": "task_h32",
+    "difficulty": "hard",
+    "instruction": "Save all Microsoft jobs you haven't saved yet, then leave a comment on Microsoft's Imagine Cup post in the feed expressing your interest in participating.",
+    "verify": "real-tasks/task_h32.py"
+  },
+  {
+    "id": "task_h33",
+    "difficulty": "hard",
+    "instruction": "Navigate to your saved posts in the feed and find the student who created a PM interview study group. Leave a comment on their post thanking them for organizing it.",
+    "verify": "real-tasks/task_h33.py"
+  },
+  {
+    "id": "task_h34",
+    "difficulty": "hard",
+    "instruction": "Review your saved jobs and unsave any whose employer is not in the Technology or Artificial Intelligence industry.",
+    "verify": "real-tasks/task_h34.py"
+  },
+  {
+    "id": "task_h35",
+    "difficulty": "hard",
+    "instruction": "Follow all employers headquartered in New York and save all their active internship positions.",
+    "verify": "real-tasks/task_h35.py"
+  },
+  {
+    "id": "task_h36",
+    "difficulty": "hard",
+    "instruction": "Schedule a cover letter review appointment with Sarah Thompson for March 11, 2026 at 1:00 PM virtually, then update your website URL to 'mayachen.design'.",
+    "verify": "real-tasks/task_h36.py"
+  },
+  {
+    "id": "task_h37",
+    "difficulty": "hard",
+    "instruction": "Set your profile visibility to 'Employers', remove 'Part-time' from your job type preferences, add 'Full-time' instead, and add 'Los Angeles, CA' to your preferred locations. Save your changes.",
+    "verify": "real-tasks/task_h37.py"
+  },
+  {
+    "id": "task_h38",
+    "difficulty": "hard",
+    "instruction": "Find the student who posted career fair tips in the feed. Go to Q&A and mark their answer as helpful, then leave a comment on their feed post thanking them for the advice.",
+    "verify": "real-tasks/task_h38.py"
+  },
+  {
+    "id": "task_h39",
+    "difficulty": "hard",
+    "instruction": "Like all feed posts from employers in the Consulting or Finance industries, follow those employers, and save all their active job listings.",
+    "verify": "real-tasks/task_h39.py"
+  },
+  {
+    "id": "task_h40",
+    "difficulty": "hard",
+    "instruction": "Read all unread messages from Technology industry employers, then bookmark those same employers' posts in the feed.",
+    "verify": "real-tasks/task_h40.py"
   }
 ]
