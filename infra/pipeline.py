@@ -517,7 +517,6 @@ def save_state(
             "docs_path": args.docs_path,
             "hardening_rounds": getattr(args, "hardening_rounds", 3),
             "tasks_per_round": getattr(args, "tasks_per_round", 20),
-            "target_pass_rate": getattr(args, "target_pass_rate", None),
         }
 
     path = _state_file_path(app_name)
@@ -776,16 +775,10 @@ def main() -> None:
         help="Number of new tasks to generate per hardening round (default: 20)",
     )
     parser.add_argument(
-        "--target-pass-rate",
-        type=float,
-        default=None,
-        help="Optional: stop hardening if overall pass rate drops to this %% (default: disabled)",
-    )
-    parser.add_argument(
         "--audit-every",
         type=int,
-        default=3,
-        help="Run audit-fix loop every N hardening rounds (default: 0 = no audit during hardening)",
+        default=0,
+        help="Run audit on accumulated results every N hardening rounds (default: 0 = audit only after all rounds)",
     )
     parser.add_argument(
         "--s3-bucket",
@@ -815,7 +808,6 @@ def main() -> None:
     log.info("  skip-hardening:  %s", args.skip_hardening)
     log.info("  hardening-rounds:%d", args.hardening_rounds)
     log.info("  tasks-per-round: %d", args.tasks_per_round)
-    log.info("  target-pass-rate:%s", args.target_pass_rate or "disabled")
     log.info("  branch:          %s", args.branch or "(current)")
     log.info("  push:            %s", args.push_enabled)
     log.info("  s3-bucket:       %s", args.s3_bucket or "(disabled)")
@@ -1105,14 +1097,11 @@ def main() -> None:
 
         # Determine starting round on resume
         hardening_start_round = 1
-        hardening_start_audit_iter = 1
         if resume_phase in ("phase_4a", "phase_4b"):
-            # iteration is encoded as round * 100 + audit_iter
             hardening_start_round = max(1, resume_iter // 100)
-            hardening_start_audit_iter = resume_iter % 100 or 1
 
-        # Track all new task IDs since last audit for batched auditing
-        unaudited_ids: set[str] = set()
+        # Collect result dirs from each round for batched auditing
+        hardening_result_dirs: list[Path] = []
 
         for round_num in range(hardening_start_round, args.hardening_rounds + 1):
             log.info(
@@ -1162,7 +1151,6 @@ def main() -> None:
                     break
 
                 log.info("Generated %d new tasks: %s", len(new_ids), sorted(new_ids))
-                unaudited_ids.update(new_ids)
 
                 # Sanity check
                 ok, output = run_sanity_check(app_dir, "real")
@@ -1192,9 +1180,7 @@ def main() -> None:
                 )
 
             # --- 4b: Eval new tasks from this round only ---
-            # Use this round's new_ids (set in 4a), or fall back to all
-            # unaudited IDs when resuming directly into 4b.
-            round_ids = new_ids if not skip_4a else unaudited_ids
+            round_ids = new_ids if not skip_4a else set()
             task_id_filter = ",".join(sorted(round_ids)) if round_ids else None
             save_state(
                 args.app_name,
@@ -1220,109 +1206,47 @@ def main() -> None:
                 results["total"],
             )
 
+            if results_dir is not None:
+                hardening_result_dirs.append(results_dir)
+
             # --- Audit if this is an audit round ---
             is_last_round = round_num == args.hardening_rounds
-            is_audit_round = args.audit_every > 0 and (
-                round_num % args.audit_every == 0 or is_last_round
-            )
+            if args.audit_every > 0:
+                is_audit_round = round_num % args.audit_every == 0 or is_last_round
+            else:
+                # Default: audit only after the final round
+                is_audit_round = is_last_round
 
-            if is_audit_round and unaudited_ids:
-                # Eval ALL hardening tasks for audit baseline
-                audit_filter = ",".join(sorted(unaudited_ids))
-                results_dir = run_eval(
-                    app_dir,
-                    "real-tasks",
-                    args.model,
-                    args.workers,
-                    args.repetitions,
-                    task_id_filter=audit_filter,
+            if is_audit_round and hardening_result_dirs:
+                # Audit uses existing results from all hardening rounds — no re-eval
+                result_paths_str = "\n".join(
+                    f"  - {d}" for d in hardening_result_dirs
                 )
-                results = parse_results(results_dir)
                 log.info(
-                    "Audit baseline (all hardening tasks): %.1f%% (%d/%d)",
-                    results["pass_rate"],
-                    results["passed"],
-                    results["total"],
+                    "Running audit on %d hardening eval result dirs",
+                    len(hardening_result_dirs),
                 )
 
-                if results_dir is not None and results["pass_rate"] < 100:
-                    log.info(
-                        "Running audit on %d hardening tasks",
-                        len(unaudited_ids),
-                    )
-                    for iteration in range(1, max_iterations + 1):
-                        log.info(
-                            "Phase 4b: Audit iteration %d/%d",
-                            iteration,
-                            max_iterations,
-                        )
-                        save_state(
-                            args.app_name,
-                            "phase_4b",
-                            iteration=round_num * 100 + iteration,
-                            args=args,
-                        )
-
-                        run_claude(
-                            "audit-real-tasks",
-                            cwd=REPO_DIR,
-                            timeout=3600,
-                            evaluation_result_path=str(results_dir),
-                        )
-
-                        if not detect_changes(app_dir):
-                            log.info(
-                                "Audit made no changes — remaining failures are agent-side"
-                            )
-                            break
-
-                        ok, output = run_sanity_check(app_dir, "real")
-                        commit_checkpoint(
-                            app_dir,
-                            f"Hardening audit iter {iteration} (after round {round_num}): {args.app_name}",
-                            push=args.push_enabled,
-                        )
-
-                        # Re-eval all hardening tasks
-                        results_dir = run_eval(
-                            app_dir,
-                            "real-tasks",
-                            args.model,
-                            args.workers,
-                            args.repetitions,
-                            task_id_filter=audit_filter,
-                        )
-                        results = parse_results(results_dir)
-                        log.info(
-                            "Post-audit eval: %.1f%% (%d/%d)",
-                            results["pass_rate"],
-                            results["passed"],
-                            results["total"],
-                        )
-                        if results["pass_rate"] == 100:
-                            break
-
-                unaudited_ids.clear()
-
-            # Optional: check overall pass rate with full suite eval
-            if args.target_pass_rate is not None:
-                log.info("Running full suite eval to check overall pass rate")
-                full_results_dir = run_eval(
-                    app_dir,
-                    "real-tasks",
-                    args.model,
-                    args.workers,
-                    args.repetitions,
+                run_claude(
+                    "audit-real-tasks",
+                    cwd=REPO_DIR,
+                    timeout=3600,
+                    evaluation_result_path=result_paths_str,
                 )
-                full_results = parse_results(full_results_dir)
-                log.info("Full suite pass rate: %.1f%%", full_results["pass_rate"])
-                if full_results["pass_rate"] <= args.target_pass_rate:
-                    log.info(
-                        "Target pass rate reached (%.1f%% <= %.1f%%) — stopping hardening",
-                        full_results["pass_rate"],
-                        args.target_pass_rate,
+
+                if detect_changes(app_dir):
+                    ok, output = run_sanity_check(app_dir, "real")
+                    commit_checkpoint(
+                        app_dir,
+                        f"Hardening audit (after round {round_num}): {args.app_name}",
+                        push=args.push_enabled,
                     )
-                    break
+                else:
+                    log.info(
+                        "Audit made no changes — remaining failures are agent-side"
+                    )
+
+                hardening_result_dirs.clear()
 
         log.info("Phase 4 complete")
     else:

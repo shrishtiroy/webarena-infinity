@@ -204,17 +204,25 @@ class BrowserUseAgent:
             max_steps=self.max_steps,
         )
 
+        timed_out = False
         t0 = time.time()
-        history = await asyncio.wait_for(agent.run(), timeout=self.timeout)
+        try:
+            history = await asyncio.wait_for(agent.run(), timeout=self.timeout)
+        except asyncio.TimeoutError:
+            timed_out = True
+            history = agent.history
         elapsed = time.time() - t0
 
-        # Save trajectory
+        # Save trajectory (including partial history on timeout)
         history.save_to_file(task_dir / "history.json")
         screenshots_dst = task_dir / "screenshots"
         for step_idx, path_str in enumerate(history.screenshot_paths()):
             if path_str and Path(path_str).exists():
                 screenshots_dst.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(path_str, screenshots_dst / f"step_{step_idx}.png")
+
+        if timed_out:
+            raise asyncio.TimeoutError()
 
         return AgentResult(
             elapsed=round(elapsed, 1),

@@ -297,7 +297,21 @@ async def worker(
                     if any(k in err_text for k in ("INSUFFICIENT_RESOURCES", "Timeout", "CDP", "consecutive failures")):
                         needs_restart = True
             except asyncio.TimeoutError:
-                print(f"  {tag} {BOLD}{task_id}{RESET} {dc}{diff}{RESET}  {BG_YELLOW}{WHITE}{BOLD} TIME {RESET}")
+                # history.json and screenshots are saved by the agent
+                # before re-raising; read step count from saved history
+                steps = -1
+                history_file = task_dir / "history.json"
+                if history_file.exists():
+                    try:
+                        with open(history_file) as hf:
+                            hist = json.load(hf)
+                        steps = len(hist) if isinstance(hist, list) else len(hist.get("history", []))
+                    except (json.JSONDecodeError, OSError):
+                        pass
+                print(
+                    f"  {tag} {BOLD}{task_id}{RESET} {dc}{diff}{RESET}  "
+                    f"{BG_YELLOW}{WHITE}{BOLD} TIME {RESET} {DIM}{TASK_TIMEOUT}s  {steps} steps{RESET}"
+                )
                 result = {
                     "task_id": task_id,
                     "difficulty": task.get("difficulty", ""),
@@ -305,7 +319,7 @@ async def worker(
                     "passed": False,
                     "verifier_message": f"Timed out after {TASK_TIMEOUT}s",
                     "elapsed": TASK_TIMEOUT,
-                    "steps": -1,
+                    "steps": steps,
                     "is_done": False,
                     "final_result": None,
                     "errors": [f"Timeout after {TASK_TIMEOUT}s"],
@@ -497,6 +511,10 @@ async def main():
                         help="Cascading mode: run 2+ retries only tasks that failed "
                              "in the previous run. Without this flag, every run "
                              "executes the full task set.")
+    parser.add_argument("--no-skip-timeout", action="store_true",
+                        help="Retry timed-out tasks in subsequent runs. "
+                             "By default, tasks that time out are NOT retried "
+                             "(they almost never pass on retry).")
     parser.add_argument("--resume-dir", default=None,
                         help="Resume a partial evaluation into this existing directory. "
                              "Detects completed tasks and only re-runs the remainder.")
@@ -593,7 +611,11 @@ async def main():
             results = saved.get("tasks", [])
 
             if args.failed_only:
-                failed_ids = {r["task_id"] for r in results if not r["passed"]}
+                skip_timeout = not args.no_skip_timeout
+                failed_ids = {
+                    r["task_id"] for r in results
+                    if not r["passed"] and not (skip_timeout and not r.get("is_done", True))
+                }
                 current_tasks = [all_tasks_by_id[tid] for tid in failed_ids if tid in all_tasks_by_id]
             continue
 
@@ -628,10 +650,17 @@ async def main():
 
         if args.failed_only:
             # Narrow to only the tasks that still failed for the next round
-            failed_ids = {r["task_id"] for r in results if not r["passed"]}
+            skip_timeout = not args.no_skip_timeout
+            failed_ids = {
+                r["task_id"] for r in results
+                if not r["passed"] and not (skip_timeout and not r.get("is_done", True))
+            }
+            timed_out = sum(1 for r in results if not r["passed"] and not r.get("is_done", True))
             current_tasks = [all_tasks_by_id[tid] for tid in failed_ids if tid in all_tasks_by_id]
 
             passed_this_round = sum(1 for r in results if r["passed"])
+            if skip_timeout and timed_out > 0:
+                print(f"  {MAGENTA}→ {timed_out} timed out — skipping in subsequent runs{RESET}")
             if passed_this_round > 0 and failed_ids:
                 print(f"  {MAGENTA}→ {len(failed_ids)} still failing, will retry in next round{RESET}")
 
