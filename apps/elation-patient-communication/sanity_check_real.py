@@ -1017,6 +1017,255 @@ def solve_task_h40(state):
             prov["notificationTimeframe"] = "1_week"
 
 
+# ── Hardened tasks (h41–h60) ─────────────────────────────────────────
+
+def solve_task_h41(state):
+    """Schedule in-person podiatry follow-up for Patricia O'Brien (vs_2 referral)."""
+    state["appointments"].append({
+        "id": next_appointment_id(state),
+        "patientId": "pat_8",
+        "providerId": "prov_1",
+        "date": "2026-04-15T14:00:00Z",
+        "place": "in_person",
+        "status": "scheduled",
+        "virtualVisitInstructions": None,
+        "reason": "Podiatry referral follow-up",
+    })
+
+
+def solve_task_h42(state):
+    """Update Helen Matsumoto's EC phone and sharing level."""
+    patient = find_patient_by_name(state, "Helen", "Matsumoto")
+    patient["emergencyContact"]["phone"] = "(415) 555-9900"
+    patient["passportSharingLevel"] = 4
+
+
+def solve_task_h43(state):
+    """Update Geriatric patients below sharing level 3 to level 3."""
+    for patient in state["patients"]:
+        if "Geriatric" in patient.get("tags", []):
+            if patient.get("passportSharingLevel", 2) < 3:
+                patient["passportSharingLevel"] = 3
+
+
+def solve_task_h44(state):
+    """Send no-reply fasting reminder to Warfarin check patient (Robert Washington)."""
+    conv_id = next_conversation_id(state)
+    letter = make_letter(
+        state, "pat_3", conv_id,
+        "Warfarin Check Appointment Reminder",
+        "Dear Mr. Washington, please fast for 12 hours before your upcoming blood draw and bring your current medication list.",
+        doNotAllowResponse=True,
+    )
+    state["patientLetters"].append(letter)
+
+
+def solve_task_h45(state):
+    """Cancel Howard Blackwell's virtual appt, reschedule in-person same date."""
+    appt = find_entity(state["appointments"], id="appt_9")
+    appt["status"] = "cancelled"
+    state["appointments"].append({
+        "id": next_appointment_id(state),
+        "patientId": "pat_27",
+        "providerId": "prov_4",
+        "date": "2026-03-15T14:00:00Z",
+        "place": "in_person",
+        "status": "scheduled",
+        "virtualVisitInstructions": None,
+        "reason": "CHF management review",
+    })
+
+
+def solve_task_h46(state):
+    """Add Nurses (ug_3) to Prescription Refill routing for all providers."""
+    for prov in state["providers"]:
+        pid = prov["id"]
+        routing = state["messageRouting"][pid].get("Prescription Refill", [])
+        if "ug_3" not in routing:
+            routing.append("ug_3")
+        state["messageRouting"][pid]["Prescription Refill"] = routing
+
+
+def solve_task_h47(state):
+    """Resend Passport invite for Tyler Robinson + add Telehealth Preferred tag."""
+    patient = find_patient_by_name(state, "Tyler", "Robinson")
+    patient["invitedAt"] = TIMESTAMP
+    patient["invitationCode"] = "8888888"
+    if "Telehealth Preferred" not in patient["tags"]:
+        patient["tags"].append("Telehealth Preferred")
+
+
+def solve_task_h48(state):
+    """Reply to Susan Cho, cancel virtual appt, schedule in-person."""
+    reply = make_letter(
+        state, "pat_40", "conv_28",
+        "Re: Appointment Request",
+        "Hi Susan, given the flare-up severity, I'd recommend coming in for an in-person evaluation instead. I've rescheduled your appointment.",
+    )
+    state["patientLetters"].append(reply)
+    appt = find_entity(state["appointments"], id="appt_14")
+    appt["status"] = "cancelled"
+    state["appointments"].append({
+        "id": next_appointment_id(state),
+        "patientId": "pat_40",
+        "providerId": "prov_3",
+        "date": "2026-03-12T15:00:00Z",
+        "place": "in_person",
+        "status": "scheduled",
+        "virtualVisitInstructions": None,
+        "reason": "Urticaria flare evaluation",
+    })
+
+
+def solve_task_h49(state):
+    """Send letter to older BPH patient (DeLuca), tag younger (Tran)."""
+    conv_id = next_conversation_id(state)
+    letter = make_letter(
+        state, "pat_19", conv_id,
+        "Prostate Check-up Reminder",
+        "Mr. DeLuca, please schedule your next prostate check-up at your convenience.",
+    )
+    state["patientLetters"].append(letter)
+    patient = find_patient_by_name(state, "Philip", "Tran")
+    if "Chronic Care" not in patient["tags"]:
+        patient["tags"].append("Chronic Care")
+
+
+def solve_task_h50(state):
+    """Opt Geriatric ACE-intolerant patient into SMS, tag the other High Risk."""
+    pat_33 = find_patient_by_name(state, "Douglas", "Fitzgerald")
+    pat_33["smsOptInStatus"] = "opted_in"
+    pat_14 = find_patient_by_name(state, "Maria", "Gonzalez")
+    if "High Risk" not in pat_14["tags"]:
+        pat_14["tags"].append("High Risk")
+
+
+def solve_task_h51(state):
+    """Change chat mode + activate virtual for Amanda Wright."""
+    state["practiceSettings"]["videoSettings"]["chatMode"] = "everyone_in_waiting_room"
+    prov = find_provider(state, "prov_5")
+    prov["virtualVisitActivated"] = True
+    prov["virtualVisitInstructions"] = "Please join at https://meet.bayareafamilymed.com/wright"
+
+
+def solve_task_h52(state):
+    """Reply to Aisha Patel's ankle swelling message + tag High Risk."""
+    reply = make_letter(
+        state, "pat_20", "conv_22",
+        "Re: General Question",
+        "Hi Aisha, some ankle swelling is normal at this stage of pregnancy, but please monitor for any sudden increase or if it's accompanied by headaches or visual changes. Contact us immediately if that happens.",
+    )
+    state["patientLetters"].append(reply)
+    patient = find_patient_by_name(state, "Aisha", "Patel")
+    if "High Risk" not in patient["tags"]:
+        patient["tags"].append("High Risk")
+
+
+def solve_task_h53(state):
+    """Reply to Catherine Morales, acknowledge rem_6, change sharing to 3."""
+    reply = make_letter(
+        state, "pat_46", "conv_27",
+        "Re: General Question",
+        "Hi Catherine, yes please continue taking the Levothyroxine on an empty stomach, 30-60 minutes before breakfast. And yes, Vitamin D is still important - keep taking it.",
+    )
+    state["patientLetters"].append(reply)
+    rem = find_reminder(state, "rem_6")
+    rem["acknowledged"] = True
+    patient = find_patient_by_name(state, "Catherine", "Morales")
+    patient["passportSharingLevel"] = 3
+
+
+def solve_task_h54(state):
+    """Reply to Sophia Nguyen's thyroid check-up request + acknowledge rem_9."""
+    reply = make_letter(
+        state, "pat_4", "conv_4",
+        "Re: Appointment Request",
+        "Hi Sophia, I'll arrange your annual thyroid check-up via telehealth. Our front desk will reach out with available times.",
+    )
+    state["patientLetters"].append(reply)
+    rem = find_reminder(state, "rem_9")
+    rem["acknowledged"] = True
+
+
+def solve_task_h55(state):
+    """Invite Dr. Torres's uninvited patients, set sharing to 3 for all invited."""
+    for patient in state["patients"]:
+        if patient["assignedProviderId"] == "prov_2" and patient["passportStatus"] == "not_invited":
+            patient["passportStatus"] = "invited"
+            patient["invitedAt"] = TIMESTAMP
+            patient["invitationCode"] = "9999990"
+    for patient in state["patients"]:
+        if patient["assignedProviderId"] == "prov_2" and patient["passportStatus"] == "invited":
+            patient["passportSharingLevel"] = 3
+
+
+def solve_task_h56(state):
+    """Update William Chang's email and resend Passport invitation."""
+    patient = find_patient_by_name(state, "William", "Chang")
+    patient["email"] = "william.chang.new@gmail.com"
+    patient["invitedAt"] = TIMESTAMP
+    patient["invitationCode"] = "8888888"
+
+
+def solve_task_h57(state):
+    """Add Pacific Heights Office, add CPT 99215, change Dr. Kim sharing to 3."""
+    state["practiceSettings"]["practiceLocations"].append({
+        "id": next_location_id(state),
+        "name": "Pacific Heights Office",
+        "address": "3500 California Street, San Francisco, CA 94118",
+        "posCode": "11",
+        "posDescription": "Office",
+    })
+    state["practiceSettings"]["cptCodes"].append({
+        "code": "99215",
+        "description": "Office visit, established patient, comprehensive",
+    })
+    prov = find_provider(state, "prov_4")
+    prov["sharingDefault"] = 3
+
+
+def solve_task_h58(state):
+    """Send no-reply letters to both Mental Health tagged patients."""
+    for pat_id in ["pat_12", "pat_22"]:
+        conv_id = next_conversation_id(state)
+        letter = make_letter(
+            state, pat_id, conv_id,
+            "Therapy Follow-up Appointment",
+            "Please schedule your next therapy follow-up appointment at your earliest convenience.",
+            doNotAllowResponse=True,
+        )
+        state["patientLetters"].append(letter)
+
+
+def solve_task_h59(state):
+    """Reply to Kevin Adebayo's billing conversation, end it, add tag."""
+    reply = make_letter(
+        state, "pat_11", "conv_8",
+        "Re: Billing Question",
+        "Hi Kevin, the billing issue has been resolved. The charge was adjusted and your insurance has been rebilled correctly.",
+        conversationState="ended",
+    )
+    state["patientLetters"].append(reply)
+    for l in state["patientLetters"]:
+        if l["conversationId"] == "conv_8":
+            l["conversationState"] = "ended"
+    patient = find_patient_by_name(state, "Kevin", "Adebayo")
+    if "Insurance Pending" not in patient["tags"]:
+        patient["tags"].append("Insurance Pending")
+
+
+def solve_task_h60(state):
+    """Add 48-hour providers to Dr. Torres's Referral Request routing."""
+    providers_48h = [
+        prov["id"] for prov in state["providers"]
+        if prov["notificationTimeframe"] == "48_hours"
+    ]
+    routing = state["messageRouting"]["prov_2"]["Referral Request"]
+    for pid in providers_48h:
+        if pid not in routing:
+            routing.append(pid)
+
+
 SOLVERS = {
     "task_e1": solve_task_e1,
     "task_e2": solve_task_e2,
@@ -1098,6 +1347,26 @@ SOLVERS = {
     "task_h38": solve_task_h38,
     "task_h39": solve_task_h39,
     "task_h40": solve_task_h40,
+    "task_h41": solve_task_h41,
+    "task_h42": solve_task_h42,
+    "task_h43": solve_task_h43,
+    "task_h44": solve_task_h44,
+    "task_h45": solve_task_h45,
+    "task_h46": solve_task_h46,
+    "task_h47": solve_task_h47,
+    "task_h48": solve_task_h48,
+    "task_h49": solve_task_h49,
+    "task_h50": solve_task_h50,
+    "task_h51": solve_task_h51,
+    "task_h52": solve_task_h52,
+    "task_h53": solve_task_h53,
+    "task_h54": solve_task_h54,
+    "task_h55": solve_task_h55,
+    "task_h56": solve_task_h56,
+    "task_h57": solve_task_h57,
+    "task_h58": solve_task_h58,
+    "task_h59": solve_task_h59,
+    "task_h60": solve_task_h60,
 }
 
 

@@ -478,5 +478,125 @@
     "difficulty": "hard",
     "instruction": "Change the notification timeframe to '1 week' for every provider in the practice whose current timeframe is set to '24 hours'.",
     "verify": "real-tasks/task_h40.py"
+  },
+  {
+    "id": "task_h41",
+    "difficulty": "hard",
+    "instruction": "Check the visit summaries and find which patient was referred to podiatry for neuropathy screening. Schedule an in-person follow-up appointment for that patient with Dr. Chen on April 15, 2026 at 2:00 PM.",
+    "verify": "real-tasks/task_h41.py"
+  },
+  {
+    "id": "task_h42",
+    "difficulty": "hard",
+    "instruction": "Find the patient who takes both Donepezil and Memantine. Update their emergency contact's phone number to (415) 555-9900 and change their Passport sharing level to Level 4.",
+    "verify": "real-tasks/task_h42.py"
+  },
+  {
+    "id": "task_h43",
+    "difficulty": "hard",
+    "instruction": "For each patient tagged 'Geriatric' whose Passport sharing level is below Level 3, update it to Level 3.",
+    "verify": "real-tasks/task_h43.py"
+  },
+  {
+    "id": "task_h44",
+    "difficulty": "hard",
+    "instruction": "Look up which patient has an upcoming Warfarin check appointment. Send them a message reminding them to fast for 12 hours before the blood draw and to bring their current medication list. Don't allow a reply.",
+    "verify": "real-tasks/task_h44.py"
+  },
+  {
+    "id": "task_h45",
+    "difficulty": "hard",
+    "instruction": "The patient being managed for congestive heart failure has a virtual appointment coming up. Cancel it and schedule a new in-person visit with the same provider for the same date and time.",
+    "verify": "real-tasks/task_h45.py"
+  },
+  {
+    "id": "task_h46",
+    "difficulty": "hard",
+    "instruction": "Go through each provider's message routing and add the Nurses group to Prescription Refill for any provider that doesn't already have it.",
+    "verify": "real-tasks/task_h46.py"
+  },
+  {
+    "id": "task_h47",
+    "difficulty": "hard",
+    "instruction": "There's a patient with a pending Passport invitation who is tagged 'Pediatric'. Resend their invitation and add 'Telehealth Preferred' to their profile.",
+    "verify": "real-tasks/task_h47.py"
+  },
+  {
+    "id": "task_h48",
+    "difficulty": "hard",
+    "instruction": "Read Susan Cho's message about her urticaria flare-up and reply recommending an in-person evaluation instead. Cancel her existing virtual appointment and schedule a new in-person one with the same provider on March 12, 2026 at 3:00 PM.",
+    "verify": "real-tasks/task_h48.py"
+  },
+  {
+    "id": "task_h49",
+    "difficulty": "hard",
+    "instruction": "Two patients have BPH on their problem list. Send a letter to the older one about scheduling a prostate check-up. Add the 'Chronic Care' tag to the younger one.",
+    "verify": "real-tasks/task_h49.py"
+  },
+  {
+    "id": "task_h50",
+    "difficulty": "hard",
+    "instruction": "Two patients have ACE inhibitor intolerance listed in their drug intolerances. Opt the one tagged 'Geriatric' into SMS messaging. Add 'High Risk' to the other one's profile.",
+    "verify": "real-tasks/task_h50.py"
+  },
+  {
+    "id": "task_h51",
+    "difficulty": "hard",
+    "instruction": "Change the telehealth chat mode to 'Everyone in Waiting Room' and activate virtual visits for Amanda Wright with instructions: 'Please join at https://meet.bayareafamilymed.com/wright'.",
+    "verify": "real-tasks/task_h51.py"
+  },
+  {
+    "id": "task_h52",
+    "difficulty": "hard",
+    "instruction": "Find the conversation where a patient mentions ankle swelling. Reply reassuring them it can be normal but to monitor for sudden changes, then add 'High Risk' to that patient's profile.",
+    "verify": "real-tasks/task_h52.py"
+  },
+  {
+    "id": "task_h53",
+    "difficulty": "hard",
+    "instruction": "Reply to Catherine Morales's question about her Levothyroxine confirming she should continue taking it on an empty stomach. Then acknowledge the unread alert reminder about her thyroid update and change her Passport sharing level to Level 3.",
+    "verify": "real-tasks/task_h53.py"
+  },
+  {
+    "id": "task_h54",
+    "difficulty": "hard",
+    "instruction": "There's an unread message from a patient asking to schedule a thyroid check-up via telehealth. Reply to confirm you'll arrange it, then acknowledge the appointment reminder for that same patient.",
+    "verify": "real-tasks/task_h54.py"
+  },
+  {
+    "id": "task_h55",
+    "difficulty": "hard",
+    "instruction": "Invite all of Dr. Torres's patients who haven't been invited to Passport yet. Then set the Passport sharing level to 3 for every one of Dr. Torres's patients who currently has 'invited' status.",
+    "verify": "real-tasks/task_h55.py"
+  },
+  {
+    "id": "task_h56",
+    "difficulty": "hard",
+    "instruction": "Check the reminders for a patient who was invited to Passport in February and still hasn't registered. Go to that patient's profile, update their email to 'william.chang.new@gmail.com', and resend the Passport invitation.",
+    "verify": "real-tasks/task_h56.py"
+  },
+  {
+    "id": "task_h57",
+    "difficulty": "hard",
+    "instruction": "Add a new practice location called 'Pacific Heights Office' at '3500 California Street, San Francisco, CA 94118' with Place of Service code 11. Then add CPT code 99215 for 'Office visit, established patient, comprehensive'. Finally, change Dr. Kim's default sharing level to Level 3.",
+    "verify": "real-tasks/task_h57.py"
+  },
+  {
+    "id": "task_h58",
+    "difficulty": "hard",
+    "instruction": "Send a separate letter to each patient tagged 'Mental Health' about scheduling a therapy follow-up appointment. Do not allow responses on either letter.",
+    "verify": "real-tasks/task_h58.py"
+  },
+  {
+    "id": "task_h59",
+    "difficulty": "hard",
+    "instruction": "Find the conversation where a patient asked about a $247 bill. Reply letting them know the billing issue has been resolved, then end the conversation and add 'Insurance Pending' to that patient's profile.",
+    "verify": "real-tasks/task_h59.py"
+  },
+  {
+    "id": "task_h60",
+    "difficulty": "hard",
+    "instruction": "Check which providers have their notification timeframe set to 48 hours. Add each of those providers as a direct recipient in Dr. Torres's Referral Request message routing.",
+    "verify": "real-tasks/task_h60.py"
   }
 ]
