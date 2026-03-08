@@ -1498,6 +1498,367 @@ def solve_task_h60(state):
     m["matterStageId"] = trial["id"]
 
 
+# HARDENING ROUND 3
+
+def solve_task_h61(state):
+    """Swap billing: contingency→hourly, hourly→flat_rate for all open matters."""
+    originals = {}
+    for m in state["matters"]:
+        if m["status"] == "Open":
+            originals[m["id"]] = m["billingPreference"]["billingMethod"]
+    for m in state["matters"]:
+        if m["status"] == "Open":
+            orig = originals[m["id"]]
+            if orig == "contingency":
+                m["billingPreference"]["billingMethod"] = "hourly"
+            elif orig == "hourly":
+                m["billingPreference"]["billingMethod"] = "flat_rate"
+
+
+def solve_task_h62(state):
+    """Cruz: $60k recovery from Rodriguez NM Hospital bill payer, legal fee with highest-rate member at 30%."""
+    rodriguez = find_matter(state, "Rodriguez v. Premier Auto")
+    nm = find_contact_by_name(state, "Northwestern Memorial Hospital")
+    nm_provider = find_provider(rodriguez, nm["id"])
+    payer_id = nm_provider["medicalBills"][0]["payers"][0]["payerId"]
+    highest = max(state["firmUsers"], key=lambda u: u["rate"])
+    cruz = find_matter(state, "Cruz v. Metro Transit")
+    rec_id = "rec_" + str(gen_id(state, "recovery")).zfill(3)
+    cruz["settlement"]["recoveries"].append({
+        "id": rec_id,
+        "sourceContactId": payer_id,
+        "amount": 60000,
+        "createdAt": "2026-03-08T00:00:00Z",
+    })
+    cruz["settlement"]["legalFees"].append({
+        "id": "lf_" + str(gen_id(state, "legalFee")).zfill(3),
+        "recoveryId": rec_id,
+        "recipientId": highest["id"],
+        "rate": 30,
+        "discount": 0,
+        "referralFees": [],
+        "createdAt": "2026-03-08T00:00:00Z",
+    })
+
+
+def solve_task_h63(state):
+    """Create new matter for Okafor client under Criminal Law with Osei, hourly."""
+    okafor = find_matter(state, "State v. Okafor")
+    client_id = okafor["clientId"]
+    contact_name = okafor["contactName"]
+    osei = find_user_by_name(state, "Michael Osei")
+    criminal = find_practice_area(state, "Criminal Law")
+    stages = state["matterStages"].get(criminal["id"], [])
+    first_stage = stages[0]["id"] if stages else None
+    num = str(gen_id(state, "matter")).zfill(5)
+    matter = {
+        "id": "mat_" + num,
+        "matterNumber": num,
+        "displayNumber": num + "-" + contact_name.split()[-1],
+        "description": "Okafor - Civil Rights Claim",
+        "clientId": client_id,
+        "contactName": contact_name,
+        "status": "Open",
+        "practiceAreaId": criminal["id"],
+        "matterStageId": first_stage,
+        "responsibleAttorneyId": osei["id"],
+        "originatingAttorneyId": None,
+        "responsibleStaffId": None,
+        "clientRefNumber": "",
+        "location": "",
+        "openDate": "2026-03-08T00:00:00Z",
+        "pendingDate": None,
+        "closedDate": None,
+        "createdAt": "2026-03-08T00:00:00Z",
+        "updatedAt": "2026-03-08T00:00:00Z",
+        "permissions": {"type": "everyone"},
+        "blockedUsers": [],
+        "billingPreference": {
+            "isBillable": True,
+            "billingMethod": "hourly",
+            "currency": "USD",
+            "contingencyRate": None,
+            "contingencyRecipientId": None,
+            "flatFeeAmount": None,
+            "flatFeeRecipientId": None,
+            "customRates": [],
+            "budget": None,
+            "budgetNotifyUsers": [],
+            "trustMinBalance": None,
+            "trustNotifyUsers": [],
+        },
+        "deductionOrder": "fees_first",
+        "relatedContacts": [],
+        "notifications": [],
+        "customFields": [],
+        "taskLists": [],
+        "documentFolders": [],
+        "reports": {"useFirmSettings": True, "originatingAllocation": 0, "responsibleAllocation": 0},
+        "templateId": None,
+        "financials": {"workInProgress": 0, "outstandingBalance": 0, "trustFunds": 0, "totalTime": 0, "totalExpenses": 0},
+        "timeline": [{
+            "id": "tl_ev_" + str(gen_id(state, "timeline")),
+            "action": "created",
+            "timestamp": "2026-03-08T00:00:00Z",
+            "userId": state["currentUser"]["id"],
+            "details": "Matter created",
+        }],
+        "damages": [],
+        "medicalProviders": [],
+        "settlement": {"recoveries": [], "legalFees": [], "otherLiens": [], "outstandingBalances": [], "expenses": []},
+    }
+    state["matters"].append(matter)
+
+
+def solve_task_h64(state):
+    """Rodriguez: set billStatus to Requested for providers with 'Not yet requested'."""
+    m = find_matter(state, "Rodriguez v. Premier Auto")
+    for p in m["medicalProviders"]:
+        if p.get("billStatus") == "Not yet requested":
+            p["billStatus"] = "Requested"
+            p["billRequestDate"] = "2026-03-05"
+
+
+def solve_task_h65(state):
+    """Add Arbitration stage to PI, move Rodriguez to it."""
+    pa = find_practice_area(state, "Personal Injury")
+    stages = state["matterStages"].get(pa["id"], [])
+    stg_id = "stg_" + str(gen_id(state, "stage")).zfill(3)
+    stages.append({"id": stg_id, "name": "Arbitration", "order": len(stages)})
+    state["matterStages"][pa["id"]] = stages
+    m = find_matter(state, "Rodriguez v. Premier Auto")
+    m["matterStageId"] = stg_id
+
+
+def solve_task_h66(state):
+    """Open matter with highest WIP: staff=Thompson, originating=Garcia."""
+    best = max(
+        (m for m in state["matters"] if m["status"] == "Open"),
+        key=lambda m: m.get("financials", {}).get("workInProgress", 0),
+    )
+    thompson = find_user_by_name(state, "Rachel Thompson")
+    garcia = find_user_by_name(state, "Maria Garcia")
+    best["responsibleStaffId"] = thompson["id"]
+    best["originatingAttorneyId"] = garcia["id"]
+
+
+def solve_task_h67(state):
+    """Rodriguez: double recoveries, increase legal fee rates by 5."""
+    m = find_matter(state, "Rodriguez v. Premier Auto")
+    for r in m["settlement"]["recoveries"]:
+        r["amount"] = r["amount"] * 2
+    for f in m["settlement"]["legalFees"]:
+        f["rate"] = round(f["rate"] + 5, 2)
+
+
+def solve_task_h68(state):
+    """Harris: $75k Lakeside recovery, legal fee at 35% with Harris resp atty, 5% referral to Espinoza."""
+    m = find_matter(state, "Harris v. ABC Construction")
+    lakeside = find_contact_by_name(state, "Lakeside Insurance Co.")
+    espinoza = find_contact_by_name(state, "Carlos Espinoza")
+    rec_id = "rec_" + str(gen_id(state, "recovery")).zfill(3)
+    m["settlement"]["recoveries"].append({
+        "id": rec_id,
+        "sourceContactId": lakeside["id"],
+        "amount": 75000,
+        "createdAt": "2026-03-08T00:00:00Z",
+    })
+    m["settlement"]["legalFees"].append({
+        "id": "lf_" + str(gen_id(state, "legalFee")).zfill(3),
+        "recoveryId": rec_id,
+        "recipientId": m["responsibleAttorneyId"],
+        "rate": 35,
+        "discount": 0,
+        "referralFees": [{"recipientId": espinoza["id"], "rate": 5}],
+        "createdAt": "2026-03-08T00:00:00Z",
+    })
+
+
+def solve_task_h69(state):
+    """Create Maritime Law PA, 4 stages, move Kowalski to Investigation."""
+    pa_id = "pa_" + str(gen_id(state, "practiceArea")).zfill(3)
+    state["practiceAreas"].append({
+        "id": pa_id, "name": "Maritime Law", "enabled": True, "isPrimary": False,
+    })
+    stages = []
+    for i, name in enumerate(["Case Intake", "Investigation", "Arbitration", "Settlement"]):
+        stg_id = "stg_" + str(gen_id(state, "stage")).zfill(3)
+        stages.append({"id": stg_id, "name": name, "order": i})
+    state["matterStages"][pa_id] = stages
+    investigation = stages[1]
+    m = find_matter(state, "Kowalski")
+    m["practiceAreaId"] = pa_id
+    m["matterStageId"] = investigation["id"]
+
+
+def solve_task_h70(state):
+    """Add lien matching outstanding balance holder and amount on matter with balances."""
+    for m in state["matters"]:
+        if m["status"] != "Open":
+            continue
+        balances = m.get("settlement", {}).get("outstandingBalances", [])
+        if balances:
+            balance = balances[0]
+            m["settlement"]["otherLiens"].append({
+                "id": "ol_" + str(gen_id(state, "lien")).zfill(3),
+                "lienHolderId": balance["balanceHolderId"],
+                "description": "Additional services rendered",
+                "amount": balance["balanceOwing"],
+                "reduction": 0,
+                "createdAt": "2026-03-08T00:00:00Z",
+            })
+            break
+
+
+def solve_task_h71(state):
+    """Rodriguez: set recordFollowUpDate for providers with recordStatus='Received'."""
+    m = find_matter(state, "Rodriguez v. Premier Auto")
+    for p in m["medicalProviders"]:
+        if p.get("recordStatus") == "Received":
+            p["recordFollowUpDate"] = "2026-03-15"
+
+
+def solve_task_h72(state):
+    """Singh: resp attorney from TechNova, originating from Rodriguez."""
+    technova = find_matter(state, "TechNova Solutions")
+    rodriguez = find_matter(state, "Rodriguez v. Premier Auto")
+    singh = find_matter(state, "Singh Family Trust")
+    singh["responsibleAttorneyId"] = technova["responsibleAttorneyId"]
+    singh["originatingAttorneyId"] = rodriguez["originatingAttorneyId"]
+
+
+def solve_task_h73(state):
+    """Delete all closed matters."""
+    closed = [m for m in state["matters"] if m["status"] == "Closed"]
+    for m in closed:
+        state["deletedMatters"].append({
+            "id": m["id"], "matterNumber": m["matterNumber"],
+            "displayNumber": m["displayNumber"], "description": m["description"],
+            "clientId": m["clientId"], "contactName": m["contactName"],
+            "deletedAt": "2026-03-08T00:00:00Z", "deletedBy": state["currentUser"]["id"],
+            "canRecover": True,
+        })
+    state["matters"] = [m for m in state["matters"] if m["status"] != "Closed"]
+
+
+def solve_task_h74(state):
+    """Rodriguez: add damage with amount = sum of settlement expenses."""
+    m = find_matter(state, "Rodriguez v. Premier Auto")
+    total = sum(e["amount"] for e in m["settlement"]["expenses"])
+    m["damages"].append({
+        "id": "dmg_" + str(gen_id(state, "damage")).zfill(3),
+        "description": "Out-of-pocket travel expenses",
+        "type": "Out-of-Pocket Expenses",
+        "category": "Special",
+        "amount": total,
+        "createdAt": "2026-03-08T00:00:00Z",
+        "createdBy": state["currentUser"]["id"],
+    })
+
+
+def solve_task_h75(state):
+    """Rodriguez: add Reeves_Evaluation.pdf bill to Dr. Reeves."""
+    m = find_matter(state, "Rodriguez v. Premier Auto")
+    reeves = find_contact_by_name(state, "Dr. Amanda Reeves")
+    p = find_provider(m, reeves["id"])
+    p["medicalBills"].append({
+        "id": "mb_" + str(gen_id(state, "medBill")).zfill(3),
+        "fileName": "Reeves_Evaluation.pdf",
+        "billDate": "",
+        "receivedDate": "",
+        "billAmount": 5000,
+        "adjustment": 500,
+        "payers": [],
+        "balanceOwed": 4500,
+        "balanceIsLien": False,
+        "balanceIsOutstanding": True,
+        "comments": [],
+    })
+
+
+def solve_task_h76(state):
+    """Move all open PI matters to first stage."""
+    pa = find_practice_area(state, "Personal Injury")
+    stages = sorted(state["matterStages"][pa["id"]], key=lambda s: s["order"])
+    first_stage = stages[0]
+    for m in state["matters"]:
+        if m["practiceAreaId"] == pa["id"] and m["status"] == "Open":
+            m["matterStageId"] = first_stage["id"]
+
+
+def solve_task_h77(state):
+    """Rodriguez: remove Riverside CU lien, create outstanding balance with same amount."""
+    m = find_matter(state, "Rodriguez v. Premier Auto")
+    riverside = find_contact_by_name(state, "Riverside Community Credit Union")
+    lien = next(l for l in m["settlement"]["otherLiens"] if l["lienHolderId"] == riverside["id"])
+    lien_amount = lien["amount"]
+    m["settlement"]["otherLiens"] = [l for l in m["settlement"]["otherLiens"]
+                                     if l["lienHolderId"] != riverside["id"]]
+    m["settlement"]["outstandingBalances"].append({
+        "id": "ob_" + str(gen_id(state, "balance")).zfill(3),
+        "responsibleParty": "client",
+        "balanceHolderId": riverside["id"],
+        "description": "Converted from lien",
+        "balanceOwing": lien_amount,
+        "reduction": 0,
+        "createdAt": "2026-03-08T00:00:00Z",
+    })
+
+
+def solve_task_h78(state):
+    """Change all hourly templates to contingency at 25%."""
+    for t in state["matterTemplates"]:
+        if t["billingMethod"] == "hourly":
+            t["billingMethod"] = "contingency"
+            t["contingencyRate"] = 25
+
+
+def solve_task_h79(state):
+    """Open matter with 2nd highest trust: billing=flat_rate, staff=Thompson."""
+    open_matters = [m for m in state["matters"] if m["status"] == "Open"]
+    sorted_by_trust = sorted(
+        open_matters,
+        key=lambda m: m.get("financials", {}).get("trustFunds", 0),
+        reverse=True,
+    )
+    target = sorted_by_trust[1]
+    thompson = find_user_by_name(state, "Rachel Thompson")
+    target["billingPreference"]["billingMethod"] = "flat_rate"
+    target["responsibleStaffId"] = thompson["id"]
+
+
+def solve_task_h80(state):
+    """Okafor: State Farm recovery, Chen legal fee at 25%, Riverside CU lien $3k."""
+    m = find_matter(state, "State v. Okafor")
+    sf = find_contact_by_name(state, "State Farm Insurance")
+    chen = find_user_by_name(state, "James Chen")
+    riverside = find_contact_by_name(state, "Riverside Community Credit Union")
+    rec_id = "rec_" + str(gen_id(state, "recovery")).zfill(3)
+    m["settlement"]["recoveries"].append({
+        "id": rec_id,
+        "sourceContactId": sf["id"],
+        "amount": 35000,
+        "createdAt": "2026-03-08T00:00:00Z",
+    })
+    m["settlement"]["legalFees"].append({
+        "id": "lf_" + str(gen_id(state, "legalFee")).zfill(3),
+        "recoveryId": rec_id,
+        "recipientId": chen["id"],
+        "rate": 25,
+        "discount": 0,
+        "referralFees": [],
+        "createdAt": "2026-03-08T00:00:00Z",
+    })
+    m["settlement"]["otherLiens"].append({
+        "id": "ol_" + str(gen_id(state, "lien")).zfill(3),
+        "lienHolderId": riverside["id"],
+        "description": "Outstanding personal loan",
+        "amount": 3000,
+        "reduction": 0,
+        "createdAt": "2026-03-08T00:00:00Z",
+    })
+
+
 SOLVERS = {}
 for _name, _fn in list(globals().items()):
     if _name.startswith("solve_task_"):
