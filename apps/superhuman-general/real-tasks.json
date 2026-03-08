@@ -478,5 +478,125 @@
     "difficulty": "hard",
     "instruction": "Create a calendar event called 'Design Review Follow-up' on March 15 from 2pm to 3pm on Zoom. Invite all the attendees from the Design Review event on March 8.",
     "verify": "real-tasks/task_h40.py"
+  },
+  {
+    "id": "task_h41",
+    "difficulty": "hard",
+    "instruction": "Star the inbox email sent by the person who organized the Quarterly OKR Review.",
+    "verify": "real-tasks/task_h41.py"
+  },
+  {
+    "id": "task_h42",
+    "difficulty": "hard",
+    "instruction": "Forward the brand assets email from Marcus Williams to the Acme Corp attendee of today's Design Review.",
+    "verify": "real-tasks/task_h42.py"
+  },
+  {
+    "id": "task_h43",
+    "difficulty": "hard",
+    "instruction": "Create a custom auto label called 'Partner' that matches emails from designhub.io, financeplus.com, or cloudscale.dev. Then create a new inbox split called 'Partners' that uses the Partner auto label.",
+    "verify": "real-tasks/task_h43.py"
+  },
+  {
+    "id": "task_h44",
+    "difficulty": "hard",
+    "instruction": "Send an email to the external attendees of the Q1 Board Meeting about preparing board follow-up materials. Put Patrick O'Neil on CC.",
+    "verify": "real-tasks/task_h44.py"
+  },
+  {
+    "id": "task_h45",
+    "difficulty": "hard",
+    "instruction": "Archive the inbox email from the same person who has a snoozed reminder about payment terms.",
+    "verify": "real-tasks/task_h45.py"
+  },
+  {
+    "id": "task_h46",
+    "difficulty": "hard",
+    "instruction": "Reply to the inbox email from the person whose name appears most recently in the Recent Opens feed.",
+    "verify": "real-tasks/task_h46.py"
+  },
+  {
+    "id": "task_h47",
+    "difficulty": "hard",
+    "instruction": "Add the 'Finance' label to the inbox email from the person who organized the All-Hands Meeting on March 9.",
+    "verify": "real-tasks/task_h47.py"
+  },
+  {
+    "id": "task_h48",
+    "difficulty": "hard",
+    "instruction": "Unshare all shared snippets that have an open rate below 80%. Then delete all unshared snippets that have fewer than 20 sends.",
+    "verify": "real-tasks/task_h48.py"
+  },
+  {
+    "id": "task_h49",
+    "difficulty": "hard",
+    "instruction": "Star all unread inbox emails from people who are attending the Team Offsite on March 12.",
+    "verify": "real-tasks/task_h49.py"
+  },
+  {
+    "id": "task_h50",
+    "difficulty": "hard",
+    "instruction": "For all emails with attachments in the Important inbox split: add the 'Finance' label to those from Acme Corp senders, and add the 'Clients' label to those from external senders.",
+    "verify": "real-tasks/task_h50.py"
+  },
+  {
+    "id": "task_h51",
+    "difficulty": "hard",
+    "instruction": "Create a label called 'Vendor Review' with a red color. Apply it to the inbox emails from the three vendors Ben Carter flagged as needing attention in his security assessment.",
+    "verify": "real-tasks/task_h51.py"
+  },
+  {
+    "id": "task_h52",
+    "difficulty": "hard",
+    "instruction": "Move Omar Al-Rashid's consulting engagement summary from Done back to the inbox, add the 'Work' label, and set a reminder for March 10.",
+    "verify": "real-tasks/task_h52.py"
+  },
+  {
+    "id": "task_h53",
+    "difficulty": "hard",
+    "instruction": "Edit the 'Thank You' snippet: rename it to 'Client Thank You' and share it with the team.",
+    "verify": "real-tasks/task_h53.py"
+  },
+  {
+    "id": "task_h54",
+    "difficulty": "hard",
+    "instruction": "Archive all inbox emails from the Patel who works in engineering, and star all inbox emails from the Patel who works in design.",
+    "verify": "real-tasks/task_h54.py"
+  },
+  {
+    "id": "task_h55",
+    "difficulty": "hard",
+    "instruction": "Send the draft reply to Sophie Laurent about the EuroDesign conference, then delete the other draft about the BioMed proposal.",
+    "verify": "real-tasks/task_h55.py"
+  },
+  {
+    "id": "task_h56",
+    "difficulty": "hard",
+    "instruction": "Star all emails that mention 'CloudScale' in their subject, across all folders.",
+    "verify": "real-tasks/task_h56.py"
+  },
+  {
+    "id": "task_h57",
+    "difficulty": "hard",
+    "instruction": "Disable Ask AI, turn off auto-add meeting links, switch auto reminders to manual mode, and change the swipe left action to Remind.",
+    "verify": "real-tasks/task_h57.py"
+  },
+  {
+    "id": "task_h58",
+    "difficulty": "hard",
+    "instruction": "Reply to Kevin Zhao's quantum computing email and CC the person who sent the SaaS Platform API access email.",
+    "verify": "real-tasks/task_h58.py"
+  },
+  {
+    "id": "task_h59",
+    "difficulty": "hard",
+    "instruction": "Trash all newsletter emails in the Other inbox split.",
+    "verify": "real-tasks/task_h59.py"
+  },
+  {
+    "id": "task_h60",
+    "difficulty": "hard",
+    "instruction": "Create a booking page called 'Investor Call' — 30 minutes on Zoom, available Monday through Friday from 2pm to 5pm. Then activate the Quick Sync booking page and delete the Product Demo booking page.",
+    "verify": "real-tasks/task_h60.py"
   }
 ]

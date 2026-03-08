@@ -1007,11 +1007,338 @@ def solve_task_h40(state):
     })
 
 
+# ── solve functions: hardening round 2 (h41-h60) ────────────────────
+
+def solve_task_h41(state):
+    """Star the inbox email from the Quarterly OKR Review organizer (Priya)."""
+    email = find_email_by_subject_and_sender(
+        state, "Budget Approval Needed - Marketing Campaign", "priya.sharma@acmecorp.com"
+    )
+    email["isStarred"] = True
+
+
+def solve_task_h42(state):
+    """Forward brand assets email to the Acme Corp Design Review attendee (Maya Patel)."""
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [{"name": "Maya Patel", "email": "maya.patel@acmecorp.com"}],
+        "cc": [], "bcc": [],
+        "subject": "Fwd: New Brand Assets - Review Needed",
+        "snippet": "FYI - forwarding the brand assets email for your review.",
+        "body": "FYI - forwarding the brand assets email for your review.\n\n---------- Forwarded message ----------",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h43(state):
+    """Create 'Partner' auto label + 'Partners' inbox split."""
+    al_id = "al_" + str(state.get("_nextAutoLabelId", 20))
+    state["_nextAutoLabelId"] = state.get("_nextAutoLabelId", 20) + 1
+    state["autoLabels"].append({
+        "id": al_id,
+        "name": "Partner",
+        "type": "custom",
+        "enabled": True,
+        "criteria": {"from": "designhub.io OR financeplus.com OR cloudscale.dev"}
+    })
+    split_id = "split_" + str(state.get("_nextSplitId", 20))
+    state["_nextSplitId"] = state.get("_nextSplitId", 20) + 1
+    state["splits"].append({
+        "id": split_id,
+        "name": "Partners",
+        "position": len(state["splits"]),
+        "isDefault": False,
+        "criteria": {"autoLabel": "Partner"},
+        "description": "Partner emails"
+    })
+
+
+def solve_task_h44(state):
+    """Send email to external Q1 Board Meeting attendees, CC Patrick O'Neil."""
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [
+            {"name": "Emily Rodriguez", "email": "emily.r@venturelabs.co"},
+            {"name": "Lena Johansson", "email": "lena.j@nordicventures.se"},
+        ],
+        "cc": [{"name": "Patrick O'Neil", "email": "patrick.oneil@acmecorp.com"}],
+        "bcc": [],
+        "subject": "Board Meeting Follow-up Materials",
+        "snippet": "Hi Emily and Lena, preparing follow-up materials from the Q1 Board Meeting.",
+        "body": "Hi Emily and Lena,\n\nPreparing follow-up materials from the Q1 Board Meeting. Will share the updated deck and action items shortly.\n\nBest,\nAlex",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h45(state):
+    """Archive inbox email from David Kim (payment terms reminder sender)."""
+    email = find_email_by_subject_and_sender(
+        state, "Partnership Opportunity - FinancePlus x Acme", "david.kim@financeplus.com"
+    )
+    email["isDone"] = True
+    email["isRead"] = True
+    email["remindAt"] = None
+
+
+def solve_task_h46(state):
+    """Reply to Emily Rodriguez's inbox email (most recent in Recent Opens)."""
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [{"name": "Emily Rodriguez", "email": "emily.r@venturelabs.co"}],
+        "cc": [], "bcc": [],
+        "subject": "Re: Series B Term Sheet Discussion",
+        "snippet": "Emily, thanks for the detailed feedback on the term sheet.",
+        "body": "Emily,\n\nThanks for the detailed feedback on the term sheet. Let's discuss the liquidation preference and other points.\n\nBest,\nAlex",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h47(state):
+    """Add Finance label to Patrick O'Neil's email (All-Hands organizer)."""
+    label = find_label_by_name(state, "Finance")
+    email = find_email_by_subject_and_sender(
+        state, "Executive Team Dinner - March 14", "patrick.oneil@acmecorp.com"
+    )
+    if label["id"] not in email["labels"]:
+        email["labels"].append(label["id"])
+
+
+def solve_task_h48(state):
+    """Unshare shared snippets with open rate < 80%; delete unshared snippets with < 20 sends."""
+    # Step 1: unshare shared snippets with open rate < 80%
+    for s in state["snippets"]:
+        if s.get("isShared") and s.get("metrics", {}).get("openRate", 0) < 0.80:
+            s["isShared"] = False
+    # Step 2: delete unshared snippets with < 20 sends
+    state["snippets"] = [
+        s for s in state["snippets"]
+        if s.get("isShared") or s.get("metrics", {}).get("sends", 0) >= 20
+    ]
+
+
+def solve_task_h49(state):
+    """Star all unread inbox emails from Team Offsite attendees."""
+    offsite_attendees = set()
+    for evt in state["calendarEvents"]:
+        if evt["title"] == "Team Offsite":
+            for a in evt["attendees"]:
+                if isinstance(a, dict):
+                    offsite_attendees.add(a["email"])
+                elif isinstance(a, str):
+                    offsite_attendees.add(a)
+            break
+    for e in state["emails"]:
+        if (e["from"]["email"] in offsite_attendees
+                and not e["isDone"] and not e["isTrashed"]
+                and not e["isSpam"] and not e["isDraft"]
+                and e["remindAt"] is None
+                and not e["isRead"]):
+            e["isStarred"] = True
+
+
+def solve_task_h50(state):
+    """Add Finance to Acme attachment emails; Clients to external attachment emails."""
+    fin_label = find_label_by_name(state, "Finance")
+    cli_label = find_label_by_name(state, "Clients")
+    for e in state["emails"]:
+        if (e.get("hasAttachments")
+                and e["splitCategory"] == "important"
+                and not e["isDone"] and not e["isTrashed"]
+                and not e["isSpam"] and not e["isDraft"]
+                and e["remindAt"] is None):
+            sender = e["from"]["email"]
+            if sender.endswith("@acmecorp.com"):
+                if fin_label["id"] not in e["labels"]:
+                    e["labels"].append(fin_label["id"])
+            else:
+                if cli_label["id"] not in e["labels"]:
+                    e["labels"].append(cli_label["id"])
+
+
+def solve_task_h51(state):
+    """Create 'Vendor Review' label (red), apply to flagged vendor emails."""
+    label_id = "label_" + str(state.get("_nextLabelId", 30))
+    state["_nextLabelId"] = state.get("_nextLabelId", 30) + 1
+    state["labels"].append({
+        "id": label_id, "name": "Vendor Review", "type": "user", "color": "#F44336"
+    })
+    # Ben's security assessment flagged: CloudScale, MarketingPro, LogisticsPro
+    vendor_domains = {"cloudscale.dev", "marketingpro.co", "logisticspro.net"}
+    for e in state["emails"]:
+        sender = e["from"]["email"]
+        domain = sender.split("@")[-1] if "@" in sender else ""
+        if (domain in vendor_domains
+                and not e["isDone"] and not e["isTrashed"]
+                and not e["isSpam"] and not e["isDraft"]
+                and e["remindAt"] is None):
+            if label_id not in e["labels"]:
+                e["labels"].append(label_id)
+
+
+def solve_task_h52(state):
+    """Move Omar's consulting email from Done to inbox, add Work, set reminder March 10."""
+    email = find_email_by_subject_and_sender(
+        state, "Consulting Engagement Summary", "omar.ar@consulting.group"
+    )
+    email["isDone"] = False
+    label = find_label_by_name(state, "Work")
+    if label["id"] not in email["labels"]:
+        email["labels"].append(label["id"])
+    email["remindAt"] = "2026-03-10T09:00:00Z"
+
+
+def solve_task_h53(state):
+    """Rename 'Thank You' snippet to 'Client Thank You' and share it."""
+    snip = find_snippet_by_name(state, "Thank You")
+    snip["name"] = "Client Thank You"
+    snip["isShared"] = True
+
+
+def solve_task_h54(state):
+    """Archive Nate Patel's inbox emails; star Maya Patel's inbox emails."""
+    for e in state["emails"]:
+        if e["splitCategory"] != "important":
+            continue
+        sender = e["from"]["email"]
+        if sender == "nate.patel@acmecorp.com":
+            e["isDone"] = True
+            e["isRead"] = True
+            e["remindAt"] = None
+        elif sender == "maya.patel@acmecorp.com":
+            e["isStarred"] = True
+
+
+def solve_task_h55(state):
+    """Send the EuroDesign draft, delete the BioMed draft."""
+    # Send draft to Sophie
+    for e in state["emails"]:
+        if (e.get("isDraft")
+                and "EuroDesign" in e.get("subject", "")):
+            e["isDraft"] = False
+            e["isRead"] = True
+            e["date"] = "2026-03-08T12:00:00Z"
+            break
+    # Delete BioMed draft
+    state["emails"] = [
+        e for e in state["emails"]
+        if not (e.get("isDraft") and "BioMed" in e.get("subject", ""))
+    ]
+
+
+def solve_task_h56(state):
+    """Star all emails with 'CloudScale' in subject."""
+    for e in state["emails"]:
+        if "CloudScale" in e.get("subject", ""):
+            e["isStarred"] = True
+
+
+def solve_task_h57(state):
+    """Disable Ask AI, auto-add meeting links, manual reminders, swipe left to remind."""
+    state["settings"]["askAi"]["enabled"] = False
+    state["settings"]["meetingLink"]["autoAdd"] = False
+    state["settings"]["autoReminders"]["mode"] = "manual"
+    state["settings"]["swipeLeft"] = "remind"
+
+
+def solve_task_h58(state):
+    """Reply to Kevin Zhao with Ryan Cooper on CC."""
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [{"name": "Kevin Zhao", "email": "kevin.zhao@quantumlab.tech"}],
+        "cc": [{"name": "Ryan Cooper", "email": "ryan.cooper@saasplatform.io"}],
+        "bcc": [],
+        "subject": "Re: Quantum Computing Integration Prototype",
+        "snippet": "Kevin, great work on the prototype. Looping in Ryan from SaaS Platform.",
+        "body": "Kevin,\n\nGreat work on the prototype. Looping in Ryan from SaaS Platform to coordinate on the integration.\n\nBest,\nAlex",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h59(state):
+    """Trash all newsletter emails in the Other inbox split."""
+    for e in state["emails"]:
+        if (e.get("autoLabel") == "Newsletter"
+                and e.get("splitCategory") == "other"
+                and not e["isDone"] and not e["isTrashed"]
+                and not e["isSpam"] and not e["isDraft"]):
+            e["isTrashed"] = True
+            e["isDone"] = False
+            e["remindAt"] = None
+
+
+def solve_task_h60(state):
+    """Create 'Investor Call' booking page, activate Quick Sync, delete Product Demo."""
+    # Create Investor Call
+    bp_id = "bp_" + str(state.get("_nextBookingPageId", 10))
+    state["_nextBookingPageId"] = state.get("_nextBookingPageId", 10) + 1
+    state["bookingPages"].append({
+        "id": bp_id,
+        "title": "Investor Call",
+        "duration": 30,
+        "location": "Zoom",
+        "description": "",
+        "availability": {
+            "days": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+            "startTime": "14:00",
+            "endTime": "17:00"
+        },
+        "link": "https://cal.superhuman.com/alex/investor-call",
+        "isActive": True
+    })
+    # Activate Quick Sync
+    qs = find_booking_page_by_title(state, "Quick Sync")
+    qs["isActive"] = True
+    # Delete Product Demo
+    state["bookingPages"] = [
+        bp for bp in state["bookingPages"] if bp["title"] != "Product Demo"
+    ]
+
+
 # ── solver registry ──────────────────────────────────────────────────
 
 SOLVERS = {}
 for _prefix in ("e", "m", "h"):
-    for _i in range(1, 41):
+    for _i in range(1, 61):
         _key = f"task_{_prefix}{_i}"
         _fn_name = f"solve_{_key}"
         if _fn_name in globals():
