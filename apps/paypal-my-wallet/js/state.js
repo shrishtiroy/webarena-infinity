@@ -762,6 +762,13 @@ const AppState = {
         }
     },
 
+    setCashBackCategory(category) {
+        if (this.paypalDebitCard && this.paypalDebitCard.cashBackCategories.includes(category)) {
+            this.paypalDebitCard.cashBackCategory = category;
+            this.notify();
+        }
+    },
+
     updateDirectDeposit(data) {
         if (this.paypalDebitCard) {
             Object.assign(this.paypalDebitCard.directDeposit, data);

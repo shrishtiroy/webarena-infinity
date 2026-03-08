@@ -418,7 +418,17 @@ const Views = {
 
             ${Components.renderSectionHeader('Card Settings')}
             <div class="settings-card">
-                ${Components.renderToggle('debit-cashback-toggle', dc.cashBackEnabled, `Cash Back (${dc.cashBackPercent}% on ${dc.cashBackCategory || 'select categories'})`, 'debit-cashback')}
+                ${Components.renderToggle('debit-cashback-toggle', dc.cashBackEnabled, `Cash Back (${dc.cashBackPercent}%)`, 'debit-cashback')}
+                ${dc.cashBackEnabled ? `
+                    <div class="divider"></div>
+                    ${Components.renderInfoRow('Cash Back Category',
+                        Components.renderDropdown('cashback-category-dropdown',
+                            dc.cashBackCategories.map(c => ({ value: c, label: c })),
+                            dc.cashBackCategory,
+                            'Select category'
+                        )
+                    )}
+                ` : ''}
                 <div class="divider"></div>
 
                 ${Components.renderInfoRow('PIN Status', dc.pinSet ? 'Set' : 'Not Set',

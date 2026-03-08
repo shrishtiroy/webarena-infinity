@@ -299,6 +299,10 @@ const App = {
                 AppState.setBackupPaymentMethod(value);
                 Components.showToast('Backup payment method updated');
                 break;
+            case 'cashback-category-dropdown':
+                AppState.setCashBackCategory(value);
+                Components.showToast(`Cash back category changed to ${value}`);
+                break;
             case 'add-money-bank':
             case 'withdraw-bank':
             case 'convert-from-currency':
