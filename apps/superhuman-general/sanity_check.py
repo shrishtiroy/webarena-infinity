@@ -1334,11 +1334,442 @@ def solve_task_h60(state):
     ]
 
 
+# ── solve functions: hardening round 3 (h61-h80) ────────────────────
+
+def solve_task_h61(state):
+    """Create 'Contract Signing' event, invite attorney + CloudScale sender."""
+    evt_id = "evt_" + str(state.get("_nextEventId", 30))
+    state["_nextEventId"] = state.get("_nextEventId", 30) + 1
+    state["calendarEvents"].append({
+        "id": evt_id,
+        "title": "Contract Signing",
+        "date": "2026-03-14",
+        "startTime": "10:00",
+        "endTime": "11:00",
+        "location": "Zoom",
+        "description": "",
+        "attendees": ["james.obrien@legalwise.com", "michael.f@cloudscale.dev"],
+        "meetingLink": None,
+        "isAllDay": False,
+        "calendarId": "work",
+        "organizer": "alex.morgan@acmecorp.com",
+        "status": "confirmed",
+        "color": "#6C4FF7"
+    })
+
+
+def solve_task_h62(state):
+    """Star unread inbox emails with attachments, add Work label to those without."""
+    work_label = find_label_by_name(state, "Work")
+    wid = work_label["id"]
+    for e in state["emails"]:
+        if (not e["isDone"] and not e["isTrashed"] and not e["isSpam"]
+                and not e["isDraft"] and e["remindAt"] is None
+                and not e["isRead"]):
+            if e.get("hasAttachments"):
+                e["isStarred"] = True
+            else:
+                if wid not in e["labels"]:
+                    e["labels"].append(wid)
+
+
+def solve_task_h63(state):
+    """Send email to OKR Review organizer (Priya), CC other attendees (Sarah, Patrick)."""
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [{"name": "Priya Sharma", "email": "priya.sharma@acmecorp.com"}],
+        "cc": [
+            {"name": "Sarah Chen", "email": "sarah.chen@acmecorp.com"},
+            {"name": "Patrick O'Neil", "email": "patrick.oneil@acmecorp.com"},
+        ],
+        "bcc": [],
+        "subject": "Q2 OKR Objectives",
+        "snippet": "Hi Priya, following up on the OKR review to prepare Q2 objectives.",
+        "body": "Hi Priya,\n\nFollowing up on the Quarterly OKR Review to prepare Q2 objectives.\n\nBest,\nAlex",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h64(state):
+    """Forward Sarah's roadmap email to Emily Rodriguez (most recent external reader)."""
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [{"name": "Emily Rodriguez", "email": "emily.r@venturelabs.co"}],
+        "cc": [], "bcc": [],
+        "subject": "Fwd: Q2 Product Roadmap - Final Review",
+        "snippet": "FYI - forwarding the Q2 roadmap for your review.",
+        "body": "FYI - forwarding the Q2 roadmap for your review.\n\n---------- Forwarded message ----------",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h65(state):
+    """Reply to Kevin Zhao, CC CTO (Nate) + VP Engineering (Tom) from dinner list."""
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [{"name": "Kevin Zhao", "email": "kevin.zhao@quantumlab.tech"}],
+        "cc": [
+            {"name": "Nate Patel", "email": "nate.patel@acmecorp.com"},
+            {"name": "Tom Bradley", "email": "tom.bradley@acmecorp.com"},
+        ],
+        "bcc": [],
+        "subject": "Re: Quantum Computing Integration Prototype",
+        "snippet": "Kevin, impressive results on the prototype. Looping in Nate and Tom.",
+        "body": "Kevin,\n\nImpressive results on the prototype. Looping in Nate (CTO) and Tom (VP Engineering) to discuss next steps.\n\nBest,\nAlex",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h66(state):
+    """Add Clients label to Kevin Zhao's email (highest read receipt open count)."""
+    label = find_label_by_name(state, "Clients")
+    email = find_email_by_subject_and_sender(
+        state, "Quantum Computing Integration Prototype", "kevin.zhao@quantumlab.tech"
+    )
+    if label["id"] not in email["labels"]:
+        email["labels"].append(label["id"])
+
+
+def solve_task_h67(state):
+    """Create 'Meeting Prep' label (green), apply to inbox emails from March 8 event attendees."""
+    label_id = "label_" + str(state.get("_nextLabelId", 30))
+    state["_nextLabelId"] = state.get("_nextLabelId", 30) + 1
+    state["labels"].append({
+        "id": label_id, "name": "Meeting Prep", "type": "user", "color": "#4CAF50"
+    })
+
+    # Collect all March 8 event attendees (excluding current user)
+    march8_people = set()
+    for evt in state["calendarEvents"]:
+        if evt.get("date") == "2026-03-08":
+            org = evt.get("organizer", "")
+            if org:
+                march8_people.add(org)
+            for a in evt.get("attendees", []):
+                if isinstance(a, dict):
+                    march8_people.add(a.get("email", ""))
+                elif isinstance(a, str):
+                    march8_people.add(a)
+    march8_people.discard("alex.morgan@acmecorp.com")
+
+    for e in state["emails"]:
+        if (e["from"]["email"] in march8_people
+                and not e["isDone"] and not e["isTrashed"]
+                and not e["isSpam"] and not e["isDraft"]
+                and e["remindAt"] is None):
+            if label_id not in e["labels"]:
+                e["labels"].append(label_id)
+
+
+def solve_task_h68(state):
+    """Delete non-Alex snippets, create shared 'Team Standup' snippet."""
+    state["snippets"] = [
+        s for s in state["snippets"]
+        if s.get("authorId") == "user_1"
+    ]
+    snip_id = "snip_" + str(state.get("_nextSnippetId", 30))
+    state["_nextSnippetId"] = state.get("_nextSnippetId", 30) + 1
+    state["snippets"].append({
+        "id": snip_id,
+        "name": "Team Standup",
+        "body": "Hi team, here are my updates for {date}: {updates}",
+        "variables": ["date", "updates"],
+        "isShared": True,
+        "author": "Alex Morgan",
+        "authorId": "user_1",
+        "createdAt": "2026-03-08T12:00:00Z",
+        "metrics": {"sends": 0, "openRate": 0, "responseRate": 0}
+    })
+
+
+def solve_task_h69(state):
+    """Reply to Priya's budget email, CC Ben Carter (Board Meeting Prep co-attendee)."""
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [{"name": "Priya Sharma", "email": "priya.sharma@acmecorp.com"}],
+        "cc": [{"name": "Ben Carter", "email": "ben.carter@acmecorp.com"}],
+        "bcc": [],
+        "subject": "Re: Budget Approval Needed - Marketing Campaign",
+        "snippet": "Priya, reviewing the Q2 marketing budget. Looping in Ben.",
+        "body": "Priya,\n\nReviewing the Q2 marketing budget. Looping in Ben for context.\n\nBest,\nAlex",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h70(state):
+    """Disable all custom auto labels, enable Shipping Update."""
+    for al in state["autoLabels"]:
+        if al.get("type") == "custom":
+            al["enabled"] = False
+    shipping = find_auto_label_by_name(state, "Shipping Update")
+    shipping["enabled"] = True
+
+
+def solve_task_h71(state):
+    """Add Travel label + March 11 reminder to Marcus Williams' inbox email."""
+    label = find_label_by_name(state, "Travel")
+    email = find_email_by_subject_and_sender(
+        state, "New Brand Assets - Review Needed", "marcus.w@designhub.io"
+    )
+    if label["id"] not in email["labels"]:
+        email["labels"].append(label["id"])
+    email["remindAt"] = "2026-03-11T09:00:00Z"
+
+
+def solve_task_h72(state):
+    """Create Advisory Call booking page, delete Product Demo, create Advisory auto label."""
+    # Create booking page
+    bp_id = "bp_" + str(state.get("_nextBookingPageId", 10))
+    state["_nextBookingPageId"] = state.get("_nextBookingPageId", 10) + 1
+    state["bookingPages"].append({
+        "id": bp_id,
+        "title": "Advisory Call",
+        "duration": 45,
+        "location": "Google Meet",
+        "description": "",
+        "availability": {
+            "days": ["Wed", "Fri"],
+            "startTime": "14:00",
+            "endTime": "17:00"
+        },
+        "link": "https://cal.superhuman.com/alex/advisory-call",
+        "isActive": True
+    })
+    # Delete Product Demo
+    state["bookingPages"] = [
+        bp for bp in state["bookingPages"] if bp["title"] != "Product Demo"
+    ]
+    # Create auto label
+    al_id = "al_" + str(state.get("_nextAutoLabelId", 20))
+    state["_nextAutoLabelId"] = state.get("_nextAutoLabelId", 20) + 1
+    state["autoLabels"].append({
+        "id": al_id,
+        "name": "Advisory",
+        "type": "custom",
+        "enabled": True,
+        "criteria": {"subject": "advisory OR consulting"}
+    })
+
+
+def solve_task_h73(state):
+    """Archive all read Important inbox emails except starred or Urgent-labeled."""
+    urgent_label = find_label_by_name(state, "Urgent")
+    uid = urgent_label["id"]
+    for e in state["emails"]:
+        if (e.get("splitCategory") == "important"
+                and not e["isDone"] and not e["isTrashed"]
+                and not e["isSpam"] and not e["isDraft"]
+                and e["remindAt"] is None
+                and e["isRead"]
+                and not e["isStarred"]
+                and uid not in e["labels"]):
+            e["isDone"] = True
+            e["isRead"] = True
+            e["remindAt"] = None
+
+
+def solve_task_h74(state):
+    """Create 'Security Risk' auto label with flagged vendor domains."""
+    al_id = "al_" + str(state.get("_nextAutoLabelId", 20))
+    state["_nextAutoLabelId"] = state.get("_nextAutoLabelId", 20) + 1
+    state["autoLabels"].append({
+        "id": al_id,
+        "name": "Security Risk",
+        "type": "custom",
+        "enabled": True,
+        "criteria": {"from": "cloudscale.dev OR marketingpro.co OR logisticspro.net"}
+    })
+
+
+def solve_task_h75(state):
+    """Move Priya's travel expenses from Done to inbox, add Finance, remind March 12."""
+    email = find_email_by_subject_and_sender(
+        state, "Travel Expenses Approved", "priya.sharma@acmecorp.com"
+    )
+    email["isDone"] = False
+    label = find_label_by_name(state, "Finance")
+    if label["id"] not in email["labels"]:
+        email["labels"].append(label["id"])
+    email["remindAt"] = "2026-03-12T09:00:00Z"
+
+
+def solve_task_h76(state):
+    """Delete Quick Sync + Product Demo, create Office Hours booking page."""
+    state["bookingPages"] = [
+        bp for bp in state["bookingPages"]
+        if bp["title"] not in ("Quick Sync", "Product Demo")
+    ]
+    bp_id = "bp_" + str(state.get("_nextBookingPageId", 10))
+    state["_nextBookingPageId"] = state.get("_nextBookingPageId", 10) + 1
+    state["bookingPages"].append({
+        "id": bp_id,
+        "title": "Office Hours",
+        "duration": 30,
+        "location": "Zoom",
+        "description": "",
+        "availability": {
+            "days": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+            "startTime": "09:00",
+            "endTime": "12:00"
+        },
+        "link": "https://cal.superhuman.com/alex/office-hours",
+        "isActive": True
+    })
+
+
+def solve_task_h77(state):
+    """Create 'Board Members' label (gold), apply to external Q1 Board attendee emails."""
+    label_id = "label_" + str(state.get("_nextLabelId", 30))
+    state["_nextLabelId"] = state.get("_nextLabelId", 30) + 1
+    state["labels"].append({
+        "id": label_id, "name": "Board Members", "type": "user", "color": "#FFD700"
+    })
+    # Q1 Board Meeting external attendees: emily.r@venturelabs.co, lena.j@nordicventures.se
+    external = {"emily.r@venturelabs.co", "lena.j@nordicventures.se"}
+    for e in state["emails"]:
+        if (e["from"]["email"] in external
+                and not e["isDone"] and not e["isTrashed"]
+                and not e["isSpam"] and not e["isDraft"]
+                and e["remindAt"] is None):
+            if label_id not in e["labels"]:
+                e["labels"].append(label_id)
+
+
+def solve_task_h78(state):
+    """Send EuroDesign draft, forward original invitation to Patrick O'Neil."""
+    # Send draft
+    for e in state["emails"]:
+        if e.get("isDraft") and "EuroDesign" in e.get("subject", ""):
+            e["isDraft"] = False
+            e["isRead"] = True
+            e["date"] = "2026-03-08T12:00:00Z"
+            break
+    # Forward original to Patrick (Q1 Board Meeting organizer)
+    email_id = state.get("_nextEmailId", 200)
+    state["_nextEmailId"] = email_id + 1
+    state["emails"].insert(0, {
+        "id": email_id,
+        "threadId": "thread_" + str(email_id),
+        "from": {"name": "Alex Morgan", "email": "alex.morgan@acmecorp.com"},
+        "to": [{"name": "Patrick O'Neil", "email": "patrick.oneil@acmecorp.com"}],
+        "cc": [], "bcc": [],
+        "subject": "Fwd: EuroDesign Conference - Speaker Invitation",
+        "snippet": "FYI - forwarding the EuroDesign conference speaker invitation.",
+        "body": "FYI - forwarding the EuroDesign conference speaker invitation.\n\n---------- Forwarded message ----------",
+        "date": "2026-03-08T12:00:00Z",
+        "isRead": True, "isStarred": False, "isDone": False,
+        "isTrashed": False, "isSpam": False, "isDraft": False,
+        "labels": [], "hasAttachments": False, "attachments": [],
+        "splitCategory": "important", "remindAt": None,
+        "readReceipt": {"opened": False},
+        "autoLabel": None, "replyDraftingTeammate": None, "threadMessages": None
+    })
+
+
+def solve_task_h79(state):
+    """Create 'Security Review' event with Ben Carter and Weekly Standup organizer (Tom)."""
+    evt_id = "evt_" + str(state.get("_nextEventId", 30))
+    state["_nextEventId"] = state.get("_nextEventId", 30) + 1
+    state["calendarEvents"].append({
+        "id": evt_id,
+        "title": "Security Review",
+        "date": "2026-03-13",
+        "startTime": "11:00",
+        "endTime": "12:00",
+        "location": "Zoom",
+        "description": "",
+        "attendees": ["ben.carter@acmecorp.com", "tom.bradley@acmecorp.com"],
+        "meetingLink": None,
+        "isAllDay": False,
+        "calendarId": "work",
+        "organizer": "alex.morgan@acmecorp.com",
+        "status": "confirmed",
+        "color": "#6C4FF7"
+    })
+
+
+def solve_task_h80(state):
+    """Create 'Priority Clients' label (red), apply + create Client Sync event."""
+    label_id = "label_" + str(state.get("_nextLabelId", 30))
+    state["_nextLabelId"] = state.get("_nextLabelId", 30) + 1
+    state["labels"].append({
+        "id": label_id, "name": "Priority Clients", "type": "user", "color": "#F44336"
+    })
+    # FinancePlus (david.kim) and CloudScale (michael.f) inbox emails
+    targets = {"david.kim@financeplus.com", "michael.f@cloudscale.dev"}
+    for e in state["emails"]:
+        if (e["from"]["email"] in targets
+                and not e["isDone"] and not e["isTrashed"]
+                and not e["isSpam"] and not e["isDraft"]
+                and e["remindAt"] is None):
+            if label_id not in e["labels"]:
+                e["labels"].append(label_id)
+    # Create Client Sync event
+    evt_id = "evt_" + str(state.get("_nextEventId", 30))
+    state["_nextEventId"] = state.get("_nextEventId", 30) + 1
+    state["calendarEvents"].append({
+        "id": evt_id,
+        "title": "Client Sync",
+        "date": "2026-03-13",
+        "startTime": "15:00",
+        "endTime": "16:00",
+        "location": "Zoom",
+        "description": "",
+        "attendees": ["david.kim@financeplus.com", "michael.f@cloudscale.dev"],
+        "meetingLink": None,
+        "isAllDay": False,
+        "calendarId": "work",
+        "organizer": "alex.morgan@acmecorp.com",
+        "status": "confirmed",
+        "color": "#6C4FF7"
+    })
+
+
 # ── solver registry ──────────────────────────────────────────────────
 
 SOLVERS = {}
 for _prefix in ("e", "m", "h"):
-    for _i in range(1, 61):
+    for _i in range(1, 81):
         _key = f"task_{_prefix}{_i}"
         _fn_name = f"solve_{_key}"
         if _fn_name in globals():

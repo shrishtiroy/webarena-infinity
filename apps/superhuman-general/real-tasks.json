@@ -598,5 +598,125 @@
     "difficulty": "hard",
     "instruction": "Create a booking page called 'Investor Call' — 30 minutes on Zoom, available Monday through Friday from 2pm to 5pm. Then activate the Quick Sync booking page and delete the Product Demo booking page.",
     "verify": "real-tasks/task_h60.py"
+  },
+  {
+    "id": "task_h61",
+    "difficulty": "hard",
+    "instruction": "Create a calendar event called 'Contract Signing' on March 14 from 10am to 11am on Zoom. Invite the attorney from the vendor agreement email and the sender of the CloudScale contract email.",
+    "verify": "real-tasks/task_h61.py"
+  },
+  {
+    "id": "task_h62",
+    "difficulty": "hard",
+    "instruction": "For all unread emails in your inbox: star the ones that have attachments, and add the 'Work' label to the ones that don't have attachments.",
+    "verify": "real-tasks/task_h62.py"
+  },
+  {
+    "id": "task_h63",
+    "difficulty": "hard",
+    "instruction": "Send an email to the organizer of the Quarterly OKR Review about preparing Q2 objectives. CC the other attendees of that event.",
+    "verify": "real-tasks/task_h63.py"
+  },
+  {
+    "id": "task_h64",
+    "difficulty": "hard",
+    "instruction": "Forward Sarah Chen's Q2 roadmap email to the most recent non-Acme reader shown in the Recent Opens feed.",
+    "verify": "real-tasks/task_h64.py"
+  },
+  {
+    "id": "task_h65",
+    "difficulty": "hard",
+    "instruction": "Reply to Kevin Zhao's quantum computing email. CC the CTO and the VP of Engineering from the executive team dinner guest list.",
+    "verify": "real-tasks/task_h65.py"
+  },
+  {
+    "id": "task_h66",
+    "difficulty": "hard",
+    "instruction": "Add the 'Clients' label to the inbox email whose read receipt shows the highest number of opens.",
+    "verify": "real-tasks/task_h66.py"
+  },
+  {
+    "id": "task_h67",
+    "difficulty": "hard",
+    "instruction": "Create a label called 'Meeting Prep' with a green color. Apply it to all inbox emails from people who have a calendar event on March 8.",
+    "verify": "real-tasks/task_h67.py"
+  },
+  {
+    "id": "task_h68",
+    "difficulty": "hard",
+    "instruction": "Delete all snippets authored by someone other than Alex Morgan, then create a new shared snippet called 'Team Standup' with body 'Hi team, here are my updates for {date}: {updates}'.",
+    "verify": "real-tasks/task_h68.py"
+  },
+  {
+    "id": "task_h69",
+    "difficulty": "hard",
+    "instruction": "Reply to the budget approval email from Priya Sharma. CC the other attendee of the Board Meeting Prep event on March 7.",
+    "verify": "real-tasks/task_h69.py"
+  },
+  {
+    "id": "task_h70",
+    "difficulty": "hard",
+    "instruction": "Disable all enabled custom auto labels, then enable the Shipping Update auto label.",
+    "verify": "real-tasks/task_h70.py"
+  },
+  {
+    "id": "task_h71",
+    "difficulty": "hard",
+    "instruction": "Add the 'Travel' label to the inbox email from the person you're having lunch with on March 7, and set a reminder on that email for March 11.",
+    "verify": "real-tasks/task_h71.py"
+  },
+  {
+    "id": "task_h72",
+    "difficulty": "hard",
+    "instruction": "Create a booking page called 'Advisory Call' — 45 minutes on Google Meet, available Wednesday and Friday from 2pm to 5pm. Then delete the Product Demo booking page and create a custom auto label called 'Advisory' matching emails with 'advisory' or 'consulting' in the subject.",
+    "verify": "real-tasks/task_h72.py"
+  },
+  {
+    "id": "task_h73",
+    "difficulty": "hard",
+    "instruction": "Archive all read emails in the Important inbox split except those that are starred or have the 'Urgent' label.",
+    "verify": "real-tasks/task_h73.py"
+  },
+  {
+    "id": "task_h74",
+    "difficulty": "hard",
+    "instruction": "Create a custom auto label called 'Security Risk' that matches emails from the three vendor domains flagged in Ben Carter's security assessment.",
+    "verify": "real-tasks/task_h74.py"
+  },
+  {
+    "id": "task_h75",
+    "difficulty": "hard",
+    "instruction": "Move Priya Sharma's travel expenses email from Done back to the inbox, add the 'Finance' label, and set a reminder for March 12.",
+    "verify": "real-tasks/task_h75.py"
+  },
+  {
+    "id": "task_h76",
+    "difficulty": "hard",
+    "instruction": "Delete the Quick Sync and Product Demo booking pages, then create a new booking page called 'Office Hours' — 30 minutes on Zoom, available every weekday from 9am to 12pm.",
+    "verify": "real-tasks/task_h76.py"
+  },
+  {
+    "id": "task_h77",
+    "difficulty": "hard",
+    "instruction": "Create a label called 'Board Members' with a gold color. Apply it to inbox emails from the external attendees of the Q1 Board Meeting.",
+    "verify": "real-tasks/task_h77.py"
+  },
+  {
+    "id": "task_h78",
+    "difficulty": "hard",
+    "instruction": "Send the draft reply to Sophie Laurent about the conference, then forward the original EuroDesign conference invitation to the organizer of the Q1 Board Meeting.",
+    "verify": "real-tasks/task_h78.py"
+  },
+  {
+    "id": "task_h79",
+    "difficulty": "hard",
+    "instruction": "Create a calendar event called 'Security Review' on March 13 from 11am to 12pm on Zoom. Invite Ben Carter and the organizer of the Weekly Standup.",
+    "verify": "real-tasks/task_h79.py"
+  },
+  {
+    "id": "task_h80",
+    "difficulty": "hard",
+    "instruction": "Create a label called 'Priority Clients' with a red color. Apply it to inbox emails from FinancePlus and CloudScale contacts. Then create a 'Client Sync' event on March 13 from 3pm to 4pm on Zoom and invite those contacts.",
+    "verify": "real-tasks/task_h80.py"
   }
 ]
