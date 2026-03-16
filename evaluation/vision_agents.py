@@ -257,13 +257,16 @@ class VisionAgentBase:
         screenshots_dir = task_dir / "screenshots"
         screenshots_dir.mkdir(exist_ok=True)
 
+        # Shared state that _run_agent_loop appends to, so we can
+        # recover partial progress even if the loop is cancelled by timeout.
+        self._live_history: list[dict] = []
+        self._live_errors: list[str] = []
+
         t0 = time.time()
         timed_out = False
         steps = 0
         is_done = False
         final_result = None
-        errors: list[str] = []
-        history: list[dict] = []
 
         try:
             result_data = await asyncio.wait_for(
@@ -278,17 +281,19 @@ class VisionAgentBase:
             steps = result_data.get("steps", 0)
             is_done = result_data.get("is_done", False)
             final_result = result_data.get("final_result")
-            errors = result_data.get("errors", [])
-            history = result_data.get("history", [])
+            self._live_errors = result_data.get("errors", self._live_errors)
+            self._live_history = result_data.get("history", self._live_history)
         except asyncio.TimeoutError:
             timed_out = True
-            errors.append(f"Timeout after {self.timeout}s")
+            # Recover partial progress from shared state
+            steps = len(self._live_history)
+            self._live_errors.append(f"Timeout after {self.timeout}s")
 
         elapsed = time.time() - t0
 
         # Save history (may be partial on timeout)
         with open(task_dir / "history.json", "w") as f:
-            json.dump({"history": history, "format": "vision_agent"}, f, indent=2)
+            json.dump({"history": self._live_history, "format": "vision_agent"}, f, indent=2)
 
         if timed_out:
             raise asyncio.TimeoutError()
@@ -298,7 +303,7 @@ class VisionAgentBase:
             steps=steps,
             is_done=is_done,
             final_result=final_result,
-            errors=errors,
+            errors=self._live_errors,
         )
 
     async def _run_agent_loop(
@@ -431,8 +436,8 @@ class GeminiComputerUseAgent(VisionAgentBase):
         )
 
         contents = []
-        history: list[dict] = []
-        errors: list[str] = []
+        history = self._live_history
+        errors = self._live_errors
         is_done = False
         final_result = None
 
@@ -658,8 +663,8 @@ class ClaudeComputerUseAgent(VisionAgentBase):
         ]
 
         messages = []
-        history: list[dict] = []
-        errors: list[str] = []
+        history = self._live_history
+        errors = self._live_errors
         is_done = False
         final_result = None
 
@@ -1064,8 +1069,8 @@ class KimiVisionAgent(VisionAgentBase):
         task_dir: Path,
         screenshots_dir: Path,
     ) -> dict:
-        history: list[dict] = []
-        errors: list[str] = []
+        history = self._live_history
+        errors = self._live_errors
         is_done = False
         final_result = None
         max_image_history = 3
