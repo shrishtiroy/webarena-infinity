@@ -53,7 +53,14 @@ echo "============================================================"
 echo ""
 
 # --- Activate venv ---
-source "$REPO_ROOT/.venv/bin/activate"
+if [ -d "$HOME/venv" ]; then
+    source "$HOME/venv/bin/activate"
+elif [ -d "$REPO_ROOT/.venv" ]; then
+    source "$REPO_ROOT/.venv/bin/activate"
+else
+    echo "Error: No virtualenv found at ~/venv or $REPO_ROOT/.venv"
+    exit 1
+fi
 
 PASSED=0
 FAILED=0
