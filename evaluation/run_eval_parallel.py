@@ -84,7 +84,7 @@ AGENT_FACTORIES = {
     "gemini-pro": lambda **kw: _make_browser_use_agent(
         lambda: __import__("browser_use.llm.google.chat", fromlist=["ChatGoogle"]).ChatGoogle(model="gemini-3-pro-preview"), **kw),
     "claude": lambda **kw: _make_browser_use_agent(
-        lambda: __import__("browser_use.llm.anthropic.chat", fromlist=["ChatAnthropic"]).ChatAnthropic(model="claude-sonnet-4-5-20250929"), **kw),
+        lambda: __import__("browser_use.llm.anthropic.chat", fromlist=["ChatAnthropic"]).ChatAnthropic(model="claude-sonnet-4-6-20250514"), **kw),
     "gemini-cu": lambda **kw: _make_gemini_cu_agent(**kw),
     "claude-cu": lambda **kw: _make_claude_cu_agent(**kw),
     "kimi": lambda **kw: _make_kimi_agent(**kw),
