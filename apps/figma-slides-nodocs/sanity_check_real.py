@@ -1609,6 +1609,370 @@ def solve_task_h60(state):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# Solve functions — HARDENING ROUND 3
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def solve_task_h61(state):
+    """Presentations with 3+ unique comment authors: star + org visibility."""
+    from collections import defaultdict
+    authors_per_pres = defaultdict(set)
+    for c in state["comments"]:
+        authors_per_pres[c["presentationId"]].add(c["authorId"])
+
+    for p in state["presentations"]:
+        if len(authors_per_pres.get(p["id"], set())) >= 3:
+            p["starred"] = True
+            p["shareSettings"]["visibility"] = "organization"
+            p["updatedAt"] = NOW
+
+
+def solve_task_h62(state):
+    """Two earliest-created: private, only creator in shared, unstar."""
+    sorted_pres = sorted(state["presentations"], key=lambda p: p["createdAt"])
+    for p in sorted_pres[:2]:
+        p["starred"] = False
+        p["shareSettings"]["visibility"] = "private"
+        p["shareSettings"]["sharedWith"] = [p["createdBy"]]
+        p["updatedAt"] = NOW
+
+
+def solve_task_h63(state):
+    """Remove comments whose author is not in the presentation's sharedWith."""
+    pres_map = {p["id"]: p for p in state["presentations"]}
+    state["comments"] = [
+        c for c in state["comments"]
+        if c["authorId"] in pres_map[c["presentationId"]]["shareSettings"]["sharedWith"]
+    ]
+
+
+def solve_task_h64(state):
+    """Editor-created: unresolved -> star, all resolved -> archive."""
+    editors = {u["id"] for u in state["users"] if u["role"] == "editor"}
+
+    from collections import defaultdict
+    pres_resolved = defaultdict(int)
+    pres_unresolved = defaultdict(int)
+    for c in state["comments"]:
+        if c["resolved"]:
+            pres_resolved[c["presentationId"]] += 1
+        else:
+            pres_unresolved[c["presentationId"]] += 1
+
+    for p in state["presentations"]:
+        if p["createdBy"] not in editors:
+            continue
+        pid = p["id"]
+        has_unresolved = pres_unresolved[pid] > 0
+        has_any = (pres_resolved[pid] + pres_unresolved[pid]) > 0
+        all_resolved = has_any and not has_unresolved
+
+        if has_unresolved:
+            p["starred"] = True
+            p["updatedAt"] = NOW
+        elif all_resolved:
+            p["status"] = "archived"
+            p["updatedAt"] = NOW
+
+
+def solve_task_h65(state):
+    """Most-slides presentation: all transitions to dissolve/500ms."""
+    pres_slide_counts = {}
+    for s in state["slides"]:
+        pid = s["presentationId"]
+        pres_slide_counts[pid] = pres_slide_counts.get(pid, 0) + 1
+
+    most_pid = max(pres_slide_counts, key=pres_slide_counts.get)
+    for s in state["slides"]:
+        if s["presentationId"] == most_pid:
+            s["transition"] = {"type": "dissolve", "duration": 500}
+
+
+def solve_task_h66(state):
+    """Draft presentations: transitions to none/0, clear speaker notes."""
+    draft_pids = {p["id"] for p in state["presentations"] if p["status"] == "draft"}
+    for s in state["slides"]:
+        if s["presentationId"] in draft_pids:
+            s["transition"] = {"type": "none", "duration": 0}
+            s["speakerNotes"] = ""
+
+
+def solve_task_h67(state):
+    """Delete last slide from presentations with all-resolved comments."""
+    from collections import defaultdict
+    pres_resolved = defaultdict(int)
+    pres_unresolved = defaultdict(int)
+    pres_has_comment = set()
+    for c in state["comments"]:
+        pres_has_comment.add(c["presentationId"])
+        if c["resolved"]:
+            pres_resolved[c["presentationId"]] += 1
+        else:
+            pres_unresolved[c["presentationId"]] += 1
+
+    all_resolved_pids = {
+        pid for pid in pres_has_comment
+        if pres_resolved[pid] > 0 and pres_unresolved[pid] == 0
+    }
+
+    for pid in all_resolved_pids:
+        pres_slides = [s for s in state["slides"] if s["presentationId"] == pid]
+        if not pres_slides:
+            continue
+        last_slide = max(pres_slides, key=lambda s: s["order"])
+        state["slides"] = [s for s in state["slides"] if s["id"] != last_slide["id"]]
+        # Update slideCount
+        for p in state["presentations"]:
+            if p["id"] == pid:
+                p["slideCount"] = len([s for s in state["slides"] if s["presentationId"] == pid])
+                p["updatedAt"] = NOW
+                break
+
+
+def solve_task_h68(state):
+    """Brand Identity: purple bg slides (#7B61FF) to dark navy (#1a1a2e)."""
+    for s in state["slides"]:
+        if s["presentationId"] == "pres_002" and s["backgroundColor"] == "#7B61FF":
+            s["backgroundColor"] = "#1a1a2e"
+
+
+def solve_task_h69(state):
+    """Share James's presentations with all of Anika's shared users."""
+    james_id = "user_004"
+    anika_id = "user_003"
+
+    # Collect union of Anika's sharedWith
+    anika_users = set()
+    for p in state["presentations"]:
+        if p["createdBy"] == anika_id:
+            anika_users.update(p["shareSettings"]["sharedWith"])
+
+    # Add to James's presentations
+    for p in state["presentations"]:
+        if p["createdBy"] == james_id:
+            sw = p["shareSettings"]["sharedWith"]
+            for uid in anika_users:
+                if uid not in sw:
+                    sw.append(uid)
+            p["updatedAt"] = NOW
+
+
+def solve_task_h70(state):
+    """>12 slides: published -> org + comments; draft -> publish + star."""
+    slide_counts = {}
+    for s in state["slides"]:
+        pid = s["presentationId"]
+        slide_counts[pid] = slide_counts.get(pid, 0) + 1
+
+    for p in state["presentations"]:
+        if slide_counts.get(p["id"], 0) <= 12:
+            continue
+        if p["status"] == "published":
+            p["shareSettings"]["visibility"] = "organization"
+            p["shareSettings"]["allowComments"] = True
+            p["updatedAt"] = NOW
+        elif p["status"] == "draft":
+            p["status"] = "published"
+            p["starred"] = True
+            p["updatedAt"] = NOW
+
+
+def solve_task_h71(state):
+    """Nature theme: star fewest, archive most, delete comments on middle."""
+    nature_pres = [p for p in state["presentations"] if p.get("theme") == "nature"]
+    nature_pres.sort(key=lambda p: p["slideCount"])
+    # fewest=pres_011(9), middle=pres_007(14), most=pres_004(16)
+    fewest, middle, most = nature_pres[0], nature_pres[1], nature_pres[2]
+
+    fewest["starred"] = True
+    fewest["updatedAt"] = NOW
+
+    most["status"] = "archived"
+    most["updatedAt"] = NOW
+
+    state["comments"] = [
+        c for c in state["comments"]
+        if c["presentationId"] != middle["id"]
+    ]
+
+
+def solve_task_h72(state):
+    """Exactly 4 comments: resolve+disable editing+team. Exactly 5: delete resolved+enable editing+star."""
+    from collections import Counter
+    comment_counts = Counter(c["presentationId"] for c in state["comments"])
+
+    four_pids = {pid for pid, cnt in comment_counts.items() if cnt == 4}
+    five_pids = {pid for pid, cnt in comment_counts.items() if cnt == 5}
+
+    for c in state["comments"]:
+        if c["presentationId"] in four_pids:
+            c["resolved"] = True
+
+    for p in state["presentations"]:
+        if p["id"] in four_pids:
+            p["shareSettings"]["allowEditing"] = False
+            p["shareSettings"]["visibility"] = "team"
+            p["updatedAt"] = NOW
+
+    # Delete resolved from 5-comment presentations
+    state["comments"] = [
+        c for c in state["comments"]
+        if not (c["presentationId"] in five_pids and c["resolved"])
+    ]
+
+    for p in state["presentations"]:
+        if p["id"] in five_pids:
+            p["shareSettings"]["allowEditing"] = True
+            p["starred"] = True
+            p["updatedAt"] = NOW
+
+
+def solve_task_h73(state):
+    """Sarah commented but not creator: star, enable comments, resolve Sarah's comments."""
+    sarah = "user_001"
+
+    # Find presentations where Sarah commented but isn't creator
+    sarah_commented_pres = set()
+    for c in state["comments"]:
+        if c["authorId"] == sarah:
+            sarah_commented_pres.add(c["presentationId"])
+
+    for p in state["presentations"]:
+        if p["id"] in sarah_commented_pres and p["createdBy"] != sarah:
+            p["starred"] = True
+            p["shareSettings"]["allowComments"] = True
+            p["updatedAt"] = NOW
+
+            # Resolve Sarah's comments on this presentation
+            for c in state["comments"]:
+                if c["presentationId"] == p["id"] and c["authorId"] == sarah:
+                    c["resolved"] = True
+
+
+def solve_task_h74(state):
+    """Mobile-tagged: add all editors, org visibility, resolve unresolved comments."""
+    editors = {u["id"] for u in state["users"] if u["role"] == "editor"}
+
+    for p in state["presentations"]:
+        if "mobile" not in p.get("tags", []):
+            continue
+        sw = p["shareSettings"]["sharedWith"]
+        for uid in editors:
+            if uid not in sw:
+                sw.append(uid)
+        p["shareSettings"]["visibility"] = "organization"
+        p["updatedAt"] = NOW
+
+        for c in state["comments"]:
+            if c["presentationId"] == p["id"]:
+                c["resolved"] = True
+
+
+def solve_task_h75(state):
+    """Add Elena to presentations she commented on but doesn't have access to."""
+    elena = "user_008"
+    pres_map = {p["id"]: p for p in state["presentations"]}
+
+    elena_commented_pres = set()
+    for c in state["comments"]:
+        if c["authorId"] == elena:
+            elena_commented_pres.add(c["presentationId"])
+
+    for pid in elena_commented_pres:
+        p = pres_map[pid]
+        sw = p["shareSettings"]["sharedWith"]
+        if elena not in sw:
+            sw.append(elena)
+            p["updatedAt"] = NOW
+
+
+def solve_task_h76(state):
+    """Viewer-creator -> disable comments+editing. Owner-creator -> enable both."""
+    user_roles = {u["id"]: u["role"] for u in state["users"]}
+
+    for p in state["presentations"]:
+        role = user_roles.get(p["createdBy"])
+        if role == "viewer":
+            p["shareSettings"]["allowComments"] = False
+            p["shareSettings"]["allowEditing"] = False
+            p["updatedAt"] = NOW
+        elif role == "owner":
+            p["shareSettings"]["allowComments"] = True
+            p["shareSettings"]["allowEditing"] = True
+            p["updatedAt"] = NOW
+
+
+def solve_task_h77(state):
+    """Has comment with replies -> star. Has comments but no replies -> unstar."""
+    from collections import defaultdict
+    pres_has_reply = defaultdict(bool)
+    pres_has_comment = set()
+
+    for c in state["comments"]:
+        pid = c["presentationId"]
+        pres_has_comment.add(pid)
+        if c.get("replies") and len(c["replies"]) > 0:
+            pres_has_reply[pid] = True
+
+    for p in state["presentations"]:
+        pid = p["id"]
+        if pid in pres_has_comment:
+            if pres_has_reply[pid]:
+                p["starred"] = True
+            else:
+                p["starred"] = False
+            p["updatedAt"] = NOW
+
+
+def solve_task_h78(state):
+    """Published with only creator in shared: add editors, team vis, enable comments."""
+    editors = {u["id"] for u in state["users"] if u["role"] == "editor"}
+
+    for p in state["presentations"]:
+        if p["status"] != "published":
+            continue
+        sw = p["shareSettings"]["sharedWith"]
+        if set(sw) == {p["createdBy"]}:
+            for uid in editors:
+                if uid not in sw:
+                    sw.append(uid)
+            p["shareSettings"]["visibility"] = "team"
+            p["shareSettings"]["allowComments"] = True
+            p["updatedAt"] = NOW
+
+
+def solve_task_h79(state):
+    """Unstar all, then star where creator commented on own presentation."""
+    creator_commented = set()
+    pres_creators = {p["id"]: p["createdBy"] for p in state["presentations"]}
+
+    for c in state["comments"]:
+        pid = c["presentationId"]
+        if c["authorId"] == pres_creators.get(pid):
+            creator_commented.add(pid)
+
+    for p in state["presentations"]:
+        p["starred"] = p["id"] in creator_commented
+        p["updatedAt"] = NOW
+
+
+def solve_task_h80(state):
+    """David Kim's non-created access: remove him, add Marcus, disable editing."""
+    david = "user_007"
+    marcus = "user_002"
+
+    for p in state["presentations"]:
+        if p["createdBy"] == david:
+            continue
+        sw = p["shareSettings"]["sharedWith"]
+        if david in sw:
+            sw.remove(david)
+            if marcus not in sw:
+                sw.append(marcus)
+            p["shareSettings"]["allowEditing"] = False
+            p["updatedAt"] = NOW
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Solver registry
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -1713,6 +2077,26 @@ SOLVERS = {
     "task_h58": solve_task_h58,
     "task_h59": solve_task_h59,
     "task_h60": solve_task_h60,
+    "task_h61": solve_task_h61,
+    "task_h62": solve_task_h62,
+    "task_h63": solve_task_h63,
+    "task_h64": solve_task_h64,
+    "task_h65": solve_task_h65,
+    "task_h66": solve_task_h66,
+    "task_h67": solve_task_h67,
+    "task_h68": solve_task_h68,
+    "task_h69": solve_task_h69,
+    "task_h70": solve_task_h70,
+    "task_h71": solve_task_h71,
+    "task_h72": solve_task_h72,
+    "task_h73": solve_task_h73,
+    "task_h74": solve_task_h74,
+    "task_h75": solve_task_h75,
+    "task_h76": solve_task_h76,
+    "task_h77": solve_task_h77,
+    "task_h78": solve_task_h78,
+    "task_h79": solve_task_h79,
+    "task_h80": solve_task_h80,
 }
 
 
