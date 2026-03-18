@@ -679,6 +679,267 @@ def solve_task_55(state):
     inv["activity"].append({"type": "voided", "date": NOW, "user": "System", "detail": "Invoice voided"})
 
 
+def solve_task_56(state):
+    """Create draft for Ironclad Security Systems in GBP with 3 line items."""
+    con = find_contact_by_name(state, "Ironclad Security Systems")
+    make_invoice(state, con["id"], [
+        {"description": "Database optimization", "quantity": 2, "unitPrice": 500,
+         "taxRateId": "tax_1", "accountCode": "280"},
+        {"description": "Software onboarding training", "quantity": 1, "unitPrice": 1200,
+         "taxRateId": "tax_1", "accountCode": "310"},
+        {"description": "Help desk support - monthly retainer", "quantity": 3, "unitPrice": 200,
+         "taxRateId": "tax_1", "accountCode": "270"},
+    ], currency="GBP")
+
+
+def solve_task_57(state):
+    """Create draft for CloudBridge Software with Minimal Clean theme."""
+    con = find_contact_by_name(state, "CloudBridge Software")
+    make_invoice(state, con["id"], [
+        {"description": "Cloud migration services", "quantity": 1, "unitPrice": 3000,
+         "taxRateId": "tax_1", "accountCode": "200"},
+    ], brandingThemeId="theme_3")
+
+
+def solve_task_58(state):
+    """Create draft for Atlas Import/Export Ltd with specific dates."""
+    con = find_contact_by_name(state, "Atlas Import/Export Ltd")
+    make_invoice(state, con["id"], [
+        {"description": "Freight and logistics services", "quantity": 10, "unitPrice": 85,
+         "taxRateId": "tax_1", "accountCode": "200"},
+    ], issueDate="2026-01-15", dueDate="2026-02-15")
+
+
+def solve_task_59(state):
+    """Send awaiting_payment invoice INV-0011."""
+    inv = find_invoice_by_number(state, "INV-0011")
+    inv["sentAt"] = inv.get("sentAt") or NOW
+    inv["updatedAt"] = NOW
+    con = next(c for c in state["contacts"] if c["id"] == inv["contactId"])
+    inv["activity"].append({"type": "sent", "date": NOW, "user": "System",
+                            "detail": f"Email sent to {con['email']}"})
+
+
+def solve_task_60(state):
+    """Bulk send INV-0004 and INV-0013."""
+    for num in ["INV-0004", "INV-0013"]:
+        inv = find_invoice_by_number(state, num)
+        inv["sentAt"] = inv.get("sentAt") or NOW
+        inv["updatedAt"] = NOW
+        con = next(c for c in state["contacts"] if c["id"] == inv["contactId"])
+        inv["activity"].append({"type": "sent", "date": NOW, "user": "System",
+                                "detail": f"Email sent to {con['email']}"})
+
+
+def solve_task_61(state):
+    """Copy overdue INV-0039 to new draft."""
+    orig = find_invoice_by_number(state, "INV-0039")
+    li_raw = [{"description": li["description"], "quantity": li["quantity"],
+               "unitPrice": li["unitPrice"], "taxRateId": li["taxRateId"],
+               "accountCode": li["accountCode"]} for li in orig["lineItems"]]
+    ref = (orig["reference"] + " (copy)") if orig["reference"] else ""
+    make_invoice(state, orig["contactId"], li_raw,
+                 reference=ref, notes=orig["notes"], currency=orig["currency"],
+                 brandingThemeId=orig["brandingThemeId"])
+
+
+def solve_task_62(state):
+    """Copy awaiting_payment INV-0007 to new draft."""
+    orig = find_invoice_by_number(state, "INV-0007")
+    li_raw = [{"description": li["description"], "quantity": li["quantity"],
+               "unitPrice": li["unitPrice"], "taxRateId": li["taxRateId"],
+               "accountCode": li["accountCode"]} for li in orig["lineItems"]]
+    ref = (orig["reference"] + " (copy)") if orig["reference"] else ""
+    make_invoice(state, orig["contactId"], li_raw,
+                 reference=ref, notes=orig["notes"], currency=orig["currency"],
+                 brandingThemeId=orig["brandingThemeId"])
+
+
+def solve_task_63(state):
+    """Approve awaiting_approval INV-0032."""
+    inv = find_invoice_by_number(state, "INV-0032")
+    inv["status"] = "awaiting_payment"
+    inv["updatedAt"] = NOW
+    inv["activity"].append({"type": "approved", "date": NOW, "user": "System", "detail": "Invoice approved"})
+
+
+def solve_task_64(state):
+    """Remove 'Social media campaign management' from INV-0093."""
+    inv = find_invoice_by_number(state, "INV-0093")
+    inv["lineItems"] = [li for li in inv["lineItems"] if li["description"] != "Social media campaign management"]
+    # Recalculate totals
+    subtotal = sum(li["lineTotal"] for li in inv["lineItems"])
+    tax_total = 0
+    for li in inv["lineItems"]:
+        rate_obj = next((t for t in state["taxRates"] if t["id"] == li["taxRateId"]), None)
+        if rate_obj:
+            tax_total += li["lineTotal"] * (rate_obj["rate"] / 100)
+    inv["subtotal"] = round(subtotal, 2)
+    inv["taxTotal"] = round(tax_total, 2)
+    inv["total"] = round(subtotal + tax_total, 2)
+    inv["amountDue"] = round(inv["total"] - inv["amountPaid"], 2)
+    inv["updatedAt"] = NOW
+
+
+def solve_task_65(state):
+    """Change qty of 'IT infrastructure assessment' on INV-0082 to 50."""
+    inv = find_invoice_by_number(state, "INV-0082")
+    li = next(l for l in inv["lineItems"] if l["description"] == "IT infrastructure assessment")
+    li["quantity"] = 50
+    li["lineTotal"] = round(50 * li["unitPrice"], 2)
+    # Recalculate totals
+    subtotal = sum(l["lineTotal"] for l in inv["lineItems"])
+    tax_total = 0
+    for l in inv["lineItems"]:
+        rate_obj = next((t for t in state["taxRates"] if t["id"] == l["taxRateId"]), None)
+        if rate_obj:
+            tax_total += l["lineTotal"] * (rate_obj["rate"] / 100)
+    inv["subtotal"] = round(subtotal, 2)
+    inv["taxTotal"] = round(tax_total, 2)
+    inv["total"] = round(subtotal + tax_total, 2)
+    inv["amountDue"] = round(inv["total"] - inv["amountPaid"], 2)
+    inv["updatedAt"] = NOW
+
+
+def solve_task_66(state):
+    """Change unit price of 'Network security audit' on INV-0025 to 150."""
+    inv = find_invoice_by_number(state, "INV-0025")
+    li = next(l for l in inv["lineItems"] if l["description"] == "Network security audit")
+    li["unitPrice"] = 150
+    li["lineTotal"] = round(li["quantity"] * 150, 2)
+    # Recalculate totals
+    subtotal = sum(l["lineTotal"] for l in inv["lineItems"])
+    tax_total = 0
+    for l in inv["lineItems"]:
+        rate_obj = next((t for t in state["taxRates"] if t["id"] == l["taxRateId"]), None)
+        if rate_obj:
+            tax_total += l["lineTotal"] * (rate_obj["rate"] / 100)
+    inv["subtotal"] = round(subtotal, 2)
+    inv["taxTotal"] = round(tax_total, 2)
+    inv["total"] = round(subtotal + tax_total, 2)
+    inv["amountDue"] = round(inv["total"] - inv["amountPaid"], 2)
+    inv["updatedAt"] = NOW
+
+
+def solve_task_67(state):
+    """Change tax rate of 'Staff training workshop - 2 days' on INV-0054 to No GST."""
+    inv = find_invoice_by_number(state, "INV-0054")
+    li = next(l for l in inv["lineItems"] if l["description"] == "Staff training workshop - 2 days")
+    li["taxRateId"] = "tax_3"
+    # Recalculate totals
+    subtotal = sum(l["lineTotal"] for l in inv["lineItems"])
+    tax_total = 0
+    for l in inv["lineItems"]:
+        rate_obj = next((t for t in state["taxRates"] if t["id"] == l["taxRateId"]), None)
+        if rate_obj:
+            tax_total += l["lineTotal"] * (rate_obj["rate"] / 100)
+    inv["subtotal"] = round(subtotal, 2)
+    inv["taxTotal"] = round(tax_total, 2)
+    inv["total"] = round(subtotal + tax_total, 2)
+    inv["amountDue"] = round(inv["total"] - inv["amountPaid"], 2)
+    inv["updatedAt"] = NOW
+
+
+def solve_task_68(state):
+    """Change currency of INV-0018 from AUD to NZD."""
+    inv = find_invoice_by_number(state, "INV-0018")
+    inv["currency"] = "NZD"
+    inv["updatedAt"] = NOW
+
+
+def solve_task_69(state):
+    """Change issue date of INV-0025 to 2026-03-01."""
+    inv = find_invoice_by_number(state, "INV-0025")
+    inv["issueDate"] = "2026-03-01"
+    inv["updatedAt"] = NOW
+
+
+def solve_task_70(state):
+    """Edit INV-0061 reference and notes."""
+    inv = find_invoice_by_number(state, "INV-0061")
+    inv["reference"] = "WO-12400"
+    inv["notes"] = "Urgent delivery required."
+    inv["updatedAt"] = NOW
+
+
+def solve_task_71(state):
+    """Record full payment $575 on INV-0070 using Business Savings."""
+    inv = find_invoice_by_number(state, "INV-0070")
+    add_payment(state, inv["id"], 575.0, "bank_2", "PAY-0070")
+
+
+def solve_task_72(state):
+    """Record full payment $2520 on INV-0067 using AUD Holding."""
+    inv = find_invoice_by_number(state, "INV-0067")
+    add_payment(state, inv["id"], 2520.0, "bank_4", "PAY-0067-AUD")
+
+
+def solve_task_73(state):
+    """Record full payment $2070 on INV-0090 using Credit Card."""
+    inv = find_invoice_by_number(state, "INV-0090")
+    add_payment(state, inv["id"], 2070.0, "bank_5", "CC-0090")
+
+
+def solve_task_74(state):
+    """Record payment $802.82 on INV-0074 to fully pay."""
+    inv = find_invoice_by_number(state, "INV-0074")
+    add_payment(state, inv["id"], 802.82, "bank_1", "FINAL-074")
+
+
+def solve_task_75(state):
+    """Rename Meridian Health Clinic."""
+    con = find_contact_by_name(state, "Meridian Health Clinic")
+    con["name"] = "Meridian Health & Wellness Clinic"
+
+
+def solve_task_76(state):
+    """Update full billing address of Harmony Music Academy."""
+    con = find_contact_by_name(state, "Harmony Music Academy")
+    con["billingAddress"] = {
+        "street": "120 Willis Street",
+        "city": "Wellington",
+        "region": "Wellington",
+        "postalCode": "6011",
+        "country": "New Zealand",
+    }
+
+
+def solve_task_77(state):
+    """Create contact Tasman Bay Charters (minimal)."""
+    cid = next_contact_id(state)
+    state["contacts"].append({
+        "id": f"con_{cid}",
+        "name": "Tasman Bay Charters",
+        "email": "info@tasmanbay.co.nz",
+        "phone": "",
+        "billingAddress": {"street": "", "city": "", "region": "", "postalCode": "", "country": "New Zealand"},
+        "taxId": "",
+        "contactType": "customer",
+        "createdAt": NOW,
+    })
+
+
+def solve_task_78(state):
+    """Change default email body template."""
+    state["settings"]["defaultEmailBody"] = (
+        "Dear {ContactName},\n\nPlease find invoice {InvoiceNumber} for {Total} attached."
+        "\n\nDue: {DueDate}\n\nKiwi Consulting Ltd"
+    )
+
+
+def solve_task_79(state):
+    """Update company address and phone."""
+    state["settings"]["companyAddress"] = "50 Symonds Street, Grafton, Auckland 1010, New Zealand"
+    state["settings"]["companyPhone"] = "+64 9 373 7999"
+
+
+def solve_task_80(state):
+    """Update email of contact with INV-0009."""
+    inv = find_invoice_by_number(state, "INV-0009")
+    con = next(c for c in state["contacts"] if c["id"] == inv["contactId"])
+    con["email"] = "accounts@pinnacle.co.nz"
+
+
 SOLVERS = {
     "task_1": solve_task_1,
     "task_2": solve_task_2,
@@ -735,6 +996,31 @@ SOLVERS = {
     "task_53": solve_task_53,
     "task_54": solve_task_54,
     "task_55": solve_task_55,
+    "task_56": solve_task_56,
+    "task_57": solve_task_57,
+    "task_58": solve_task_58,
+    "task_59": solve_task_59,
+    "task_60": solve_task_60,
+    "task_61": solve_task_61,
+    "task_62": solve_task_62,
+    "task_63": solve_task_63,
+    "task_64": solve_task_64,
+    "task_65": solve_task_65,
+    "task_66": solve_task_66,
+    "task_67": solve_task_67,
+    "task_68": solve_task_68,
+    "task_69": solve_task_69,
+    "task_70": solve_task_70,
+    "task_71": solve_task_71,
+    "task_72": solve_task_72,
+    "task_73": solve_task_73,
+    "task_74": solve_task_74,
+    "task_75": solve_task_75,
+    "task_76": solve_task_76,
+    "task_77": solve_task_77,
+    "task_78": solve_task_78,
+    "task_79": solve_task_79,
+    "task_80": solve_task_80,
 }
 
 
