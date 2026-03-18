@@ -14,7 +14,7 @@ def verify(server_url: str) -> tuple[bool, str]:
         return False, "Prescription rx_003 (Metformin) not found."
 
     sig = rx.get("sig") or ""
-    if "twice daily with meals" not in sig.lower():
-        return False, f"Prescription rx_003 sig is '{sig}', expected it to contain 'twice daily with meals'."
+    if "once daily with dinner" not in sig.lower():
+        return False, f"Prescription rx_003 sig is '{sig}', expected it to contain 'once daily with dinner'."
 
-    return True, "Prescription rx_003 (Metformin) sig contains 'twice daily with meals'."
+    return True, "Prescription rx_003 (Metformin) sig contains 'once daily with dinner'."

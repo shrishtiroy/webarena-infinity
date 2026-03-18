@@ -520,7 +520,7 @@ def solve_task_20(state):
 def solve_task_21(state):
     """Modify rx_003 sig."""
     rx = find_rx(state, "rx_003")
-    rx["sig"] = "Take 1 tablet by mouth twice daily with meals"
+    rx["sig"] = "Take 1 tablet by mouth once daily with dinner"
     rx["history"].append({
         "action": "modified", "date": NOW,
         "provider": provider_display_name(state),

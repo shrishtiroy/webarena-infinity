@@ -101,7 +101,7 @@
   },
   {
     "id": "task_21",
-    "instruction": "Modify Margaret Chen's Metformin (Glucophage) 1000mg prescription: change the directions (sig) to 'Take 1 tablet by mouth twice daily with meals'.",
+    "instruction": "Modify Margaret Chen's Metformin (Glucophage) 1000mg prescription: change the directions (sig) to 'Take 1 tablet by mouth once daily with dinner'.",
     "verify": "function-tasks/task_21.py"
   },
   {
