@@ -1,711 +1,780 @@
-// ============================================================
-// app.js — Routing, event delegation, and initialization
-// ============================================================
+/* app.js — Router, event delegation & lifecycle for Gmail Accounts & Contacts */
 
 const App = {
 
-    _sidebarCollapsed: false,
-    _selectedColor: null,
-
     init() {
         AppState.init();
+        this._setupSSE();
         AppState.subscribe(() => this.render());
-        AppState._initSSE();
-
-        document.addEventListener('click', (e) => this.handleClick(e));
-        document.addEventListener('input', (e) => this.handleInput(e));
-        document.addEventListener('change', (e) => this.handleChange(e));
-
+        this._parseRoute();
         this.render();
-        AppState._pushStateToServer();
+
+        window.addEventListener('hashchange', () => {
+            this._parseRoute();
+            this.render();
+        });
+
+        document.addEventListener('click', (e) => this._handleClick(e));
+        document.addEventListener('input', (e) => this._handleInput(e));
+        document.addEventListener('change', (e) => this._handleChange(e));
     },
 
     render() {
-        const app = document.getElementById('app');
-        let html = '';
-
-        // Top bar
-        html += Views.renderTopBar();
-
-        // Layout
-        html += `<div class="app-layout ${this._sidebarCollapsed ? 'sidebar-collapsed' : ''}">`;
-        html += Views.renderSidebar();
-        html += `<div class="main-area">`;
-        html += Views.renderMain();
-        html += `</div>`;
-
-        // Detail panel
-        if (AppState.selectedContactId && AppState.currentView === 'contacts') {
-            html += Views.renderContactDetail();
-        }
-        html += `</div>`;
-
-        // Modals
-        if (AppState.createContactOpen) {
-            html += Views.renderCreateContactModal();
-        }
-        if (AppState.editingContact) {
-            const contact = AppState.getContactById(AppState.editingContact);
-            if (contact) html += Views.renderEditContactModal(contact);
-        }
-        if (AppState.createLabelOpen) {
-            html += Views.renderCreateLabelModal();
-        }
-        if (AppState.editLabelId) {
-            const label = AppState.contactLabels.find(l => l.id === AppState.editLabelId);
-            if (label) html += Views.renderEditLabelModal(label);
-        }
-        if (AppState.addDelegateOpen) {
-            html += Views.renderAddDelegateModal();
-        }
-        if (AppState._labelPickerContactId) {
-            html += Views.renderLabelPickerModal(AppState._labelPickerContactId);
-        }
-        if (AppState.confirmModal) {
-            html += Components.confirmDialog(
-                AppState.confirmModal.title,
-                AppState.confirmModal.message,
-                AppState.confirmModal.confirmText,
-                AppState.confirmModal.confirmAction,
-                'close-confirm'
-            );
-        }
-
-        // Toast
-        if (AppState.toastMessage) {
-            html += Components.toast(AppState.toastMessage.text, AppState.toastMessage.type);
-        }
-
-        app.innerHTML = html;
+        const sidebar = document.getElementById('sidebarNav');
+        const content = document.getElementById('contentWrapper');
+        if (sidebar) sidebar.innerHTML = Views.renderSidebar();
+        if (content) content.innerHTML = Views.renderContent();
     },
 
-    // ---- Event Handling ----
+    navigate(route, params) {
+        if (params) {
+            window.location.hash = '#/' + route + '/' + params;
+        } else {
+            window.location.hash = '#/' + route;
+        }
+    },
 
-    handleClick(e) {
+    _parseRoute() {
+        const hash = window.location.hash.replace('#/', '') || 'contacts';
+        const parts = hash.split('/');
+        const route = parts[0];
+        const param = parts[1] || null;
+
+        switch (route) {
+            case 'contacts':
+                AppState.currentView = 'contacts';
+                AppState.currentContactId = null;
+                break;
+            case 'contact':
+                AppState.currentView = 'contact-detail';
+                AppState.currentContactId = param;
+                break;
+            case 'new-contact':
+                AppState.currentView = 'new-contact';
+                AppState.currentContactId = null;
+                break;
+            case 'edit-contact':
+                AppState.currentView = 'edit-contact';
+                AppState.currentContactId = param;
+                break;
+            case 'group':
+                AppState.currentView = 'group-detail';
+                AppState.currentGroupId = param;
+                break;
+            case 'other-contacts':
+                AppState.currentView = 'other-contacts';
+                break;
+            case 'directory':
+                AppState.currentView = 'directory';
+                break;
+            case 'account':
+                AppState.currentView = 'account';
+                break;
+            case 'send-mail-as':
+                AppState.currentView = 'send-mail-as';
+                break;
+            case 'delegation':
+                AppState.currentView = 'delegation';
+                break;
+            case 'import-export':
+                AppState.currentView = 'import-export';
+                break;
+            case 'merge-duplicates':
+                AppState.currentView = 'merge-duplicates';
+                break;
+            default:
+                AppState.currentView = 'contacts';
+        }
+    },
+
+    _setupSSE() {
+        const es = new EventSource('/api/events');
+        es.onmessage = (e) => {
+            if (e.data === 'reset') {
+                AppState.resetToSeedData();
+                window.location.hash = '#/contacts';
+            }
+        };
+    },
+
+    // ─── Event Handling ───
+    _handleClick(e) {
         const target = e.target;
 
-        // Star toggle — handle before other actions to prevent row selection
-        const starBtn = target.closest('[data-action="toggle-star"]');
-        if (starBtn) {
+        // Dropdown trigger
+        const ddTrigger = target.closest('[data-dropdown-trigger]');
+        if (ddTrigger) {
+            e.preventDefault();
             e.stopPropagation();
-            const contactId = starBtn.getAttribute('data-contact-id');
-            AppState.toggleStar(contactId);
+            const menuId = ddTrigger.dataset.dropdownTrigger + '-menu';
+            this._toggleDropdown(menuId);
             return;
         }
 
-        // Dropdown toggle
-        const dropdownTrigger = target.closest('[data-dropdown]');
-        if (dropdownTrigger) {
-            const dropdownId = dropdownTrigger.getAttribute('data-dropdown');
-            const menu = document.getElementById(dropdownId + '-menu');
-            if (menu) {
-                const wasOpen = menu.classList.contains('open');
-                document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
-                if (!wasOpen) menu.classList.add('open');
+        // Dropdown item
+        const ddItem = target.closest('[data-dropdown-item]');
+        if (ddItem) {
+            e.preventDefault();
+            this._handleDropdownSelect(ddItem);
+            return;
+        }
+
+        // Route navigation
+        const routeEl = target.closest('[data-route]');
+        if (routeEl) {
+            e.preventDefault();
+            const route = routeEl.dataset.route;
+            const filter = routeEl.dataset.filter;
+            const id = routeEl.dataset.id;
+
+            if (route === 'contacts' && filter) {
+                if (filter !== 'all' && filter !== 'starred' && filter.startsWith('grp_')) {
+                    AppState.contactFilter = filter;
+                    AppState.currentView = 'contacts';
+                    AppState.currentContactId = null;
+                    AppState.currentPage = 1;
+                    AppState.selectedContactIds = [];
+                    this.navigate('contacts');
+                    return;
+                }
+                AppState.contactFilter = filter;
+                AppState.currentView = 'contacts';
+                AppState.currentContactId = null;
+                AppState.currentPage = 1;
+                AppState.selectedContactIds = [];
+                this.navigate('contacts');
+                return;
             }
+            if (route === 'contact-detail' && id) {
+                this.navigate('contact', id);
+                return;
+            }
+            this.navigate(route, id || undefined);
             return;
         }
 
-        // Dropdown item selection
-        const dropdownItem = target.closest('.dropdown-item[data-value]');
-        if (dropdownItem) {
-            const value = dropdownItem.getAttribute('data-value');
-            const dropdownId = dropdownItem.getAttribute('data-dropdown-id');
-            this.handleDropdownSelect(dropdownId, value);
-            document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
+        // Action dispatch
+        const actionEl = target.closest('[data-action]');
+        if (actionEl) {
+            e.preventDefault();
+            this._handleAction(actionEl.dataset.action, actionEl);
+            return;
+        }
+
+        // Contact row click → detail
+        const contactRow = target.closest('.contact-row[data-contact-id]');
+        if (contactRow && !target.closest('input, button, .star-icon, [data-action]')) {
+            this.navigate('contact', contactRow.dataset.contactId);
+            return;
+        }
+
+        // Modal backdrop
+        if (target.id === 'modalOverlay') {
+            Components.closeModal();
             return;
         }
 
         // Close dropdowns on outside click
-        if (!target.closest('.custom-dropdown')) {
-            document.querySelectorAll('.dropdown-menu.open').forEach(m => m.classList.remove('open'));
-        }
+        this._closeAllDropdowns();
+    },
 
-        // Color swatch
-        const colorSwatch = target.closest('.color-swatch');
-        if (colorSwatch) {
-            const color = colorSwatch.getAttribute('data-color');
-            this._selectedColor = color;
-            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('color-selected'));
-            colorSwatch.classList.add('color-selected');
-            return;
-        }
-
-        // Modal overlay click to close
-        if (target.classList.contains('modal-overlay')) {
-            this._closeAllModals();
-            return;
-        }
-
-        // Actions
-        const actionEl = target.closest('[data-action]');
-        if (actionEl) {
-            const action = actionEl.getAttribute('data-action');
-            this.handleAction(action, actionEl);
-            return;
-        }
-
-        // Contact row click
-        const contactRow = target.closest('[data-contact-id]');
-        if (contactRow && !target.closest('.ct-actions') && !target.closest('.icon-btn')) {
-            const contactId = contactRow.getAttribute('data-contact-id');
-            AppState.selectedContactId = contactId;
-            AppState.notify();
-            return;
+    _handleInput(e) {
+        const target = e.target;
+        if (target.id === 'contactSearch') {
+            AppState.setSearch(target.value);
+        } else if (target.id === 'otherContactSearch') {
+            AppState.setOtherContactSearch(target.value);
+        } else if (target.id === 'directorySearch') {
+            AppState.setDirectorySearch(target.value);
         }
     },
 
-    handleAction(action, el) {
-        switch (action) {
-            // Navigation
-            case 'navigate': {
-                const view = el.getAttribute('data-view');
-                const filter = el.getAttribute('data-filter');
-                AppState.currentView = view;
-                if (filter) AppState.contactsFilter = filter;
-                AppState.selectedContactId = null;
-                AppState.searchQuery = '';
-                AppState.currentPage = 1;
-                AppState.notify();
-                break;
-            }
-            case 'filter-by-label': {
-                const labelId = el.getAttribute('data-label-id');
-                AppState.currentView = 'contacts';
-                AppState.contactsFilter = labelId;
-                AppState.selectedContactId = null;
-                AppState.currentPage = 1;
-                AppState.notify();
-                break;
-            }
+    _handleChange(e) {
+        const target = e.target;
 
+        // Radio: reply-from
+        if (target.name === 'replyFrom') {
+            AppState.setReplyFromSetting(target.value);
+        }
+
+        // Toggle
+        if (target.dataset && target.dataset.toggle) {
+            // Currently no generic toggles outside modals
+        }
+    },
+
+    // ─── Action Dispatch ───
+    _handleAction(action, el) {
+        switch (action) {
             // Contact CRUD
-            case 'open-create-contact':
-                AppState.createContactOpen = true;
-                this._selectedColor = null;
-                AppState.notify();
+            case 'new-contact':
+                this.navigate('new-contact');
                 break;
-            case 'save-new-contact':
-                this._saveNewContact();
+            case 'save-contact':
+                this._saveContact(el.dataset.id);
                 break;
-            case 'edit-contact': {
-                const contactId = el.getAttribute('data-contact-id');
-                AppState.editingContact = contactId;
-                AppState.notify();
+            case 'edit-contact':
+                this.navigate('edit-contact', el.dataset.id);
                 break;
-            }
-            case 'save-edited-contact':
-                this._saveEditedContact(el.getAttribute('data-contact-id'));
+            case 'delete-contact':
+                Components.confirmDanger('Are you sure you want to delete this contact?', () => {
+                    AppState.deleteContact(el.dataset.id);
+                    Components.showToast('Contact deleted', 'info');
+                    this.navigate('contacts');
+                });
                 break;
-            case 'delete-contact': {
-                const contactId = el.getAttribute('data-contact-id');
-                const contact = AppState.getContactById(contactId);
-                const name = contact ? (contact.firstName + ' ' + contact.lastName).trim() : 'this contact';
-                AppState.confirmModal = {
-                    title: 'Delete contact',
-                    message: `Are you sure you want to delete ${name}?`,
-                    confirmText: 'Delete',
-                    confirmAction: 'confirm-delete-contact',
-                    _contactId: contactId
-                };
-                AppState.notify();
+            case 'cancel-form':
+                window.history.back();
                 break;
-            }
-            case 'confirm-delete-contact':
-                if (AppState.confirmModal && AppState.confirmModal._contactId) {
-                    AppState.deleteContact(AppState.confirmModal._contactId);
-                    AppState.confirmModal = null;
-                    this._showToast('Contact deleted', 'success');
+            case 'merge-duplicates':
+                this.navigate('merge-duplicates');
+                break;
+            case 'merge-keep': {
+                const keepId = el.dataset.keepId;
+                const mergeId = el.dataset.mergeId;
+                const result = AppState.mergeContacts(keepId, mergeId);
+                if (result) {
+                    Components.showToast('Contacts merged', 'success');
+                } else {
+                    Components.showToast('Could not merge contacts', 'error');
                 }
                 break;
-            case 'select-contact': {
-                const contactId = el.getAttribute('data-contact-id');
-                AppState.selectedContactId = contactId;
+            }
+            case 'toggle-star':
+                AppState.toggleContactStar(el.dataset.id);
+                break;
+
+            // Selection
+            case 'toggle-select': {
+                AppState.toggleContactSelection(el.dataset.id);
+                break;
+            }
+            case 'select-all-page': {
+                const contacts = AppState.getFilteredContacts();
+                const page = AppState.currentPage;
+                const pageSize = AppState.pageSize;
+                const paged = contacts.slice((page - 1) * pageSize, page * pageSize);
+                const ids = paged.map(c => c.id);
+                const allSelected = ids.every(id => AppState.selectedContactIds.includes(id));
+                if (allSelected) {
+                    AppState.selectedContactIds = AppState.selectedContactIds.filter(id => !ids.includes(id));
+                } else {
+                    const newIds = ids.filter(id => !AppState.selectedContactIds.includes(id));
+                    AppState.selectedContactIds = AppState.selectedContactIds.concat(newIds);
+                }
                 AppState.notify();
                 break;
             }
-            case 'close-detail':
-                AppState.selectedContactId = null;
-                AppState.notify();
+            case 'clear-selection':
+                AppState.clearSelection();
+                break;
+
+            // Bulk actions
+            case 'bulk-delete':
+                Components.confirmDanger(`Delete ${AppState.selectedContactIds.length} contacts?`, () => {
+                    AppState.deleteContacts(AppState.selectedContactIds.slice());
+                    Components.showToast('Contacts deleted', 'info');
+                });
+                break;
+            case 'bulk-add-to-group':
+                this._showBulkAddToGroupModal();
+                break;
+
+            // Groups
+            case 'new-group':
+                this._showNewGroupModal();
+                break;
+            case 'rename-group':
+                this._showRenameGroupModal(el.dataset.id);
+                break;
+            case 'delete-group':
+                Components.confirmDanger('Delete this label? Contacts in this label will not be deleted.', () => {
+                    AppState.deleteGroup(el.dataset.id);
+                    Components.showToast('Label deleted', 'info');
+                    this.navigate('contacts');
+                });
+                break;
+            case 'remove-from-group':
+                AppState.removeContactFromGroup(el.dataset.contactId, el.dataset.groupId);
+                Components.showToast('Contact removed from label', 'info');
                 break;
 
             // Other contacts
-            case 'move-to-contacts': {
-                const otherId = el.getAttribute('data-other-id');
-                AppState.moveOtherToContacts(otherId);
-                this._showToast('Contact added to your contacts', 'success');
+            case 'promote-other':
+                AppState.promoteOtherContact(el.dataset.id);
+                Components.showToast('Contact added to your contacts', 'success');
                 break;
-            }
-            case 'delete-other-contact': {
-                const otherId = el.getAttribute('data-other-id');
-                AppState.deleteOtherContact(otherId);
-                this._showToast('Contact removed', 'success');
+            case 'delete-other':
+                AppState.deleteOtherContact(el.dataset.id);
+                Components.showToast('Other contact deleted', 'info');
                 break;
-            }
 
-            // Labels
-            case 'open-create-label':
-                AppState.createLabelOpen = true;
-                this._selectedColor = null;
-                AppState.notify();
+            // Aliases
+            case 'new-alias':
+                this._showAliasForm();
                 break;
-            case 'save-new-label':
-                this._saveNewLabel();
+            case 'edit-alias':
+                this._showAliasForm(el.dataset.id);
                 break;
-            case 'edit-label': {
-                const labelId = el.getAttribute('data-label-id');
-                AppState.editLabelId = labelId;
-                const label = AppState.contactLabels.find(l => l.id === labelId);
-                if (label) this._selectedColor = label.color;
-                AppState.notify();
-                break;
-            }
-            case 'save-edited-label':
-                this._saveEditedLabel(el.getAttribute('data-label-id'));
-                break;
-            case 'delete-label': {
-                const labelId = el.getAttribute('data-label-id');
-                AppState.deleteContactLabel(labelId);
-                AppState.editLabelId = null;
-                this._showToast('Label deleted', 'success');
+            case 'delete-alias': {
+                Components.confirmDanger('Remove this email address?', () => {
+                    const result = AppState.deleteAlias(el.dataset.id);
+                    if (result === false) {
+                        Components.showToast('Cannot remove primary address', 'error');
+                    } else {
+                        Components.showToast('Address removed', 'info');
+                    }
+                });
                 break;
             }
-            case 'open-label-picker': {
-                const contactId = el.getAttribute('data-contact-id');
-                AppState._labelPickerContactId = contactId;
-                AppState.notify();
+            case 'set-default-alias':
+                AppState.setDefaultAlias(el.dataset.id);
+                Components.showToast('Default address updated', 'success');
                 break;
-            }
-            case 'remove-label-from-contact': {
-                const contactId = el.getAttribute('data-contact-id');
-                const labelId = el.getAttribute('data-label-id');
-                AppState.removeLabelFromContact(contactId, labelId);
+            case 'save-alias':
+                this._saveAlias(el.dataset.id);
                 break;
-            }
 
             // Delegates
-            case 'open-add-delegate':
-                AppState.addDelegateOpen = true;
-                AppState.notify();
+            case 'add-delegate':
+                this._showAddDelegateModal();
                 break;
-            case 'save-new-delegate':
-                this._saveNewDelegate();
+            case 'remove-delegate':
+                Components.confirmDanger('Remove this delegate?', () => {
+                    AppState.removeDelegate(el.dataset.id);
+                    Components.showToast('Delegate removed', 'info');
+                });
                 break;
-            case 'remove-delegate': {
-                const delegateId = el.getAttribute('data-delegate-id');
-                const delegate = AppState.delegates.find(d => d.id === delegateId);
-                AppState.confirmModal = {
-                    title: 'Remove delegate',
-                    message: `Remove ${delegate ? delegate.name : 'this delegate'}? They will lose access to your email.`,
-                    confirmText: 'Remove',
-                    confirmAction: 'confirm-remove-delegate',
-                    _delegateId: delegateId
-                };
-                AppState.notify();
-                break;
-            }
-            case 'confirm-remove-delegate':
-                if (AppState.confirmModal && AppState.confirmModal._delegateId) {
-                    AppState.removeDelegate(AppState.confirmModal._delegateId);
-                    AppState.confirmModal = null;
-                    this._showToast('Delegate removed', 'success');
-                }
+            case 'save-delegate':
+                this._saveDelegate();
                 break;
 
-            // Merge
-            case 'merge-contacts': {
-                const mergeId = el.getAttribute('data-merge-id');
-                AppState.mergeContacts(mergeId);
-                this._showToast('Contacts merged', 'success');
+            // Import
+            case 'add-import':
+                this._showImportForm();
                 break;
-            }
-            case 'dismiss-merge': {
-                const mergeId = el.getAttribute('data-merge-id');
-                AppState.dismissMergeSuggestion(mergeId);
+            case 'remove-import':
+                Components.confirmDanger('Remove this mail account?', () => {
+                    AppState.removeImportAccount(el.dataset.id);
+                    Components.showToast('Mail account removed', 'info');
+                });
                 break;
-            }
-
-            // Sorting & pagination
-            case 'toggle-sort-dir':
-                AppState.contactsSortDir = AppState.contactsSortDir === 'asc' ? 'desc' : 'asc';
-                AppState.notify();
-                break;
-            case 'prev-page':
-                if (AppState.currentPage > 1) {
-                    AppState.currentPage--;
-                    AppState.notify();
-                }
-                break;
-            case 'next-page': {
-                const paged = AppState.getPagedContacts();
-                if (AppState.currentPage < paged.totalPages) {
-                    AppState.currentPage++;
-                    AppState.notify();
-                }
-                break;
-            }
-
-            // Settings
-            case 'settings-tab': {
-                const tab = el.getAttribute('data-tab');
-                AppState.settingsTab = tab;
-                AppState.notify();
-                break;
-            }
-            case 'save-profile':
-                this._saveProfile();
-                break;
-            case 'open-settings-menu':
-                AppState.currentView = 'settings';
-                AppState.selectedContactId = null;
-                AppState.notify();
-                break;
-
-            // Search
-            case 'clear-search':
-                AppState.searchQuery = '';
-                AppState.currentPage = 1;
-                AppState.notify();
+            case 'save-import':
+                this._saveImport();
                 break;
 
             // Export
             case 'export-contacts':
-                this._showToast('Export started. Your file will download shortly.', 'info');
-                break;
-            case 'trigger-import':
-                this._showToast('Import feature: Select a CSV or vCard file to import contacts.', 'info');
+                this._doExport();
                 break;
 
-            // Sidebar
-            case 'toggle-sidebar':
-                this._sidebarCollapsed = !this._sidebarCollapsed;
-                this.render();
+            // Account settings
+            case 'edit-name':
+                this._showEditNameModal();
+                break;
+            case 'edit-recovery-email':
+                this._showEditFieldModal('Recovery Email', 'recoveryEmail', AppState.currentUser.recoveryEmail, 'email@example.com');
+                break;
+            case 'edit-recovery-phone':
+                this._showEditFieldModal('Recovery Phone', 'recoveryPhone', AppState.currentUser.recoveryPhone, '+1 (555) 123-4567');
+                break;
+            case 'change-password':
+                this._showChangePasswordModal();
+                break;
+            case 'toggle-2sv':
+                AppState.updateAccountInfo({ twoStepVerification: !AppState.currentUser.twoStepVerification });
+                Components.showToast('2-Step Verification ' + (AppState.currentUser.twoStepVerification ? 'enabled' : 'disabled'), 'success');
+                break;
+            case 'new-app-password':
+                this._showNewAppPasswordModal();
+                break;
+            case 'delete-app-password':
+                Components.confirmDanger('Revoke this app password?', () => {
+                    AppState.deleteAppPassword(el.dataset.id);
+                    Components.showToast('App password revoked', 'info');
+                });
+                break;
+            case 'save-field':
+                this._saveField(el.dataset.field);
+                break;
+            case 'save-name':
+                this._saveName();
+                break;
+            case 'save-password':
+                this._savePassword();
+                break;
+            case 'save-app-password':
+                this._saveAppPassword();
                 break;
 
-            // Modals
-            case 'close-modal': {
-                this._closeAllModals();
+            // Pagination
+            case 'prev-page':
+                if (AppState.currentPage > 1) AppState.setPage(AppState.currentPage - 1);
+                break;
+            case 'next-page': {
+                const totalPages = Math.ceil(AppState.getFilteredContacts().length / AppState.pageSize);
+                if (AppState.currentPage < totalPages) AppState.setPage(AppState.currentPage + 1);
                 break;
             }
-            case 'close-confirm':
-                AppState.confirmModal = null;
-                AppState.notify();
+            case 'goto-page':
+                AppState.setPage(parseInt(el.dataset.page));
                 break;
 
-            // Toast
-            case 'dismiss-toast':
-                AppState.toastMessage = null;
-                this.render();
+            // Modal
+            case 'close-modal':
+                Components.closeModal();
                 break;
-
-            // Help
-            case 'open-help':
-                this._showToast('Help center: support.google.com/contacts', 'info');
+            case 'confirm-modal':
+                if (Components._confirmCallback) {
+                    Components._confirmCallback();
+                    Components.closeModal();
+                }
                 break;
-
-            default:
-                console.warn('Unhandled action:', action);
         }
     },
 
-    handleDropdownSelect(dropdownId, value) {
-        switch (dropdownId) {
-            case 'sort-by':
-                AppState.contactsSortBy = value;
-                AppState.currentPage = 1;
-                AppState.notify();
-                break;
-            case 'contacts-sort-setting':
-                AppState.updateAccountSetting('contactsSortBy', value);
-                break;
-            case 'contacts-display-order':
-                AppState.updateAccountSetting('contactsDisplayOrder', value);
-                break;
-            case 'two-factor-method':
-                AppState.updateAccountSetting('loginSettings.twoFactorMethod', value);
-                break;
-            case 'privacy-photo':
-                AppState.updateAccountSetting('privacySettings.showProfilePhoto', value);
-                break;
-            case 'privacy-email':
-                AppState.updateAccountSetting('privacySettings.showEmail', value);
-                break;
-            case 'privacy-phone':
-                AppState.updateAccountSetting('privacySettings.showPhone', value);
-                break;
-            case 'export-format':
-                // stored in UI only, no state change needed
-                break;
-            default:
-                console.warn('Unhandled dropdown:', dropdownId, value);
-        }
+    // ─── Dropdown Management ───
+    _toggleDropdown(menuId) {
+        const menu = document.getElementById(menuId);
+        if (!menu) return;
+        const isOpen = menu.style.display !== 'none';
+        this._closeAllDropdowns();
+        if (!isOpen) menu.style.display = 'block';
     },
 
-    handleInput(e) {
-        const target = e.target;
-
-        // Search inputs
-        if (target.id === 'contact-search-input' || target.id === 'global-search-input') {
-            AppState.searchQuery = target.value;
-            AppState.currentPage = 1;
-            if (AppState.currentView !== 'contacts') {
-                AppState.currentView = 'contacts';
-                AppState.contactsFilter = 'all';
-            }
-            AppState.notify();
-            return;
-        }
+    _closeAllDropdowns() {
+        document.querySelectorAll('.dropdown-menu').forEach(m => { m.style.display = 'none'; });
     },
 
-    handleChange(e) {
-        const target = e.target;
+    _handleDropdownSelect(item) {
+        const ddId = item.dataset.dropdownId;
+        const value = item.dataset.value;
 
-        // Toggles
-        const toggleId = target.getAttribute('data-toggle');
-        if (toggleId) {
-            this.handleToggleChange(toggleId, target.checked, target);
-            return;
+        if (ddId === 'sortDropdown') {
+            AppState.setContactSort(value);
         }
 
-        // Label picker
-        const labelPicker = target.getAttribute('data-label-picker');
-        if (labelPicker) {
-            const contactId = target.getAttribute('data-contact-id');
-            if (target.checked) {
-                AppState.addLabelToContact(contactId, labelPicker);
-            } else {
-                AppState.removeLabelFromContact(contactId, labelPicker);
-            }
-            return;
-        }
+        this._closeAllDropdowns();
     },
 
-    handleToggleChange(id, checked, target) {
-        switch (id) {
-            case 'auto-save-contacts':
-                AppState.updateAccountSetting('autoSaveContacts', checked);
-                break;
-            case 'share-docs-in-email':
-                AppState.updateAccountSetting('collaborationSettings.shareDocsInEmail', checked);
-                break;
-            case 'show-contact-info':
-                AppState.updateAccountSetting('collaborationSettings.showContactInfo', checked);
-                break;
-            case 'remember-password':
-                AppState.updateAccountSetting('loginSettings.rememberPassword', checked);
-                break;
-            case 'auto-sign-in':
-                AppState.updateAccountSetting('loginSettings.autoSignIn', checked);
-                break;
-            case 'two-factor-enabled':
-                AppState.updateAccountSetting('loginSettings.twoFactorEnabled', checked);
-                break;
-            case 'activity-tracking':
-                AppState.updateAccountSetting('privacySettings.activityTracking', checked);
-                break;
-            case 'notif-delegate-activity':
-                AppState.updateAccountSetting('notificationSettings.delegateActivity', checked);
-                break;
-            case 'notif-contact-changes':
-                AppState.updateAccountSetting('notificationSettings.contactChanges', checked);
-                break;
-            case 'notif-security-alerts':
-                AppState.updateAccountSetting('notificationSettings.securityAlerts', checked);
-                break;
-            case 'notif-linked-service-updates':
-                AppState.updateAccountSetting('notificationSettings.linkedServiceUpdates', checked);
-                break;
-            case 'contacts-sync':
-                AppState.updateAccountSetting('syncSettings.contactsSync', checked);
-                break;
-            case 'calendar-sync':
-                AppState.updateAccountSetting('syncSettings.calendarSync', checked);
-                break;
-            case 'email-sync':
-                AppState.updateAccountSetting('syncSettings.emailSync', checked);
-                break;
-            case 'google-sync-deprecation-ack':
-                AppState.updateAccountSetting('syncSettings.googleSyncDeprecationAcknowledged', checked);
-                break;
-            case 'linked-service': {
-                const serviceId = target.getAttribute('data-service-id');
-                AppState.toggleLinkedService(serviceId);
-                break;
-            }
-            default:
-                console.warn('Unhandled toggle:', id);
-        }
-    },
+    // ─── Save Contact ───
+    _saveContact(existingId) {
+        const firstName = (document.getElementById('firstName') || {}).value || '';
+        const lastName = (document.getElementById('lastName') || {}).value || '';
+        const email = (document.getElementById('contactEmail') || {}).value || '';
+        const phone = (document.getElementById('contactPhone') || {}).value || '';
+        const company = (document.getElementById('contactCompany') || {}).value || '';
+        const jobTitle = (document.getElementById('contactJobTitle') || {}).value || '';
+        const address = (document.getElementById('contactAddress') || {}).value || '';
+        const birthday = (document.getElementById('contactBirthday') || {}).value || '';
+        const notes = (document.getElementById('contactNotes') || {}).value || '';
 
-    // ---- Save helpers ----
+        if (!email && !firstName && !lastName) {
+            Components.showToast('Please provide at least a name or email', 'error');
+            return;
+        }
 
-    _saveNewContact() {
-        const firstName = document.getElementById('new-contact-first')?.value?.trim();
-        const email = document.getElementById('new-contact-email')?.value?.trim();
-        if (!firstName) {
-            this._showToast('First name is required', 'error');
-            return;
-        }
-        if (!email) {
-            this._showToast('Email is required', 'error');
-            return;
-        }
-        if (!this._validateEmail(email)) {
-            this._showToast('Please enter a valid email address', 'error');
-            return;
-        }
-        const labels = [];
-        document.querySelectorAll('[data-new-contact-label]').forEach(cb => {
-            if (cb.checked) labels.push(cb.getAttribute('data-new-contact-label'));
+        // Collect groups from checkboxes
+        const groups = [];
+        AppState.contactGroups.forEach(g => {
+            const cb = document.getElementById('group-' + g.id);
+            if (cb && cb.checked) groups.push(g.id);
         });
-        AppState.addContact({
-            firstName,
-            lastName: document.getElementById('new-contact-last')?.value?.trim() || '',
-            email,
-            phone: document.getElementById('new-contact-phone')?.value?.trim() || '',
-            company: document.getElementById('new-contact-company')?.value?.trim() || '',
-            jobTitle: document.getElementById('new-contact-job')?.value?.trim() || '',
-            address: document.getElementById('new-contact-address')?.value?.trim() || '',
-            secondaryEmail: document.getElementById('new-contact-secondary-email')?.value?.trim() || '',
-            secondaryPhone: document.getElementById('new-contact-secondary-phone')?.value?.trim() || '',
-            birthday: document.getElementById('new-contact-birthday')?.value?.trim() || '',
-            website: document.getElementById('new-contact-website')?.value?.trim() || '',
-            notes: document.getElementById('new-contact-notes')?.value?.trim() || '',
-            labels
+
+        const data = { firstName, lastName, email, phone, company, jobTitle, address, birthday, notes, groups };
+
+        if (existingId) {
+            AppState.updateContact(existingId, data);
+            Components.showToast('Contact updated', 'success');
+            this.navigate('contact', existingId);
+        } else {
+            const c = AppState.createContact(data);
+            Components.showToast('Contact created', 'success');
+            this.navigate('contact', c.id);
+        }
+    },
+
+    // ─── Modal Forms ───
+    _showNewGroupModal() {
+        Components.showModal('Create Label',
+            '<div class="form-field">' + Components.textInput('newGroupName', '', 'Label name', 'Name') + '</div>',
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            '<button class="btn btn-primary" data-action="save-new-group">Create</button>'
+        );
+        // Attach save handler
+        const saveBtn = document.querySelector('[data-action="save-new-group"]');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                const name = document.getElementById('newGroupName').value.trim();
+                if (!name) { Components.showToast('Name is required', 'error'); return; }
+                const g = AppState.createGroup(name);
+                Components.showToast('Label created', 'success');
+                Components.closeModal();
+            });
+        }
+    },
+
+    _showRenameGroupModal(groupId) {
+        const g = AppState.getGroupById(groupId);
+        if (!g) return;
+        Components.showModal('Rename Label',
+            '<div class="form-field">' + Components.textInput('renameGroupName', g.name, 'Label name', 'Name') + '</div>',
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            '<button class="btn btn-primary" id="saveRenameGroup">Rename</button>'
+        );
+        document.getElementById('saveRenameGroup').addEventListener('click', () => {
+            const name = document.getElementById('renameGroupName').value.trim();
+            if (!name) { Components.showToast('Name is required', 'error'); return; }
+            AppState.renameGroup(groupId, name);
+            Components.showToast('Label renamed', 'success');
+            Components.closeModal();
         });
-        AppState.createContactOpen = false;
-        this._showToast('Contact created', 'success');
     },
 
-    _saveEditedContact(contactId) {
-        const firstName = document.getElementById('edit-contact-first')?.value?.trim();
-        const email = document.getElementById('edit-contact-email')?.value?.trim();
-        if (!firstName) {
-            this._showToast('First name is required', 'error');
-            return;
-        }
-        if (!email) {
-            this._showToast('Email is required', 'error');
-            return;
-        }
-        if (!this._validateEmail(email)) {
-            this._showToast('Please enter a valid email address', 'error');
-            return;
-        }
-        const labels = [];
-        document.querySelectorAll('[data-edit-contact-label]').forEach(cb => {
-            if (cb.checked) labels.push(cb.getAttribute('data-edit-contact-label'));
+    _showBulkAddToGroupModal() {
+        let body = '<p>Add ' + AppState.selectedContactIds.length + ' contacts to a label:</p>';
+        body += '<div class="modal-group-list">';
+        AppState.contactGroups.forEach(g => {
+            body += `<label class="checkbox-label"><input type="checkbox" value="${Components.escapeAttr(g.id)}" class="bulk-group-cb">${Components.escapeHtml(g.name)}</label>`;
         });
-        AppState.updateContact(contactId, {
-            firstName,
-            lastName: document.getElementById('edit-contact-last')?.value?.trim() || '',
-            email,
-            phone: document.getElementById('edit-contact-phone')?.value?.trim() || '',
-            company: document.getElementById('edit-contact-company')?.value?.trim() || '',
-            jobTitle: document.getElementById('edit-contact-job')?.value?.trim() || '',
-            address: document.getElementById('edit-contact-address')?.value?.trim() || '',
-            secondaryEmail: document.getElementById('edit-contact-secondary-email')?.value?.trim() || '',
-            secondaryPhone: document.getElementById('edit-contact-secondary-phone')?.value?.trim() || '',
-            birthday: document.getElementById('edit-contact-birthday')?.value?.trim() || '',
-            website: document.getElementById('edit-contact-website')?.value?.trim() || '',
-            notes: document.getElementById('edit-contact-notes')?.value?.trim() || '',
-            labels
+        body += '</div>';
+
+        Components.showModal('Add to Label', body,
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            '<button class="btn btn-primary" id="saveBulkGroup">Add</button>'
+        );
+        document.getElementById('saveBulkGroup').addEventListener('click', () => {
+            const checked = document.querySelectorAll('.bulk-group-cb:checked');
+            checked.forEach(cb => {
+                AppState.addContactsToGroup(AppState.selectedContactIds.slice(), cb.value);
+            });
+            AppState.clearSelection();
+            Components.showToast('Contacts added to label(s)', 'success');
+            Components.closeModal();
         });
-        AppState.editingContact = null;
-        this._showToast('Contact updated', 'success');
     },
 
-    _saveNewLabel() {
-        const name = document.getElementById('new-label-name')?.value?.trim();
-        if (!name) {
-            this._showToast('Label name is required', 'error');
-            return;
-        }
-        AppState.addContactLabel(name, this._selectedColor || '#757575');
-        AppState.createLabelOpen = false;
-        this._selectedColor = null;
-        this._showToast('Label created', 'success');
+    // Alias form
+    _showAliasForm(aliasId) {
+        const a = aliasId ? AppState.aliases.find(al => al.id === aliasId) : null;
+        const title = a ? 'Edit Email Address' : 'Add Email Address';
+        let body = '<div class="form-grid">';
+        body += '<div class="form-field">' + Components.textInput('aliasName', a ? a.name : '', 'Display name', 'Name') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('aliasEmail', a ? a.email : '', 'email@example.com', 'Email address *') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('aliasSmtp', a ? a.smtpServer : '', 'smtp.example.com', 'SMTP Server') + '</div>';
+        body += '<div class="form-row two-col">';
+        body += '<div class="form-field">' + Components.textInput('aliasPort', a ? a.smtpPort : '587', '587', 'Port') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('aliasUsername', a ? a.smtpUsername : '', 'username', 'Username') + '</div>';
+        body += '</div>';
+        body += Components.toggle('aliasSSL', a ? a.useSSL : true, 'Use SSL', 'Secure connection (recommended)');
+        body += '</div>';
+
+        Components.showModal(title, body,
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            `<button class="btn btn-primary" data-action="save-alias" data-id="${Components.escapeAttr(aliasId || '')}">Save</button>`
+        );
     },
 
-    _saveEditedLabel(labelId) {
-        const name = document.getElementById('edit-label-name')?.value?.trim();
-        if (!name) {
-            this._showToast('Label name is required', 'error');
-            return;
+    _saveAlias(aliasId) {
+        const name = (document.getElementById('aliasName') || {}).value || '';
+        const email = (document.getElementById('aliasEmail') || {}).value || '';
+        const smtpServer = (document.getElementById('aliasSmtp') || {}).value || '';
+        const smtpPort = (document.getElementById('aliasPort') || {}).value || '';
+        const smtpUsername = (document.getElementById('aliasUsername') || {}).value || '';
+        const useSSL = document.getElementById('aliasSSL') ? document.getElementById('aliasSSL').checked : true;
+
+        if (!email) { Components.showToast('Email is required', 'error'); return; }
+
+        const data = { name, email, smtpServer, smtpPort, smtpUsername, useSSL };
+
+        if (aliasId) {
+            AppState.updateAlias(aliasId, data);
+            Components.showToast('Address updated', 'success');
+        } else {
+            AppState.createAlias(data);
+            Components.showToast('Address added', 'success');
         }
-        AppState.renameContactLabel(labelId, name);
-        if (this._selectedColor) {
-            AppState.updateContactLabelColor(labelId, this._selectedColor);
-        }
-        AppState.editLabelId = null;
-        this._selectedColor = null;
-        this._showToast('Label updated', 'success');
+        Components.closeModal();
     },
 
-    _saveNewDelegate() {
-        const email = document.getElementById('delegate-email')?.value?.trim();
-        if (!email) {
-            this._showToast('Email address is required', 'error');
-            return;
-        }
-        if (!this._validateEmail(email)) {
-            this._showToast('Please enter a valid email address', 'error');
-            return;
-        }
-        if (AppState.delegates.find(d => d.email === email)) {
-            this._showToast('This email is already a delegate', 'error');
-            return;
-        }
-        const name = document.getElementById('delegate-name')?.value?.trim() || '';
+    // Delegate
+    _showAddDelegateModal() {
+        let body = '<div class="form-grid">';
+        body += '<div class="form-field">' + Components.textInput('delegateEmail', '', 'delegate@example.com', 'Email address *') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('delegateName', '', 'Display name', 'Name (optional)') + '</div>';
+        body += '</div>';
+        body += '<p class="text-muted" style="margin-top:8px">The delegate will receive an email to confirm access. Status will show as "pending" until confirmed.</p>';
+
+        Components.showModal('Add Delegate', body,
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            '<button class="btn btn-primary" data-action="save-delegate">Add</button>'
+        );
+    },
+
+    _saveDelegate() {
+        const email = (document.getElementById('delegateEmail') || {}).value || '';
+        const name = (document.getElementById('delegateName') || {}).value || '';
+        if (!email) { Components.showToast('Email is required', 'error'); return; }
         AppState.addDelegate(email, name || email);
-        AppState.addDelegateOpen = false;
-        this._showToast('Delegate invitation sent', 'success');
+        Components.showToast('Delegate invitation sent', 'success');
+        Components.closeModal();
     },
 
-    _saveProfile() {
-        const name = document.getElementById('user-name')?.value?.trim();
-        const phone = document.getElementById('user-phone')?.value?.trim();
-        const recoveryEmail = document.getElementById('user-recovery-email')?.value?.trim();
-        const recoveryPhone = document.getElementById('user-recovery-phone')?.value?.trim();
-        if (!name) {
-            this._showToast('Name is required', 'error');
+    // Import
+    _showImportForm() {
+        let body = '<div class="form-grid">';
+        body += '<div class="form-field">' + Components.textInput('importEmail', '', 'email@example.com', 'Email address *') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('importServer', '', 'pop.example.com', 'POP3 Server *') + '</div>';
+        body += '<div class="form-row two-col">';
+        body += '<div class="form-field">' + Components.textInput('importPort', '995', '995', 'Port') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('importUsername', '', 'username', 'Username *') + '</div>';
+        body += '</div>';
+        body += '<div class="form-field">' + Components.textInput('importLabel', '', 'e.g. personal', 'Label for incoming messages') + '</div>';
+        body += Components.toggle('importSSL', true, 'Use SSL', 'Secure connection');
+        body += Components.toggle('importLeave', true, 'Leave a copy on the server', 'Keep messages on the original server');
+        body += '</div>';
+
+        Components.showModal('Add Mail Account', body,
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            '<button class="btn btn-primary" data-action="save-import">Add</button>'
+        );
+    },
+
+    _saveImport() {
+        const email = (document.getElementById('importEmail') || {}).value || '';
+        const server = (document.getElementById('importServer') || {}).value || '';
+        const port = (document.getElementById('importPort') || {}).value || '995';
+        const username = (document.getElementById('importUsername') || {}).value || '';
+        const labelIncoming = (document.getElementById('importLabel') || {}).value || '';
+        const useSSL = document.getElementById('importSSL') ? document.getElementById('importSSL').checked : true;
+        const leaveOnServer = document.getElementById('importLeave') ? document.getElementById('importLeave').checked : true;
+
+        if (!email || !server || !username) {
+            Components.showToast('Email, server, and username are required', 'error');
             return;
         }
-        if (name !== AppState.currentUser.name) AppState.updateCurrentUser('name', name);
-        if (phone !== AppState.currentUser.phone) AppState.updateCurrentUser('phone', phone);
-        if (recoveryEmail !== AppState.currentUser.recoveryEmail) AppState.updateCurrentUser('recoveryEmail', recoveryEmail);
-        if (recoveryPhone !== AppState.currentUser.recoveryPhone) AppState.updateCurrentUser('recoveryPhone', recoveryPhone);
-        this._showToast('Profile updated', 'success');
+
+        AppState.addImportAccount({ email, server, port, username, labelIncoming, useSSL, leaveOnServer });
+        Components.showToast('Mail account added', 'success');
+        Components.closeModal();
     },
 
-    // ---- Helpers ----
+    // Export
+    _doExport() {
+        const format = document.querySelector('input[name="exportFormat"]:checked');
+        const scope = document.querySelector('input[name="exportScope"]:checked');
+        if (!format || !scope) return;
 
-    _closeAllModals() {
-        AppState.createContactOpen = false;
-        AppState.editingContact = null;
-        AppState.createLabelOpen = false;
-        AppState.editLabelId = null;
-        AppState.addDelegateOpen = false;
-        AppState._labelPickerContactId = null;
-        AppState.confirmModal = null;
-        this._selectedColor = null;
-        AppState.notify();
+        const contacts = scope.value === 'starred' ? AppState.getStarredContacts() : AppState.contacts;
+        let content = '';
+        let filename = '';
+        let mimeType = '';
+
+        if (format.value === 'vcard') {
+            content = contacts.map(c => {
+                return `BEGIN:VCARD\nVERSION:3.0\nN:${c.lastName || ''};${c.firstName || ''}\nFN:${(c.firstName + ' ' + c.lastName).trim()}\nEMAIL:${c.email || ''}\nTEL:${c.phone || ''}\nORG:${c.company || ''}\nTITLE:${c.jobTitle || ''}\nADR:;;${c.address || ''}\nNOTE:${c.notes || ''}\nEND:VCARD`;
+            }).join('\n\n');
+            filename = 'contacts.vcf';
+            mimeType = 'text/vcard';
+        } else {
+            const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Company', 'Job Title', 'Address', 'Birthday', 'Notes'];
+            const rows = contacts.map(c => [c.firstName, c.lastName, c.email, c.phone, c.company, c.jobTitle, c.address, c.birthday, c.notes].map(v => '"' + (v || '').replace(/"/g, '""') + '"').join(','));
+            content = headers.join(',') + '\n' + rows.join('\n');
+            filename = format.value === 'outlook-csv' ? 'contacts-outlook.csv' : 'contacts-google.csv';
+            mimeType = 'text/csv';
+        }
+
+        const blob = new Blob([content], { type: mimeType });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        Components.showToast(`Exported ${contacts.length} contacts`, 'success');
     },
 
-    _showToast(text, type) {
-        if (AppState.toastTimeout) clearTimeout(AppState.toastTimeout);
-        AppState.toastMessage = { text, type };
-        this.render();
-        AppState.toastTimeout = setTimeout(() => {
-            AppState.toastMessage = null;
-            this.render();
-        }, 4000);
+    // Account settings modals
+    _showEditNameModal() {
+        const u = AppState.currentUser;
+        let body = '<div class="form-row two-col">';
+        body += '<div class="form-field">' + Components.textInput('editFirstName', u.firstName, 'First name', 'First name') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('editLastName', u.lastName, 'Last name', 'Last name') + '</div>';
+        body += '</div>';
+        Components.showModal('Edit Name', body,
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            '<button class="btn btn-primary" data-action="save-name">Save</button>'
+        );
     },
 
-    _validateEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    _saveName() {
+        const firstName = (document.getElementById('editFirstName') || {}).value || '';
+        const lastName = (document.getElementById('editLastName') || {}).value || '';
+        if (!firstName) { Components.showToast('First name is required', 'error'); return; }
+        AppState.updateAccountInfo({ firstName, lastName });
+        Components.showToast('Name updated', 'success');
+        Components.closeModal();
+        // Update user initials in top bar
+        const initialsEl = document.getElementById('userInitials');
+        if (initialsEl) initialsEl.textContent = (firstName[0] || '') + (lastName[0] || '');
+    },
+
+    _showEditFieldModal(title, field, currentValue, placeholder) {
+        let body = '<div class="form-field">' + Components.textInput('editFieldValue', currentValue || '', placeholder || '', title) + '</div>';
+        Components.showModal('Edit ' + title, body,
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            `<button class="btn btn-primary" data-action="save-field" data-field="${Components.escapeAttr(field)}">Save</button>`
+        );
+    },
+
+    _saveField(field) {
+        const value = (document.getElementById('editFieldValue') || {}).value || '';
+        const update = {};
+        update[field] = value;
+        AppState.updateAccountInfo(update);
+        Components.showToast('Updated successfully', 'success');
+        Components.closeModal();
+    },
+
+    _showChangePasswordModal() {
+        let body = '<div class="form-grid">';
+        body += '<div class="form-field">' + Components.textInput('currentPassword', '', 'Current password', 'Current password', 'password') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('newPassword', '', 'New password', 'New password', 'password') + '</div>';
+        body += '<div class="form-field">' + Components.textInput('confirmPassword', '', 'Confirm password', 'Confirm new password', 'password') + '</div>';
+        body += '</div>';
+        Components.showModal('Change Password', body,
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            '<button class="btn btn-primary" data-action="save-password">Change password</button>'
+        );
+    },
+
+    _savePassword() {
+        const current = (document.getElementById('currentPassword') || {}).value || '';
+        const newPw = (document.getElementById('newPassword') || {}).value || '';
+        const confirm = (document.getElementById('confirmPassword') || {}).value || '';
+        if (!current || !newPw) { Components.showToast('Please fill in all fields', 'error'); return; }
+        if (newPw !== confirm) { Components.showToast('Passwords do not match', 'error'); return; }
+        if (newPw.length < 8) { Components.showToast('Password must be at least 8 characters', 'error'); return; }
+        AppState.updateAccountInfo({ lastPasswordChange: new Date().toISOString() });
+        Components.showToast('Password changed successfully', 'success');
+        Components.closeModal();
+    },
+
+    _showNewAppPasswordModal() {
+        let body = '<div class="form-field">' + Components.textInput('appPasswordName', '', 'e.g., Mail on iPhone', 'App name *') + '</div>';
+        body += '<p class="text-muted">This name helps you identify which app is using the password.</p>';
+        Components.showModal('Generate App Password', body,
+            '<button class="btn btn-secondary" data-action="close-modal">Cancel</button>' +
+            '<button class="btn btn-primary" data-action="save-app-password">Generate</button>'
+        );
+    },
+
+    _saveAppPassword() {
+        const name = (document.getElementById('appPasswordName') || {}).value || '';
+        if (!name) { Components.showToast('App name is required', 'error'); return; }
+        AppState.createAppPassword(name);
+        Components.showToast('App password generated', 'success');
+        Components.closeModal();
     }
 };
 
-// Boot
+// ─── Bootstrap ───
 document.addEventListener('DOMContentLoaded', () => App.init());

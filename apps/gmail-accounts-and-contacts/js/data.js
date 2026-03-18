@@ -1,682 +1,372 @@
-// ============================================================
-// data.js — Rich, realistic seed data for Gmail Accounts & Contacts
-// ============================================================
+/* data.js — Seed data for Gmail Accounts & Contacts */
+
 const SEED_DATA_VERSION = 1;
 
-// ---- Current User ----
+// ─── Current User (the logged-in Google account) ───
 const CURRENT_USER = {
-    id: 'user_1',
-    name: 'Alex Johnson',
-    email: 'alex.johnson@gmail.com',
-    alternateEmails: ['a.johnson@workplace.io', 'alexj.dev@gmail.com'],
-    phone: '+1 (415) 555-0142',
-    avatarColor: '#1a73e8',
-    recoveryEmail: 'alex.backup@outlook.com',
-    recoveryPhone: '+1 (415) 555-0199',
-    language: 'English (US)',
-    timezone: 'America/Los_Angeles',
-    profilePicture: null,
-    createdAt: '2018-03-14T10:00:00Z',
-    lastLogin: '2026-03-07T08:30:00Z'
+    id: 'usr_self',
+    firstName: 'Sarah',
+    lastName: 'Chen',
+    email: 'sarah.chen@techcorp.io',
+    recoveryEmail: 'sarahchen.personal@gmail.com',
+    recoveryPhone: '+1 (415) 555-0192',
+    profilePhoto: null,
+    twoStepVerification: true,
+    lastPasswordChange: '2026-01-15T10:30:00Z',
+    createdAt: '2021-03-08T14:00:00Z'
 };
 
-// ---- Contact Labels/Groups ----
-const CONTACT_LABELS = [
-    { id: 'clabel_1', name: 'Family', color: '#EA4335', contactCount: 0 },
-    { id: 'clabel_2', name: 'Friends', color: '#34A853', contactCount: 0 },
-    { id: 'clabel_3', name: 'Work', color: '#4285F4', contactCount: 0 },
-    { id: 'clabel_4', name: 'VIP Clients', color: '#FBBC04', contactCount: 0 },
-    { id: 'clabel_5', name: 'Gym Buddies', color: '#FF6D01', contactCount: 0 },
-    { id: 'clabel_6', name: 'College Alumni', color: '#9C27B0', contactCount: 0 },
-    { id: 'clabel_7', name: 'Neighbors', color: '#009688', contactCount: 0 },
-    { id: 'clabel_8', name: 'Book Club', color: '#795548', contactCount: 0 },
-    { id: 'clabel_9', name: 'Vendors', color: '#607D8B', contactCount: 0 },
-    { id: 'clabel_10', name: 'Emergency', color: '#F44336', contactCount: 0 },
-    { id: 'clabel_11', name: 'Travel Contacts', color: '#00BCD4', contactCount: 0 },
-    { id: 'clabel_12', name: 'Healthcare', color: '#E91E63', contactCount: 0 }
-];
-
-// ---- Contacts (main / manually saved) ----
-const CONTACTS = [
+// ─── Send Mail As (Aliases) ───
+const ALIASES = [
     {
-        id: 'contact_01', firstName: 'Sarah', lastName: 'Chen', email: 'sarah.chen@techcorp.io',
-        phone: '+1 (650) 555-0101', company: 'TechCorp', jobTitle: 'VP of Product',
-        address: '2100 Sand Hill Rd, Menlo Park, CA 94025',
-        secondaryEmail: 'sarah.c.personal@gmail.com', secondaryPhone: '+1 (650) 555-0102',
-        birthday: '1988-06-15', website: 'https://sarahchen.dev',
-        notes: 'Met at AWS re:Invent 2024. Key partner for Q1 integration project.',
-        labels: ['clabel_3', 'clabel_4'], isStarred: true, avatarColor: '#EA4335',
-        createdAt: '2020-01-10T08:00:00Z', updatedAt: '2026-02-20T14:30:00Z', source: 'manual'
+        id: 'alias_1',
+        name: 'Sarah Chen',
+        email: 'sarah.chen@techcorp.io',
+        isPrimary: true,
+        isDefault: true,
+        replyFrom: 'default',
+        smtpServer: '',
+        smtpPort: '',
+        smtpUsername: '',
+        useSSL: true,
+        createdAt: '2021-03-08T14:00:00Z'
     },
     {
-        id: 'contact_02', firstName: 'Marcus', lastName: 'Williams', email: 'marcus.w@designhub.com',
-        phone: '+1 (415) 555-0203', company: 'DesignHub', jobTitle: 'Creative Director',
-        address: '450 Mission St, San Francisco, CA 94105',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1990-11-22', website: 'https://marcuswilliams.design',
-        notes: 'Design system collaborator. Prefers async communication.',
-        labels: ['clabel_3', 'clabel_2'], isStarred: true, avatarColor: '#34A853',
-        createdAt: '2019-06-15T12:00:00Z', updatedAt: '2026-01-18T09:00:00Z', source: 'manual'
+        id: 'alias_2',
+        name: 'Sarah Chen (Support)',
+        email: 'support@techcorp.io',
+        isPrimary: false,
+        isDefault: false,
+        replyFrom: 'alias',
+        smtpServer: 'smtp.techcorp.io',
+        smtpPort: '587',
+        smtpUsername: 'support@techcorp.io',
+        useSSL: true,
+        createdAt: '2023-06-12T09:15:00Z'
     },
     {
-        id: 'contact_03', firstName: 'Emily', lastName: 'Rodriguez', email: 'emily.r@startupventures.co',
-        phone: '+1 (408) 555-0304', company: 'StartupVentures', jobTitle: 'Managing Partner',
-        address: '1 Infinite Loop, Cupertino, CA 95014',
-        secondaryEmail: 'emily.rodriguez@gmail.com', secondaryPhone: '',
-        birthday: '1985-03-08', website: 'https://startupventures.co/team/emily',
-        notes: 'Series B connector. Introduced us to 3 portfolio companies.',
-        labels: ['clabel_3', 'clabel_4'], isStarred: true, avatarColor: '#FBBC04',
-        createdAt: '2021-03-20T16:00:00Z', updatedAt: '2026-02-23T10:00:00Z', source: 'manual'
+        id: 'alias_3',
+        name: 'S. Chen',
+        email: 'schen@alumni.stanford.edu',
+        isPrimary: false,
+        isDefault: false,
+        replyFrom: 'default',
+        smtpServer: 'smtp.stanford.edu',
+        smtpPort: '465',
+        smtpUsername: 'schen@alumni.stanford.edu',
+        useSSL: true,
+        createdAt: '2022-09-01T11:00:00Z'
     },
     {
-        id: 'contact_04', firstName: 'James', lastName: "O'Brien", email: 'james.obrien@lawfirm.legal',
-        phone: '+1 (212) 555-0405', company: 'Morrison & Associates', jobTitle: 'Senior Partner',
-        address: '375 Park Ave, New York, NY 10152',
-        secondaryEmail: '', secondaryPhone: '+1 (212) 555-0406',
-        birthday: '1972-09-30', website: '',
-        notes: 'Corporate counsel. Handles all vendor agreements and NDAs.',
-        labels: ['clabel_3', 'clabel_9'], isStarred: false, avatarColor: '#4285F4',
-        createdAt: '2022-07-01T10:00:00Z', updatedAt: '2026-02-21T16:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_05', firstName: 'Priya', lastName: 'Sharma', email: 'priya.sharma@cloudnine.dev',
-        phone: '+1 (510) 555-0507', company: 'CloudNine', jobTitle: 'Lead Backend Engineer',
-        address: '1600 Amphitheatre Pkwy, Mountain View, CA 94043',
-        secondaryEmail: 'priya.codes@gmail.com', secondaryPhone: '',
-        birthday: '1992-12-04', website: 'https://github.com/priyasharma',
-        notes: 'Key technical collaborator. Expert in distributed systems.',
-        labels: ['clabel_3'], isStarred: true, avatarColor: '#9C27B0',
-        createdAt: '2020-09-05T11:00:00Z', updatedAt: '2026-02-24T08:42:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_06', firstName: 'David', lastName: 'Kim', email: 'david.kim@financeplus.com',
-        phone: '+1 (312) 555-0608', company: 'FinancePlus', jobTitle: 'CFO',
-        address: '233 S Wacker Dr, Chicago, IL 60606',
-        secondaryEmail: 'dkim.personal@yahoo.com', secondaryPhone: '+1 (312) 555-0609',
-        birthday: '1980-07-19', website: '',
-        notes: 'Financial advisor. Handles tax prep and quarterly reports.',
-        labels: ['clabel_3', 'clabel_4'], isStarred: false, avatarColor: '#FF5722',
-        createdAt: '2019-01-15T09:00:00Z', updatedAt: '2026-02-23T14:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_07', firstName: 'Lisa', lastName: 'Nakamura', email: 'lisa.n@creativeagency.co',
-        phone: '+1 (310) 555-0710', company: 'Creative Agency Co.', jobTitle: 'Art Director',
-        address: '8560 Sunset Blvd, West Hollywood, CA 90069',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1993-04-27', website: 'https://lisanakamura.art',
-        notes: 'Brand refresh project lead. Excellent eye for typography.',
-        labels: ['clabel_3'], isStarred: false, avatarColor: '#009688',
-        createdAt: '2023-02-14T14:00:00Z', updatedAt: '2026-02-15T11:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_08', firstName: 'Tom', lastName: 'Bradley', email: 'tom.bradley@realtyhome.com',
-        phone: '+1 (925) 555-0811', company: 'Realty Home', jobTitle: 'Real Estate Agent',
-        address: '1850 Mt. Diablo Blvd, Walnut Creek, CA 94596',
-        secondaryEmail: 'tombradley90@gmail.com', secondaryPhone: '',
-        birthday: '1978-01-13', website: 'https://realtyhome.com/agents/tom',
-        notes: 'Helping with property search in East Bay. Licensed since 2005.',
-        labels: ['clabel_9'], isStarred: false, avatarColor: '#795548',
-        createdAt: '2025-11-01T10:00:00Z', updatedAt: '2026-02-20T11:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_09', firstName: 'Ana', lastName: 'Gutierrez', email: 'ana.g@globalhealth.org',
-        phone: '+1 (415) 555-0912', company: 'GlobalHealth.org', jobTitle: 'Community Outreach Director',
-        address: '500 Sansome St, San Francisco, CA 94111',
-        secondaryEmail: '', secondaryPhone: '+1 (415) 555-0913',
-        birthday: '1987-08-02', website: '',
-        notes: 'Volunteer coordinator. Spring health fair contact.',
-        labels: ['clabel_2', 'clabel_5'], isStarred: false, avatarColor: '#E91E63',
-        createdAt: '2024-06-20T15:00:00Z', updatedAt: '2026-02-21T12:15:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_10', firstName: 'Robert', lastName: 'Singh', email: 'robert.singh@university.edu',
-        phone: '+1 (650) 555-1013', company: 'Stanford University', jobTitle: 'Professor of Computer Science',
-        address: '353 Jane Stanford Way, Stanford, CA 94305',
-        secondaryEmail: 'r.singh@cs.stanford.edu', secondaryPhone: '',
-        birthday: '1975-05-11', website: 'https://cs.stanford.edu/~rsingh',
-        notes: 'Guest lecture contact. Research focus: distributed systems.',
-        labels: ['clabel_6'], isStarred: false, avatarColor: '#3F51B5',
-        createdAt: '2022-10-05T13:00:00Z', updatedAt: '2026-02-18T11:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_11', firstName: 'Michelle', lastName: 'Park', email: 'michelle.park@mediaco.tv',
-        phone: '+1 (213) 555-1114', company: 'MediaCo TV', jobTitle: 'Senior Producer',
-        address: '4000 Warner Blvd, Burbank, CA 91522',
-        secondaryEmail: 'michellepark@gmail.com', secondaryPhone: '',
-        birthday: '1991-10-16', website: '',
-        notes: 'Media contact for interviews and tech panels.',
-        labels: ['clabel_3'], isStarred: false, avatarColor: '#FF9800',
-        createdAt: '2025-01-20T09:00:00Z', updatedAt: '2026-02-20T08:20:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_12', firstName: 'Carlos', lastName: 'Mendez', email: 'carlos.m@logisticspro.net',
-        phone: '+1 (305) 555-1215', company: 'LogisticsPro', jobTitle: 'Account Manager',
-        address: '100 SE 2nd St, Miami, FL 33131',
-        secondaryEmail: '', secondaryPhone: '+1 (305) 555-1216',
-        birthday: '1983-02-28', website: '',
-        notes: 'Primary shipping vendor. Reliable for express deliveries.',
-        labels: ['clabel_9'], isStarred: false, avatarColor: '#607D8B',
-        createdAt: '2023-08-10T11:00:00Z', updatedAt: '2026-02-19T10:30:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_13', firstName: 'Rachel', lastName: 'Foster', email: 'rachel.foster@nonprofitaid.org',
-        phone: '+1 (503) 555-1316', company: 'NonprofitAid', jobTitle: 'Executive Director',
-        address: '411 NW Park Ave, Portland, OR 97209',
-        secondaryEmail: 'rachel.f.pdx@gmail.com', secondaryPhone: '',
-        birthday: '1979-12-25', website: 'https://nonprofitaid.org',
-        notes: 'Annual donation contact. Tax receipt handler.',
-        labels: ['clabel_2'], isStarred: false, avatarColor: '#8BC34A',
-        createdAt: '2021-12-01T10:00:00Z', updatedAt: '2026-02-17T09:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_14', firstName: 'Kevin', lastName: 'Zhao', email: 'kevin.zhao@quantumlab.tech',
-        phone: '+1 (650) 555-1417', company: 'QuantumLab', jobTitle: 'Principal Research Scientist',
-        address: '1 Hacker Way, Menlo Park, CA 94025',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1989-07-04', website: 'https://scholar.google.com/citations?user=kzhao',
-        notes: 'Quantum computing researcher. Published 40+ papers.',
-        labels: ['clabel_3', 'clabel_6'], isStarred: true, avatarColor: '#00BCD4',
-        createdAt: '2020-04-15T16:00:00Z', updatedAt: '2026-02-22T17:45:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_15', firstName: 'Sophie', lastName: 'Laurent', email: 'sophie.l@eurodesign.fr',
-        phone: '+33 1 42 68 5318', company: 'EuroDesign', jobTitle: 'Conference Director',
-        address: '8 Rue de la Paix, 75002 Paris, France',
-        secondaryEmail: 'sophie.laurent@gmail.com', secondaryPhone: '',
-        birthday: '1986-11-03', website: 'https://eurodesign.fr',
-        notes: 'EuroDesign Summit organizer. Invited me to speak in 2026.',
-        labels: ['clabel_3', 'clabel_11'], isStarred: false, avatarColor: '#673AB7',
-        createdAt: '2025-09-12T08:00:00Z', updatedAt: '2026-02-20T14:30:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_16', firstName: 'Nate', lastName: 'Patel', email: 'nate.patel@devops.tools',
-        phone: '+1 (408) 555-1619', company: 'DevOps.tools', jobTitle: 'Infrastructure Lead',
-        address: '345 Park Ave, San Jose, CA 95110',
-        secondaryEmail: 'nate.p.dev@gmail.com', secondaryPhone: '',
-        birthday: '1994-09-17', website: 'https://github.com/natepatel',
-        notes: 'CI/CD migration collaborator. Jenkins to GitHub Actions.',
-        labels: ['clabel_3'], isStarred: false, avatarColor: '#2196F3',
-        createdAt: '2021-07-20T10:00:00Z', updatedAt: '2026-02-22T15:20:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_17', firstName: 'Hannah', lastName: 'Brooks', email: 'hannah.b@fitnessfirst.com',
-        phone: '+1 (415) 555-1720', company: 'FitnessFirst', jobTitle: 'Personal Trainer',
-        address: '2145 Market St, San Francisco, CA 94114',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1995-06-21', website: '',
-        notes: 'Personal trainer since 2025. Specializes in HIIT and strength.',
-        labels: ['clabel_5', 'clabel_12'], isStarred: false, avatarColor: '#F44336',
-        createdAt: '2025-01-05T14:00:00Z', updatedAt: '2026-02-16T14:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_18', firstName: 'Omar', lastName: 'Al-Rashid', email: 'omar.ar@consulting.group',
-        phone: '+1 (202) 555-1821', company: 'Consulting Group', jobTitle: 'Senior Strategy Consultant',
-        address: '1001 Pennsylvania Ave NW, Washington, DC 20004',
-        secondaryEmail: 'omar.alrashid@gmail.com', secondaryPhone: '+1 (202) 555-1822',
-        birthday: '1981-04-12', website: '',
-        notes: 'Strategy workshop facilitator. Based in DC, travels frequently.',
-        labels: ['clabel_3'], isStarred: false, avatarColor: '#CDDC39',
-        createdAt: '2024-01-10T09:00:00Z', updatedAt: '2026-02-17T07:30:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_19', firstName: 'Jennifer', lastName: 'Wu', email: 'jennifer.wu@biomedresearch.com',
-        phone: '+1 (617) 555-1922', company: 'BioMed Research', jobTitle: 'Director of Research',
-        address: '75 Francis St, Boston, MA 02115',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1984-08-29', website: 'https://biomedresearch.com/team/jwu',
-        notes: 'Potential collaboration partner. Expertise in AI for healthcare.',
-        labels: ['clabel_3'], isStarred: false, avatarColor: '#FF6F00',
-        createdAt: '2025-12-01T15:00:00Z', updatedAt: '2026-02-18T15:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_20', firstName: 'Daniel', lastName: 'Thompson', email: 'daniel.t@architectsllp.com',
-        phone: '+1 (415) 555-2023', company: 'Thompson Architects LLP', jobTitle: 'Principal Architect',
-        address: '2200 Broadway, San Francisco, CA 94115',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1976-03-14', website: 'https://architectsllp.com',
-        notes: 'Handling office renovation. Great attention to detail.',
-        labels: ['clabel_9'], isStarred: false, avatarColor: '#455A64',
-        createdAt: '2025-10-15T11:00:00Z', updatedAt: '2026-02-19T16:45:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_21', firstName: 'Maya', lastName: 'Patel', email: 'maya.patel@techcorp.io',
-        phone: '+1 (650) 555-2124', company: 'TechCorp', jobTitle: 'Engineering Manager',
-        address: '2100 Sand Hill Rd, Menlo Park, CA 94025',
-        secondaryEmail: 'maya.p.sf@gmail.com', secondaryPhone: '',
-        birthday: '1990-01-30', website: '',
-        notes: 'Direct report at TechCorp. Manages backend team.',
-        labels: ['clabel_3'], isStarred: true, avatarColor: '#7B1FA2',
-        createdAt: '2020-01-10T08:30:00Z', updatedAt: '2026-02-22T10:30:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_22', firstName: 'Chris', lastName: 'Evans', email: 'chris.evans@sportsnews.com',
-        phone: '+1 (925) 555-2225', company: 'SportsNews', jobTitle: 'Sports Editor',
-        address: '1901 Harrison St, Oakland, CA 94612',
-        secondaryEmail: 'chrisevans.sf@gmail.com', secondaryPhone: '',
-        birthday: '1991-06-13', website: '',
-        notes: 'Friend from college. Season ticket holder.',
-        labels: ['clabel_2', 'clabel_6', 'clabel_5'], isStarred: false, avatarColor: '#1B5E20',
-        createdAt: '2018-09-01T10:00:00Z', updatedAt: '2026-02-14T20:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_23', firstName: 'Aisha', lastName: 'Mohammed', email: 'aisha.m@edtech.academy',
-        phone: '+1 (510) 555-2326', company: 'EdTech Academy', jobTitle: 'Head of Curriculum',
-        address: '2025 Addison St, Berkeley, CA 94704',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1988-10-07', website: 'https://edtech.academy/team',
-        notes: 'Enrolled in her Advanced ML course starting March 2026.',
-        labels: ['clabel_3'], isStarred: false, avatarColor: '#BF360C',
-        createdAt: '2025-02-10T16:00:00Z', updatedAt: '2026-02-15T16:30:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_24', firstName: 'Ryan', lastName: 'Cooper', email: 'ryan.cooper@saasplatform.io',
-        phone: '+1 (206) 555-2427', company: 'SaaSPlatform', jobTitle: 'CTO',
-        address: '400 Broad St, Seattle, WA 98109',
-        secondaryEmail: 'rcooper.dev@gmail.com', secondaryPhone: '+1 (206) 555-2428',
-        birthday: '1987-05-25', website: 'https://linkedin.com/in/ryancooper',
-        notes: 'SaaS integration partner. Strong technical leader.',
-        labels: ['clabel_3', 'clabel_4'], isStarred: false, avatarColor: '#0097A7',
-        createdAt: '2021-11-08T14:00:00Z', updatedAt: '2026-02-21T09:45:00Z', source: 'manual'
-    },
-    // Family contacts
-    {
-        id: 'contact_25', firstName: 'Margaret', lastName: 'Johnson', email: 'margaret.johnson@gmail.com',
-        phone: '+1 (916) 555-2500', company: '', jobTitle: 'Retired Teacher',
-        address: '8725 Folsom Blvd, Sacramento, CA 95826',
-        secondaryEmail: '', secondaryPhone: '+1 (916) 555-2501',
-        birthday: '1958-12-20', website: '',
-        notes: 'Mom. Prefers phone calls over email.',
-        labels: ['clabel_1', 'clabel_10'], isStarred: true, avatarColor: '#C62828',
-        createdAt: '2018-03-14T10:05:00Z', updatedAt: '2026-01-15T18:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_26', firstName: 'Richard', lastName: 'Johnson', email: 'rjohnson.sr@gmail.com',
-        phone: '+1 (916) 555-2602', company: '', jobTitle: 'Retired Engineer',
-        address: '8725 Folsom Blvd, Sacramento, CA 95826',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1956-08-04', website: '',
-        notes: 'Dad. Interested in tech updates.',
-        labels: ['clabel_1', 'clabel_10'], isStarred: true, avatarColor: '#1565C0',
-        createdAt: '2018-03-14T10:06:00Z', updatedAt: '2025-12-25T10:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_27', firstName: 'Laura', lastName: 'Johnson-Martinez', email: 'laura.jm@gmail.com',
-        phone: '+1 (503) 555-2703', company: 'Nike', jobTitle: 'Marketing Manager',
-        address: '1 Bowerman Dr, Beaverton, OR 97005',
-        secondaryEmail: 'laura.johnson@nike.com', secondaryPhone: '',
-        birthday: '1992-04-11', website: '',
-        notes: 'Sister. Lives in Portland with husband Miguel.',
-        labels: ['clabel_1'], isStarred: true, avatarColor: '#AD1457',
-        createdAt: '2018-03-14T10:07:00Z', updatedAt: '2026-02-10T20:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_28', firstName: 'Dr. Patricia', lastName: 'Nguyen', email: 'dr.nguyen@baymedical.org',
-        phone: '+1 (415) 555-2804', company: 'Bay Medical Center', jobTitle: 'Primary Care Physician',
-        address: '3801 Sacramento St, San Francisco, CA 94118',
-        secondaryEmail: '', secondaryPhone: '+1 (415) 555-2805',
-        birthday: '', website: 'https://baymedical.org/providers/nguyen',
-        notes: 'Primary doctor since 2020. Annual checkup in April.',
-        labels: ['clabel_12', 'clabel_10'], isStarred: false, avatarColor: '#00695C',
-        createdAt: '2020-05-10T09:00:00Z', updatedAt: '2025-11-15T14:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_29', firstName: 'Mike', lastName: 'Chen', email: 'mike.chen.dds@gmail.com',
-        phone: '+1 (415) 555-2905', company: 'Sunset Dental', jobTitle: 'Dentist',
-        address: '1399 9th Ave, San Francisco, CA 94122',
-        secondaryEmail: 'dr.chen@sunsetdental.com', secondaryPhone: '',
-        birthday: '', website: '',
-        notes: 'Dentist. Next cleaning scheduled for March 20.',
-        labels: ['clabel_12'], isStarred: false, avatarColor: '#4E342E',
-        createdAt: '2021-03-01T10:00:00Z', updatedAt: '2025-09-20T11:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_30', firstName: 'Jake', lastName: 'Morrison', email: 'jake.morrison@gmail.com',
-        phone: '+1 (415) 555-3006', company: 'Stripe', jobTitle: 'Staff Engineer',
-        address: '510 Townsend St, San Francisco, CA 94103',
-        secondaryEmail: 'jmorrison@stripe.com', secondaryPhone: '',
-        birthday: '1989-07-22', website: '',
-        notes: 'Best friend from college. Weekly basketball games.',
-        labels: ['clabel_2', 'clabel_5', 'clabel_6'], isStarred: true, avatarColor: '#1E88E5',
-        createdAt: '2018-04-01T08:00:00Z', updatedAt: '2026-03-01T19:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_31', firstName: 'Samantha', lastName: 'Lee', email: 'samantha.lee@gmail.com',
-        phone: '+1 (415) 555-3107', company: 'Airbnb', jobTitle: 'Product Designer',
-        address: '888 Brannan St, San Francisco, CA 94103',
-        secondaryEmail: 'sam.lee@airbnb.com', secondaryPhone: '',
-        birthday: '1993-02-14', website: 'https://samlee.design',
-        notes: 'Neighbor in building. Book club co-organizer.',
-        labels: ['clabel_2', 'clabel_7', 'clabel_8'], isStarred: false, avatarColor: '#F06292',
-        createdAt: '2023-05-01T16:00:00Z', updatedAt: '2026-02-28T10:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_32', firstName: 'Greg', lastName: 'Hoffman', email: 'greg.hoffman@wellsfargo.com',
-        phone: '+1 (415) 555-3208', company: 'Wells Fargo', jobTitle: 'Financial Advisor',
-        address: '420 Montgomery St, San Francisco, CA 94104',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '', website: '',
-        notes: 'Investment advisor. Quarterly portfolio review.',
-        labels: ['clabel_9'], isStarred: false, avatarColor: '#5D4037',
-        createdAt: '2022-01-15T10:00:00Z', updatedAt: '2025-12-20T15:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_33', firstName: 'Yuki', lastName: 'Tanaka', email: 'yuki.tanaka@gmail.com',
-        phone: '+81 3-5555-3309', company: '', jobTitle: 'Freelance Translator',
-        address: 'Shibuya, Tokyo, Japan',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1990-03-03', website: '',
-        notes: 'Met during Tokyo trip 2024. Helped with conference translation.',
-        labels: ['clabel_2', 'clabel_11'], isStarred: false, avatarColor: '#D81B60',
-        createdAt: '2024-11-15T06:00:00Z', updatedAt: '2025-08-20T03:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_34', firstName: 'Ben', lastName: 'Walker', email: 'ben.walker@gmail.com',
-        phone: '+1 (415) 555-3410', company: '', jobTitle: '',
-        address: '1200 Folsom St, San Francisco, CA 94103',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1988-11-09', website: '',
-        notes: 'Neighbor. Has our spare key for emergencies.',
-        labels: ['clabel_7', 'clabel_10'], isStarred: false, avatarColor: '#546E7A',
-        createdAt: '2023-08-01T12:00:00Z', updatedAt: '2025-06-15T18:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_35', firstName: 'Diana', lastName: 'Castillo', email: 'diana.castillo@gmail.com',
-        phone: '+1 (415) 555-3511', company: 'Self-employed', jobTitle: 'Yoga Instructor',
-        address: '3150 18th St, San Francisco, CA 94110',
-        secondaryEmail: 'diana@zenflowstudio.com', secondaryPhone: '',
-        birthday: '1996-01-18', website: 'https://zenflowstudio.com',
-        notes: 'Tuesday and Thursday yoga classes. Great for stress relief.',
-        labels: ['clabel_5', 'clabel_12'], isStarred: false, avatarColor: '#7CB342',
-        createdAt: '2025-06-01T09:00:00Z', updatedAt: '2026-01-10T08:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_36', firstName: 'Raj', lastName: 'Kapoor', email: 'raj.kapoor@cloudnine.dev',
-        phone: '+91 98765-43210', company: 'CloudNine', jobTitle: 'DevOps Engineer',
-        address: 'Whitefield, Bangalore, India',
-        secondaryEmail: 'raj.k.dev@gmail.com', secondaryPhone: '',
-        birthday: '1995-08-15', website: '',
-        notes: 'Works with Priya on the backend team. Timezone: IST.',
-        labels: ['clabel_3'], isStarred: false, avatarColor: '#F9A825',
-        createdAt: '2024-03-10T05:30:00Z', updatedAt: '2025-11-20T07:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_37', firstName: 'Elena', lastName: 'Volkov', email: 'elena.volkov@eurodesign.fr',
-        phone: '+33 6 12 34 5678', company: 'EuroDesign', jobTitle: 'UX Research Lead',
-        address: '15 Rue du Louvre, 75001 Paris, France',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1991-06-30', website: '',
-        notes: 'Works with Sophie on the EuroDesign Summit. Panel moderator.',
-        labels: ['clabel_3', 'clabel_11'], isStarred: false, avatarColor: '#AB47BC',
-        createdAt: '2025-09-12T08:30:00Z', updatedAt: '2025-12-01T14:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_38', firstName: 'Tony', lastName: 'Russo', email: 'tony.russo@gmail.com',
-        phone: '+1 (415) 555-3812', company: '', jobTitle: 'Retired Chef',
-        address: '722 Columbus Ave, San Francisco, CA 94133',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1965-09-05', website: '',
-        notes: 'Book club member. Makes amazing focaccia for meetings.',
-        labels: ['clabel_7', 'clabel_8'], isStarred: false, avatarColor: '#D84315',
-        createdAt: '2023-09-01T18:00:00Z', updatedAt: '2025-10-15T19:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_39', firstName: 'Patricia', lastName: 'Wong-Anderson', email: 'p.wong.anderson@techcorp.io',
-        phone: '+1 (650) 555-3913', company: 'TechCorp', jobTitle: 'Head of People Operations',
-        address: '2100 Sand Hill Rd, Menlo Park, CA 94025',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1982-07-08', website: '',
-        notes: 'HR lead at TechCorp. Handles benefits and onboarding.',
-        labels: ['clabel_3'], isStarred: false, avatarColor: '#6A1B9A',
-        createdAt: '2020-02-01T09:00:00Z', updatedAt: '2025-08-30T11:00:00Z', source: 'manual'
-    },
-    {
-        id: 'contact_40', firstName: 'Leo', lastName: 'Martinez', email: 'leo.martinez@gmail.com',
-        phone: '+1 (503) 555-4014', company: 'Adidas', jobTitle: 'Supply Chain Analyst',
-        address: '5055 N Greeley Ave, Portland, OR 97217',
-        secondaryEmail: '', secondaryPhone: '',
-        birthday: '1990-12-01', website: '',
-        notes: "Laura's husband. Good with data analysis.",
-        labels: ['clabel_1'], isStarred: false, avatarColor: '#00838F',
-        createdAt: '2019-06-15T12:00:00Z', updatedAt: '2025-12-25T10:00:00Z', source: 'manual'
+        id: 'alias_4',
+        name: 'Sarah Chen',
+        email: 'sarah@chen-family.org',
+        isPrimary: false,
+        isDefault: false,
+        replyFrom: 'alias',
+        smtpServer: 'mail.chen-family.org',
+        smtpPort: '587',
+        smtpUsername: 'sarah@chen-family.org',
+        useSSL: true,
+        createdAt: '2024-01-20T16:45:00Z'
     }
 ];
 
-// ---- Other Contacts (auto-saved from email interactions) ----
-const OTHER_CONTACTS = [
-    {
-        id: 'other_01', firstName: '', lastName: '', email: 'support@vercel.com',
-        name: 'Vercel Support', source: 'auto', savedAt: '2026-02-23T02:15:00Z',
-        interactionCount: 8, lastInteraction: '2026-02-23T02:15:00Z'
-    },
-    {
-        id: 'other_02', firstName: '', lastName: '', email: 'billing@aws.amazon.com',
-        name: 'AWS Billing', source: 'auto', savedAt: '2026-02-22T03:00:00Z',
-        interactionCount: 15, lastInteraction: '2026-02-22T03:00:00Z'
-    },
-    {
-        id: 'other_03', firstName: '', lastName: '', email: 'hr@techcorp.io',
-        name: 'TechCorp HR', source: 'auto', savedAt: '2026-01-15T10:00:00Z',
-        interactionCount: 4, lastInteraction: '2026-01-15T10:00:00Z'
-    },
-    {
-        id: 'other_04', firstName: 'Jason', lastName: 'Blake', email: 'jason.blake@salesforce.com',
-        name: 'Jason Blake', source: 'auto', savedAt: '2026-02-10T14:00:00Z',
-        interactionCount: 3, lastInteraction: '2026-02-10T14:00:00Z'
-    },
-    {
-        id: 'other_05', firstName: '', lastName: '', email: 'no-reply@stripe.com',
-        name: 'Stripe Notifications', source: 'auto', savedAt: '2026-02-22T16:00:00Z',
-        interactionCount: 22, lastInteraction: '2026-02-22T16:00:00Z'
-    },
-    {
-        id: 'other_06', firstName: 'Tina', lastName: 'Marshall', email: 'tina.marshall@designhub.com',
-        name: 'Tina Marshall', source: 'auto', savedAt: '2025-12-05T09:00:00Z',
-        interactionCount: 2, lastInteraction: '2025-12-05T09:00:00Z'
-    },
-    {
-        id: 'other_07', firstName: '', lastName: '', email: 'noreply@github.com',
-        name: 'GitHub', source: 'auto', savedAt: '2026-02-23T15:30:00Z',
-        interactionCount: 45, lastInteraction: '2026-02-23T15:30:00Z'
-    },
-    {
-        id: 'other_08', firstName: 'Alex', lastName: 'Rivera', email: 'alex.rivera@notion.so',
-        name: 'Alex Rivera', source: 'auto', savedAt: '2026-01-20T11:00:00Z',
-        interactionCount: 6, lastInteraction: '2026-01-20T11:00:00Z'
-    },
-    {
-        id: 'other_09', firstName: '', lastName: '', email: 'receipts@uber.com',
-        name: 'Uber Receipts', source: 'auto', savedAt: '2026-03-01T22:00:00Z',
-        interactionCount: 31, lastInteraction: '2026-03-01T22:00:00Z'
-    },
-    {
-        id: 'other_10', firstName: '', lastName: '', email: 'team@linear.app',
-        name: 'Linear', source: 'auto', savedAt: '2025-11-10T08:00:00Z',
-        interactionCount: 12, lastInteraction: '2025-11-10T08:00:00Z'
-    },
-    {
-        id: 'other_11', firstName: 'Mike', lastName: 'Santos', email: 'mike.santos@cloudflare.com',
-        name: 'Mike Santos', source: 'auto', savedAt: '2026-02-05T15:00:00Z',
-        interactionCount: 5, lastInteraction: '2026-02-05T15:00:00Z'
-    },
-    {
-        id: 'other_12', firstName: '', lastName: '', email: 'do-not-reply@zoom.us',
-        name: 'Zoom', source: 'auto', savedAt: '2026-02-18T09:00:00Z',
-        interactionCount: 19, lastInteraction: '2026-02-18T09:00:00Z'
-    },
-    {
-        id: 'other_13', firstName: 'Wendy', lastName: 'Chung', email: 'wendy.chung@techcorp.io',
-        name: 'Wendy Chung', source: 'auto', savedAt: '2025-10-22T13:00:00Z',
-        interactionCount: 7, lastInteraction: '2025-10-22T13:00:00Z'
-    },
-    {
-        id: 'other_14', firstName: '', lastName: '', email: 'alerts@datadog.com',
-        name: 'Datadog Alerts', source: 'auto', savedAt: '2026-02-18T03:45:00Z',
-        interactionCount: 28, lastInteraction: '2026-02-18T03:45:00Z'
-    },
-    {
-        id: 'other_15', firstName: '', lastName: '', email: 'notifications@jira.atlassian.com',
-        name: 'Jira Notifications', source: 'auto', savedAt: '2026-02-21T18:00:00Z',
-        interactionCount: 55, lastInteraction: '2026-02-21T18:00:00Z'
-    },
-    {
-        id: 'other_16', firstName: 'Chloe', lastName: 'Bennett', email: 'chloe.b@sequoiacap.com',
-        name: 'Chloe Bennett', source: 'auto', savedAt: '2025-09-18T16:00:00Z',
-        interactionCount: 1, lastInteraction: '2025-09-18T16:00:00Z'
-    },
-    {
-        id: 'other_17', firstName: '', lastName: '', email: 'newsletter@hackernews.com',
-        name: 'Hacker News Newsletter', source: 'auto', savedAt: '2026-02-22T06:00:00Z',
-        interactionCount: 40, lastInteraction: '2026-02-22T06:00:00Z'
-    },
-    {
-        id: 'other_18', firstName: 'Peter', lastName: 'Grant', email: 'peter.grant@mongodb.com',
-        name: 'Peter Grant', source: 'auto', savedAt: '2025-08-12T10:00:00Z',
-        interactionCount: 3, lastInteraction: '2025-08-12T10:00:00Z'
-    },
-    {
-        id: 'other_19', firstName: '', lastName: '', email: 'no-reply@docusign.net',
-        name: 'DocuSign', source: 'auto', savedAt: '2026-02-19T14:00:00Z',
-        interactionCount: 9, lastInteraction: '2026-02-19T14:00:00Z'
-    },
-    {
-        id: 'other_20', firstName: 'Nina', lastName: 'Kovalenko', email: 'nina.k@figma.com',
-        name: 'Nina Kovalenko', source: 'auto', savedAt: '2025-07-30T11:00:00Z',
-        interactionCount: 4, lastInteraction: '2025-07-30T11:00:00Z'
-    }
-];
-
-// ---- Delegates ----
+// ─── Delegates ───
 const DELEGATES = [
     {
-        id: 'delegate_1', email: 'maya.patel@techcorp.io', name: 'Maya Patel',
-        status: 'active', addedAt: '2025-06-15T10:00:00Z', activatedAt: '2025-06-16T08:30:00Z',
-        permissions: { readEmail: true, sendEmail: true, deleteEmail: true, manageChat: false, changePassword: false }
+        id: 'del_1',
+        email: 'james.wu@techcorp.io',
+        name: 'James Wu',
+        status: 'active',
+        addedAt: '2025-04-10T08:00:00Z'
     },
     {
-        id: 'delegate_2', email: 'laura.jm@gmail.com', name: 'Laura Johnson-Martinez',
-        status: 'active', addedAt: '2024-12-01T14:00:00Z', activatedAt: '2024-12-02T09:00:00Z',
-        permissions: { readEmail: true, sendEmail: true, deleteEmail: true, manageChat: false, changePassword: false }
+        id: 'del_2',
+        email: 'priya.sharma@techcorp.io',
+        name: 'Priya Sharma',
+        status: 'active',
+        addedAt: '2025-08-22T13:30:00Z'
     },
     {
-        id: 'delegate_3', email: 'priya.sharma@cloudnine.dev', name: 'Priya Sharma',
-        status: 'pending', addedAt: '2026-03-05T11:00:00Z', activatedAt: null,
-        permissions: { readEmail: true, sendEmail: true, deleteEmail: true, manageChat: false, changePassword: false }
-    },
-    {
-        id: 'delegate_4', email: 'jake.morrison@gmail.com', name: 'Jake Morrison',
-        status: 'expired', addedAt: '2026-02-20T09:00:00Z', activatedAt: null,
-        permissions: { readEmail: true, sendEmail: true, deleteEmail: true, manageChat: false, changePassword: false }
+        id: 'del_3',
+        email: 'alex.martinez@techcorp.io',
+        name: 'Alex Martinez',
+        status: 'pending',
+        addedAt: '2026-03-15T09:00:00Z'
     }
 ];
 
-// ---- Linked Google Services (DMA) ----
-const LINKED_SERVICES = [
-    { id: 'svc_1', name: 'Google Search', icon: 'search', isLinked: true, category: 'core', description: 'Personalized search results and recommendations' },
-    { id: 'svc_2', name: 'YouTube', icon: 'play_circle', isLinked: true, category: 'core', description: 'Video recommendations and watch history' },
-    { id: 'svc_3', name: 'Google Ads', icon: 'campaign', isLinked: false, category: 'advertising', description: 'Personalized ad experiences across Google services' },
-    { id: 'svc_4', name: 'Google Play', icon: 'shop', isLinked: true, category: 'core', description: 'App recommendations and purchase history' },
-    { id: 'svc_5', name: 'Chrome', icon: 'language', isLinked: true, category: 'core', description: 'Browsing data sync and personalized suggestions' },
-    { id: 'svc_6', name: 'Google Shopping', icon: 'shopping_cart', isLinked: false, category: 'commerce', description: 'Shopping recommendations and price tracking' },
-    { id: 'svc_7', name: 'Google Maps', icon: 'map', isLinked: true, category: 'core', description: 'Location history and place recommendations' }
-];
-
-const ALWAYS_LINKED_SERVICES = [
-    { id: 'asvc_1', name: 'Google Contacts', description: 'Contact sync across devices' },
-    { id: 'asvc_2', name: 'Android Services', description: 'Core device functionality' },
-    { id: 'asvc_3', name: 'Google Drive', description: 'File storage and sync' },
-    { id: 'asvc_4', name: 'Gmail', description: 'Email service' },
-    { id: 'asvc_5', name: 'Google Calendar', description: 'Calendar sync and scheduling' },
-    { id: 'asvc_6', name: 'Google Photos', description: 'Photo backup and storage' },
-    { id: 'asvc_7', name: 'Google Keep', description: 'Notes and lists' },
-    { id: 'asvc_8', name: 'Google Meet', description: 'Video conferencing' },
-    { id: 'asvc_9', name: 'Google Chat', description: 'Messaging service' },
-    { id: 'asvc_10', name: 'Google Docs', description: 'Document editing' },
-    { id: 'asvc_11', name: 'Google Sheets', description: 'Spreadsheet editing' },
-    { id: 'asvc_12', name: 'Google Slides', description: 'Presentation editing' },
-    { id: 'asvc_13', name: 'Google Translate', description: 'Translation service' },
-    { id: 'asvc_14', name: 'Google Assistant', description: 'AI assistant' },
-    { id: 'asvc_15', name: 'Google Fit', description: 'Health and fitness tracking' }
-];
-
-// ---- Account Settings ----
-const ACCOUNT_SETTINGS = {
-    autoSaveContacts: true,
-    contactsSortBy: 'firstName',
-    contactsDisplayOrder: 'firstLast',
-    loginSettings: {
-        rememberPassword: true,
-        autoSignIn: true,
-        twoFactorEnabled: true,
-        twoFactorMethod: 'authenticator',
-        recoveryEmailVerified: true,
-        recoveryPhoneVerified: true
+// ─── Import Accounts (Check mail from other accounts via POP3) ───
+const IMPORT_ACCOUNTS = [
+    {
+        id: 'imp_1',
+        email: 'sarahchen.personal@gmail.com',
+        server: 'pop.gmail.com',
+        port: '995',
+        username: 'sarahchen.personal@gmail.com',
+        useSSL: true,
+        leaveOnServer: true,
+        labelIncoming: 'personal-gmail',
+        status: 'active',
+        lastChecked: '2026-03-18T06:30:00Z',
+        addedAt: '2022-05-10T14:00:00Z'
     },
-    syncSettings: {
-        googleSyncEnabled: false,
-        googleSyncDeprecationAcknowledged: true,
-        contactsSync: true,
-        calendarSync: true,
-        emailSync: true
-    },
-    collaborationSettings: {
-        allowDelegates: true,
-        maxDelegates: 10,
-        shareDocsInEmail: true,
-        showContactInfo: true
-    },
-    privacySettings: {
-        showProfilePhoto: 'everyone',
-        showEmail: 'contacts_only',
-        showPhone: 'nobody',
-        activityTracking: true
-    },
-    notificationSettings: {
-        delegateActivity: true,
-        contactChanges: false,
-        securityAlerts: true,
-        linkedServiceUpdates: true
+    {
+        id: 'imp_2',
+        email: 'sarah@old-startup.com',
+        server: 'mail.old-startup.com',
+        port: '995',
+        username: 'sarah',
+        useSSL: true,
+        leaveOnServer: false,
+        labelIncoming: 'old-startup',
+        status: 'error',
+        lastChecked: '2026-02-28T12:00:00Z',
+        errorMessage: 'Connection refused: server unreachable',
+        addedAt: '2023-01-15T10:00:00Z'
     }
-};
-
-// ---- Contact Edit History (for "View contact edit history" feature) ----
-const CONTACT_HISTORY = [
-    { id: 'hist_1', contactId: 'contact_01', action: 'created', field: null, oldValue: null, newValue: null, timestamp: '2020-01-10T08:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_2', contactId: 'contact_01', action: 'edited', field: 'jobTitle', oldValue: 'Product Manager', newValue: 'VP of Product', timestamp: '2024-03-15T10:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_3', contactId: 'contact_01', action: 'edited', field: 'phone', oldValue: '+1 (650) 555-0100', newValue: '+1 (650) 555-0101', timestamp: '2025-06-20T14:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_4', contactId: 'contact_01', action: 'label_added', field: 'labels', oldValue: null, newValue: 'VIP Clients', timestamp: '2025-09-01T09:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_5', contactId: 'contact_02', action: 'created', field: null, oldValue: null, newValue: null, timestamp: '2019-06-15T12:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_6', contactId: 'contact_02', action: 'edited', field: 'company', oldValue: 'Freelance', newValue: 'DesignHub', timestamp: '2021-01-10T11:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_7', contactId: 'contact_05', action: 'created', field: null, oldValue: null, newValue: null, timestamp: '2020-09-05T11:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_8', contactId: 'contact_05', action: 'edited', field: 'email', oldValue: 'priya.s@techcorp.io', newValue: 'priya.sharma@cloudnine.dev', timestamp: '2022-08-01T16:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_9', contactId: 'contact_25', action: 'created', field: null, oldValue: null, newValue: null, timestamp: '2018-03-14T10:05:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_10', contactId: 'contact_25', action: 'edited', field: 'address', oldValue: '123 Oak St, Sacramento, CA 95816', newValue: '8725 Folsom Blvd, Sacramento, CA 95826', timestamp: '2023-07-01T09:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_11', contactId: 'contact_30', action: 'created', field: null, oldValue: null, newValue: null, timestamp: '2018-04-01T08:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_12', contactId: 'contact_30', action: 'edited', field: 'company', oldValue: 'Google', newValue: 'Stripe', timestamp: '2023-03-15T10:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_13', contactId: 'contact_14', action: 'edited', field: 'notes', oldValue: 'Quantum computing researcher.', newValue: 'Quantum computing researcher. Published 40+ papers.', timestamp: '2026-01-05T11:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_14', contactId: 'contact_21', action: 'edited', field: 'jobTitle', oldValue: 'Senior Engineer', newValue: 'Engineering Manager', timestamp: '2025-04-01T09:00:00Z', actor: 'alex.johnson@gmail.com' },
-    { id: 'hist_15', contactId: 'contact_03', action: 'label_added', field: 'labels', oldValue: null, newValue: 'VIP Clients', timestamp: '2024-11-15T14:00:00Z', actor: 'alex.johnson@gmail.com' }
 ];
 
-// ---- Import/Export History ----
-const IMPORT_EXPORT_HISTORY = [
-    { id: 'ie_1', type: 'import', format: 'CSV', fileName: 'outlook_contacts.csv', count: 45, timestamp: '2020-01-10T08:00:00Z', status: 'completed' },
-    { id: 'ie_2', type: 'export', format: 'Google CSV', fileName: 'gmail_contacts_backup.csv', count: 28, timestamp: '2025-06-15T14:00:00Z', status: 'completed' },
-    { id: 'ie_3', type: 'import', format: 'vCard', fileName: 'iphone_contacts.vcf', count: 12, timestamp: '2024-08-20T10:00:00Z', status: 'completed' },
-    { id: 'ie_4', type: 'export', format: 'vCard', fileName: 'all_contacts.vcf', count: 35, timestamp: '2026-01-05T09:00:00Z', status: 'completed' }
+// ─── Contact Groups / Labels ───
+const CONTACT_GROUPS = [
+    { id: 'grp_1', name: 'Family', system: false, createdAt: '2021-04-01T10:00:00Z', updatedAt: '2026-02-10T08:00:00Z' },
+    { id: 'grp_2', name: 'Work', system: false, createdAt: '2021-04-01T10:00:00Z', updatedAt: '2026-03-01T14:00:00Z' },
+    { id: 'grp_3', name: 'Friends', system: false, createdAt: '2021-04-15T10:00:00Z', updatedAt: '2025-12-20T16:00:00Z' },
+    { id: 'grp_4', name: 'Engineering Team', system: false, createdAt: '2022-01-10T09:00:00Z', updatedAt: '2026-03-10T11:00:00Z' },
+    { id: 'grp_5', name: 'Investors', system: false, createdAt: '2023-03-01T08:00:00Z', updatedAt: '2025-11-05T10:00:00Z' },
+    { id: 'grp_6', name: 'College Alumni', system: false, createdAt: '2022-09-01T12:00:00Z', updatedAt: '2026-01-15T09:00:00Z' },
+    { id: 'grp_7', name: 'Book Club', system: false, createdAt: '2024-06-01T18:00:00Z', updatedAt: '2026-03-05T20:00:00Z' },
+    { id: 'grp_8', name: 'Conference Contacts', system: false, createdAt: '2025-09-15T10:00:00Z', updatedAt: '2026-02-20T14:00:00Z' },
+    { id: 'grp_9', name: 'Vendors', system: false, createdAt: '2024-02-01T10:00:00Z', updatedAt: '2026-03-12T09:00:00Z' },
+    { id: 'grp_10', name: 'VIP', system: false, createdAt: '2025-01-01T08:00:00Z', updatedAt: '2026-03-17T16:00:00Z' }
 ];
 
-// ---- Merge Suggestions (duplicate contacts) ----
+// ─── Contacts (main contacts list — 120+ contacts) ───
+const CONTACTS = [
+    // Family
+    { id: 'ct_1', firstName: 'David', lastName: 'Chen', email: 'david.chen@gmail.com', phone: '+1 (415) 555-0101', company: '', jobTitle: '', address: '142 Oak Street, San Francisco, CA 94102', birthday: '1965-08-22', notes: 'Dad - prefers calls after 6pm', starred: true, groups: ['grp_1'], createdAt: '2021-04-01T10:00:00Z', updatedAt: '2026-01-05T08:00:00Z' },
+    { id: 'ct_2', firstName: 'Linda', lastName: 'Chen', email: 'linda.chen@gmail.com', phone: '+1 (415) 555-0102', company: '', jobTitle: '', address: '142 Oak Street, San Francisco, CA 94102', birthday: '1967-11-03', notes: 'Mom', starred: true, groups: ['grp_1'], createdAt: '2021-04-01T10:01:00Z', updatedAt: '2025-12-25T09:00:00Z' },
+    { id: 'ct_3', firstName: 'Kevin', lastName: 'Chen', email: 'kevin.chen@outlook.com', phone: '+1 (650) 555-0201', company: 'Stripe', jobTitle: 'Product Manager', address: '88 Colin P Kelly Jr St, San Francisco, CA 94107', birthday: '1995-03-15', notes: 'Brother - birthday coming up', starred: true, groups: ['grp_1'], createdAt: '2021-04-01T10:02:00Z', updatedAt: '2026-03-10T12:00:00Z' },
+    { id: 'ct_4', firstName: 'Amy', lastName: 'Chen-Wu', email: 'amy.chenwu@yahoo.com', phone: '+1 (510) 555-0301', company: 'Kaiser Permanente', jobTitle: 'Pediatrician', address: '2500 Merced St, Oakland, CA 94602', birthday: '1993-07-28', notes: 'Sister - new address since June', starred: false, groups: ['grp_1'], createdAt: '2021-04-01T10:03:00Z', updatedAt: '2026-02-14T10:00:00Z' },
+    { id: 'ct_5', firstName: 'Robert', lastName: 'Chen', email: 'robert.chen@protonmail.com', phone: '+1 (408) 555-0401', company: '', jobTitle: 'Retired', address: '1200 Elm Avenue, San Jose, CA 95126', birthday: '1940-12-01', notes: 'Uncle Robert - does not use email often', starred: false, groups: ['grp_1'], createdAt: '2021-04-02T10:00:00Z', updatedAt: '2024-06-10T08:00:00Z' },
+
+    // Work - Engineering Team
+    { id: 'ct_6', firstName: 'James', lastName: 'Wu', email: 'james.wu@techcorp.io', phone: '+1 (415) 555-1001', company: 'TechCorp', jobTitle: 'Senior Backend Engineer', address: '500 Howard St, San Francisco, CA 94105', birthday: '1990-04-12', notes: 'Tech lead for payments team', starred: true, groups: ['grp_2', 'grp_4'], createdAt: '2021-06-15T09:00:00Z', updatedAt: '2026-03-15T10:00:00Z' },
+    { id: 'ct_7', firstName: 'Priya', lastName: 'Sharma', email: 'priya.sharma@techcorp.io', phone: '+1 (415) 555-1002', company: 'TechCorp', jobTitle: 'Engineering Manager', address: '500 Howard St, San Francisco, CA 94105', birthday: '1988-09-05', notes: 'Direct manager', starred: true, groups: ['grp_2', 'grp_4'], createdAt: '2021-06-15T09:01:00Z', updatedAt: '2026-03-14T11:00:00Z' },
+    { id: 'ct_8', firstName: 'Alex', lastName: 'Martinez', email: 'alex.martinez@techcorp.io', phone: '+1 (415) 555-1003', company: 'TechCorp', jobTitle: 'Frontend Engineer', address: '500 Howard St, San Francisco, CA 94105', birthday: '1994-01-20', notes: '', starred: false, groups: ['grp_2', 'grp_4'], createdAt: '2022-01-10T09:00:00Z', updatedAt: '2026-03-12T14:00:00Z' },
+    { id: 'ct_9', firstName: 'Mei', lastName: 'Zhang', email: 'mei.zhang@techcorp.io', phone: '+1 (415) 555-1004', company: 'TechCorp', jobTitle: 'DevOps Engineer', address: '500 Howard St, San Francisco, CA 94105', birthday: '1992-06-30', notes: 'On-call rotation partner', starred: false, groups: ['grp_2', 'grp_4'], createdAt: '2022-03-20T09:00:00Z', updatedAt: '2026-02-28T16:00:00Z' },
+    { id: 'ct_10', firstName: 'Tom', lastName: 'O\'Brien', email: 'tom.obrien@techcorp.io', phone: '+1 (415) 555-1005', company: 'TechCorp', jobTitle: 'QA Lead', address: '500 Howard St, San Francisco, CA 94105', birthday: '1985-11-11', notes: 'Handles release testing', starred: false, groups: ['grp_2', 'grp_4'], createdAt: '2021-09-01T09:00:00Z', updatedAt: '2026-01-20T10:00:00Z' },
+    { id: 'ct_11', firstName: 'Nina', lastName: 'Patel', email: 'nina.patel@techcorp.io', phone: '+1 (415) 555-1006', company: 'TechCorp', jobTitle: 'Data Scientist', address: '500 Howard St, San Francisco, CA 94105', birthday: '1991-02-14', notes: 'ML team - collaborating on recommendation engine', starred: false, groups: ['grp_2', 'grp_4'], createdAt: '2023-02-01T09:00:00Z', updatedAt: '2026-03-08T09:00:00Z' },
+    { id: 'ct_12', firstName: 'Marcus', lastName: 'Johnson', email: 'marcus.johnson@techcorp.io', phone: '+1 (415) 555-1007', company: 'TechCorp', jobTitle: 'VP of Engineering', address: '500 Howard St, San Francisco, CA 94105', birthday: '1980-07-04', notes: 'Skip-level manager', starred: true, groups: ['grp_2', 'grp_4', 'grp_10'], createdAt: '2021-06-15T09:02:00Z', updatedAt: '2026-03-16T08:00:00Z' },
+    { id: 'ct_13', firstName: 'Lisa', lastName: 'Kim', email: 'lisa.kim@techcorp.io', phone: '+1 (415) 555-1008', company: 'TechCorp', jobTitle: 'Product Designer', address: '500 Howard St, San Francisco, CA 94105', birthday: '1993-10-18', notes: 'Design system owner', starred: false, groups: ['grp_2'], createdAt: '2022-06-01T09:00:00Z', updatedAt: '2026-02-15T13:00:00Z' },
+    { id: 'ct_14', firstName: 'Ryan', lastName: 'Nguyen', email: 'ryan.nguyen@techcorp.io', phone: '+1 (415) 555-1009', company: 'TechCorp', jobTitle: 'Security Engineer', address: '500 Howard St, San Francisco, CA 94105', birthday: '1989-05-22', notes: 'Security review contact', starred: false, groups: ['grp_2', 'grp_4'], createdAt: '2023-04-15T09:00:00Z', updatedAt: '2026-03-11T15:00:00Z' },
+    { id: 'ct_15', firstName: 'Hannah', lastName: 'Cohen', email: 'hannah.cohen@techcorp.io', phone: '+1 (415) 555-1010', company: 'TechCorp', jobTitle: 'Technical Writer', address: '500 Howard St, San Francisco, CA 94105', birthday: '1996-08-09', notes: 'API docs collaboration', starred: false, groups: ['grp_2'], createdAt: '2024-01-08T09:00:00Z', updatedAt: '2026-01-30T11:00:00Z' },
+
+    // Work - Other departments
+    { id: 'ct_16', firstName: 'Diana', lastName: 'Ross-Taylor', email: 'diana.ross-taylor@techcorp.io', phone: '+1 (415) 555-1011', company: 'TechCorp', jobTitle: 'CFO', address: '500 Howard St, San Francisco, CA 94105', birthday: '1978-03-26', notes: 'Budget approvals', starred: false, groups: ['grp_2', 'grp_10'], createdAt: '2021-06-15T09:03:00Z', updatedAt: '2025-12-01T10:00:00Z' },
+    { id: 'ct_17', firstName: 'Carlos', lastName: 'Mendoza', email: 'carlos.mendoza@techcorp.io', phone: '+1 (415) 555-1012', company: 'TechCorp', jobTitle: 'Head of Sales', address: '500 Howard St, San Francisco, CA 94105', birthday: '1982-12-10', notes: 'Enterprise deals contact', starred: false, groups: ['grp_2'], createdAt: '2022-08-01T09:00:00Z', updatedAt: '2026-02-20T14:00:00Z' },
+    { id: 'ct_18', firstName: 'Sophia', lastName: 'Andersson', email: 'sophia.andersson@techcorp.io', phone: '+46 70 123 4567', company: 'TechCorp', jobTitle: 'Head of EU Operations', address: 'Kungsgatan 44, Stockholm, Sweden', birthday: '1986-04-15', notes: 'Stockholm office - 9 hours ahead', starred: false, groups: ['grp_2'], createdAt: '2023-06-01T09:00:00Z', updatedAt: '2026-03-05T08:00:00Z' },
+
+    // Friends
+    { id: 'ct_19', firstName: 'Jake', lastName: 'Morrison', email: 'jake.morrison@gmail.com', phone: '+1 (503) 555-2001', company: 'Nike', jobTitle: 'Brand Strategist', address: '1 Bowerman Dr, Beaverton, OR 97005', birthday: '1993-06-14', notes: 'College roommate', starred: true, groups: ['grp_3', 'grp_6'], createdAt: '2021-04-15T10:00:00Z', updatedAt: '2026-01-08T20:00:00Z' },
+    { id: 'ct_20', firstName: 'Emma', lastName: 'Thompson', email: 'emma.t@protonmail.com', phone: '+1 (212) 555-2002', company: 'The New York Times', jobTitle: 'Investigative Reporter', address: '620 8th Ave, New York, NY 10018', birthday: '1992-11-30', notes: 'Met at journalism workshop 2019', starred: false, groups: ['grp_3'], createdAt: '2021-05-20T15:00:00Z', updatedAt: '2025-11-30T09:00:00Z' },
+    { id: 'ct_21', firstName: 'Liam', lastName: 'O\'Sullivan', email: 'liam.osullivan@hotmail.com', phone: '+353 87 123 4567', company: 'Accenture', jobTitle: 'Management Consultant', address: '1 Grand Canal Square, Dublin 2, Ireland', birthday: '1991-09-08', notes: 'Study abroad friend - Dublin', starred: false, groups: ['grp_3'], createdAt: '2021-06-01T10:00:00Z', updatedAt: '2025-09-08T12:00:00Z' },
+    { id: 'ct_22', firstName: 'Aisha', lastName: 'Rahman', email: 'aisha.rahman@gmail.com', phone: '+1 (310) 555-2003', company: 'SpaceX', jobTitle: 'Propulsion Engineer', address: '1 Rocket Rd, Hawthorne, CA 90250', birthday: '1993-01-25', notes: 'High school friend', starred: false, groups: ['grp_3'], createdAt: '2021-04-15T10:01:00Z', updatedAt: '2026-02-25T18:00:00Z' },
+    { id: 'ct_23', firstName: 'Ben', lastName: 'Watkins', email: 'ben.watkins@gmail.com', phone: '+1 (415) 555-2004', company: '', jobTitle: 'Freelance Photographer', address: '2040 Mission St, San Francisco, CA 94110', birthday: '1990-10-31', notes: 'Book club & hiking buddy', starred: true, groups: ['grp_3', 'grp_7'], createdAt: '2022-03-10T14:00:00Z', updatedAt: '2026-03-05T20:00:00Z' },
+
+    // College Alumni
+    { id: 'ct_24', firstName: 'Rachel', lastName: 'Park', email: 'rachel.park@stanford.edu', phone: '+1 (650) 555-3001', company: 'Stanford University', jobTitle: 'Associate Professor, CS', address: 'Gates Building, Stanford, CA 94305', birthday: '1990-05-17', notes: 'CS 229 study group', starred: false, groups: ['grp_6'], createdAt: '2022-09-01T12:00:00Z', updatedAt: '2025-10-15T10:00:00Z' },
+    { id: 'ct_25', firstName: 'Derek', lastName: 'Hoffman', email: 'derek.hoffman@a16z.com', phone: '+1 (650) 555-3002', company: 'Andreessen Horowitz', jobTitle: 'Partner', address: '2865 Sand Hill Rd, Menlo Park, CA 94025', birthday: '1989-08-03', notes: 'Good VC contact', starred: true, groups: ['grp_6', 'grp_5', 'grp_10'], createdAt: '2022-09-01T12:01:00Z', updatedAt: '2026-03-01T09:00:00Z' },
+    { id: 'ct_26', firstName: 'Mia', lastName: 'Santos-Rivera', email: 'mia.santosrivera@google.com', phone: '+1 (650) 555-3003', company: 'Google', jobTitle: 'Staff Engineer', address: '1600 Amphitheatre Pkwy, Mountain View, CA 94043', birthday: '1991-12-22', notes: 'Potential hire referral', starred: false, groups: ['grp_6'], createdAt: '2022-09-01T12:02:00Z', updatedAt: '2026-02-10T14:00:00Z' },
+    { id: 'ct_27', firstName: 'Tyler', lastName: 'Brooks', email: 'tyler.brooks@gmail.com', phone: '+1 (206) 555-3004', company: 'Amazon', jobTitle: 'Principal PM', address: '410 Terry Ave N, Seattle, WA 98109', birthday: '1990-02-28', notes: '', starred: false, groups: ['grp_6'], createdAt: '2022-09-01T12:03:00Z', updatedAt: '2025-08-20T16:00:00Z' },
+
+    // Investors
+    { id: 'ct_28', firstName: 'Victoria', lastName: 'Blackwell', email: 'vblackwell@sequoiacap.com', phone: '+1 (650) 555-4001', company: 'Sequoia Capital', jobTitle: 'Managing Partner', address: '2800 Sand Hill Rd, Menlo Park, CA 94025', birthday: '', notes: 'Series A lead', starred: true, groups: ['grp_5', 'grp_10'], createdAt: '2023-03-01T08:00:00Z', updatedAt: '2026-03-10T10:00:00Z' },
+    { id: 'ct_29', firstName: 'Hiroshi', lastName: 'Tanaka', email: 'h.tanaka@softbank.com', phone: '+81 3 6889 1234', company: 'SoftBank Vision Fund', jobTitle: 'Investment Director', address: '1-9-1 Higashi-Shimbashi, Minato-ku, Tokyo', birthday: '1975-04-05', notes: 'Met at TechCrunch Disrupt 2023', starred: false, groups: ['grp_5'], createdAt: '2023-09-20T10:00:00Z', updatedAt: '2025-06-15T08:00:00Z' },
+    { id: 'ct_30', firstName: 'Catherine', lastName: 'Duval', email: 'catherine.duval@indexventures.com', phone: '+44 20 7154 4567', company: 'Index Ventures', jobTitle: 'General Partner', address: '1 Neal Street, London WC2H 9QL, UK', birthday: '1980-09-12', notes: 'European expansion advisor', starred: false, groups: ['grp_5', 'grp_10'], createdAt: '2024-01-15T09:00:00Z', updatedAt: '2026-02-01T11:00:00Z' },
+
+    // Book Club
+    { id: 'ct_31', firstName: 'Olivia', lastName: 'Grant', email: 'olivia.grant@gmail.com', phone: '+1 (415) 555-5001', company: 'UCSF Medical Center', jobTitle: 'Neurologist', address: '505 Parnassus Ave, San Francisco, CA 94143', birthday: '1988-07-19', notes: 'Hosts book club monthly', starred: false, groups: ['grp_7'], createdAt: '2024-06-01T18:00:00Z', updatedAt: '2026-03-02T20:00:00Z' },
+    { id: 'ct_32', firstName: 'Daniel', lastName: 'Reeves', email: 'dan.reeves@outlook.com', phone: '+1 (415) 555-5002', company: 'Dolby Laboratories', jobTitle: 'Audio Engineer', address: '1275 Market St, San Francisco, CA 94103', birthday: '1987-03-08', notes: '', starred: false, groups: ['grp_7'], createdAt: '2024-06-01T18:01:00Z', updatedAt: '2025-12-10T19:00:00Z' },
+    { id: 'ct_33', firstName: 'Grace', lastName: 'Liu', email: 'grace.liu@gmail.com', phone: '+1 (415) 555-5003', company: 'Public Library SF', jobTitle: 'Head Librarian', address: '100 Larkin St, San Francisco, CA 94102', birthday: '1985-05-05', notes: 'Gets us early copies sometimes', starred: false, groups: ['grp_7'], createdAt: '2024-06-15T18:00:00Z', updatedAt: '2026-01-20T20:00:00Z' },
+
+    // Conference Contacts
+    { id: 'ct_34', firstName: 'Satoshi', lastName: 'Yamamoto', email: 'satoshi.yamamoto@sony.co.jp', phone: '+81 3 6748 2111', company: 'Sony Group', jobTitle: 'CTO, AI Division', address: '1-7-1 Konan, Minato-ku, Tokyo 108-0075', birthday: '', notes: 'Met at AWS re:Invent 2025 - interested in partnership', starred: true, groups: ['grp_8', 'grp_10'], createdAt: '2025-09-15T10:00:00Z', updatedAt: '2026-03-01T09:00:00Z' },
+    { id: 'ct_35', firstName: 'Fatima', lastName: 'Al-Hassan', email: 'fatima.alhassan@aramco.com', phone: '+966 13 880 1234', company: 'Saudi Aramco', jobTitle: 'Digital Transformation Lead', address: 'Dhahran 31311, Saudi Arabia', birthday: '1984-02-19', notes: 'KubeCon 2025 keynote speaker', starred: false, groups: ['grp_8'], createdAt: '2025-10-01T14:00:00Z', updatedAt: '2026-01-05T10:00:00Z' },
+    { id: 'ct_36', firstName: 'Patrick', lastName: 'van der Berg', email: 'p.vanderberg@booking.com', phone: '+31 20 712 3456', company: 'Booking.com', jobTitle: 'Principal Architect', address: 'Herengracht 597, Amsterdam, Netherlands', birthday: '1983-11-25', notes: 'Microservices talk was excellent', starred: false, groups: ['grp_8'], createdAt: '2025-09-16T10:00:00Z', updatedAt: '2025-12-20T09:00:00Z' },
+    { id: 'ct_37', firstName: 'Ingrid', lastName: 'Johansson', email: 'ingrid.johansson@spotify.com', phone: '+46 76 234 5678', company: 'Spotify', jobTitle: 'VP of Engineering', address: 'Regeringsgatan 19, Stockholm, Sweden', birthday: '1981-06-21', notes: 'Connected via Sophia Andersson', starred: false, groups: ['grp_8'], createdAt: '2025-09-17T10:00:00Z', updatedAt: '2026-02-10T15:00:00Z' },
+    { id: 'ct_38', firstName: 'Wei', lastName: 'Zhao', email: 'wei.zhao@bytedance.com', phone: '+86 10 5765 4321', company: 'ByteDance', jobTitle: 'Director of Infrastructure', address: 'Zhongguancun, Haidian, Beijing', birthday: '1986-08-14', notes: 'Potential cloud migration partner', starred: false, groups: ['grp_8'], createdAt: '2025-10-02T11:00:00Z', updatedAt: '2026-01-18T08:00:00Z' },
+
+    // Vendors
+    { id: 'ct_39', firstName: 'Gregory', lastName: 'Foster', email: 'greg.foster@datadog.com', phone: '+1 (646) 555-6001', company: 'Datadog', jobTitle: 'Enterprise Account Executive', address: '620 8th Ave, 45th Floor, New York, NY 10018', birthday: '', notes: 'Annual contract renewal in April', starred: false, groups: ['grp_9'], createdAt: '2024-02-01T10:00:00Z', updatedAt: '2026-03-12T09:00:00Z' },
+    { id: 'ct_40', firstName: 'Michelle', lastName: 'Torres', email: 'mtorres@cloudflare.com', phone: '+1 (650) 555-6002', company: 'Cloudflare', jobTitle: 'Solutions Architect', address: '101 Townsend St, San Francisco, CA 94107', birthday: '1990-12-03', notes: 'Helped with DDoS mitigation setup', starred: false, groups: ['grp_9'], createdAt: '2024-03-15T10:00:00Z', updatedAt: '2026-02-28T14:00:00Z' },
+    { id: 'ct_41', firstName: 'Andrew', lastName: 'Blackstone', email: 'a.blackstone@snowflake.com', phone: '+1 (650) 555-6003', company: 'Snowflake', jobTitle: 'Sales Engineer', address: '106 E Babcock St, Bozeman, MT 59715', birthday: '', notes: 'Data warehouse migration POC', starred: false, groups: ['grp_9'], createdAt: '2024-08-01T10:00:00Z', updatedAt: '2026-03-05T11:00:00Z' },
+    { id: 'ct_42', firstName: 'Jessica', lastName: 'Singh', email: 'jessica.singh@aws.amazon.com', phone: '+1 (206) 555-6004', company: 'Amazon Web Services', jobTitle: 'Technical Account Manager', address: '440 Terry Ave N, Seattle, WA 98109', birthday: '1988-10-28', notes: 'Primary AWS support contact - Enterprise tier', starred: true, groups: ['grp_9', 'grp_10'], createdAt: '2023-07-01T09:00:00Z', updatedAt: '2026-03-17T10:00:00Z' },
+    { id: 'ct_43', firstName: 'Samuel', lastName: 'Lee', email: 'samuel.lee@pagerduty.com', phone: '+1 (415) 555-6005', company: 'PagerDuty', jobTitle: 'Customer Success Manager', address: '600 Townsend St, San Francisco, CA 94103', birthday: '', notes: '', starred: false, groups: ['grp_9'], createdAt: '2025-01-15T10:00:00Z', updatedAt: '2026-01-20T14:00:00Z' },
+
+    // Misc contacts (no specific group or multiple groups)
+    { id: 'ct_44', firstName: 'Natalie', lastName: 'Dubois', email: 'natalie.dubois@gmail.com', phone: '+33 6 12 34 56 78', company: 'Freelance', jobTitle: 'UX Consultant', address: '15 Rue de Rivoli, 75001 Paris, France', birthday: '1994-04-01', notes: 'Recommended by Lisa Kim for freelance design work', starred: false, groups: [], createdAt: '2025-11-01T10:00:00Z', updatedAt: '2026-02-15T16:00:00Z' },
+    { id: 'ct_45', firstName: 'Ibrahim', lastName: 'Okafor', email: 'ibrahim.okafor@techstars.com', phone: '+234 803 123 4567', company: 'Techstars', jobTitle: 'Program Director', address: 'Victoria Island, Lagos, Nigeria', birthday: '1987-01-10', notes: 'Accelerator program mentor', starred: false, groups: ['grp_5'], createdAt: '2024-05-01T10:00:00Z', updatedAt: '2026-01-10T09:00:00Z' },
+    { id: 'ct_46', firstName: 'Elena', lastName: 'Petrova', email: 'elena.petrova@yandex.ru', phone: '+7 495 123 4567', company: 'Yandex', jobTitle: 'Machine Learning Researcher', address: 'Lva Tolstogo 16, Moscow, Russia', birthday: '1991-07-14', notes: 'Co-authored paper on transformer architectures', starred: false, groups: ['grp_8'], createdAt: '2025-09-20T10:00:00Z', updatedAt: '2026-01-05T12:00:00Z' },
+    { id: 'ct_47', firstName: 'Charlotte', lastName: 'Müller', email: 'charlotte.mueller@sap.com', phone: '+49 6227 7 12345', company: 'SAP', jobTitle: 'Cloud Solutions Director', address: 'Dietmar-Hopp-Allee 16, Walldorf, Germany', birthday: '1979-10-08', notes: 'Enterprise integration discussion', starred: false, groups: ['grp_8', 'grp_9'], createdAt: '2025-09-18T10:00:00Z', updatedAt: '2026-02-05T09:00:00Z' },
+    { id: 'ct_48', firstName: 'Max', lastName: 'Wellington', email: 'max.wellington@gmail.com', phone: '+1 (773) 555-7001', company: '', jobTitle: '', address: '1400 N Lake Shore Dr, Chicago, IL 60610', birthday: '1995-08-22', notes: 'Fantasy football league commissioner', starred: false, groups: ['grp_3'], createdAt: '2022-08-15T14:00:00Z', updatedAt: '2025-09-01T10:00:00Z' },
+    { id: 'ct_49', firstName: 'Samantha', lastName: 'Park-Williams', email: 'sam.parkwilliams@gmail.com', phone: '+1 (415) 555-7002', company: 'Lyft', jobTitle: 'Staff Software Engineer', address: '185 Berry St, San Francisco, CA 94107', birthday: '1992-02-29', notes: 'Leap year birthday! Met at Women in Tech meetup', starred: false, groups: ['grp_3', 'grp_6'], createdAt: '2023-03-01T14:00:00Z', updatedAt: '2026-02-29T09:00:00Z' },
+    { id: 'ct_50', firstName: 'Raj', lastName: 'Kapoor', email: 'raj.kapoor@infosys.com', phone: '+91 80 2852 1234', company: 'Infosys', jobTitle: 'Delivery Manager', address: 'Electronics City, Bengaluru 560100, India', birthday: '1983-03-15', notes: 'Offshore development partnership', starred: false, groups: ['grp_9'], createdAt: '2024-11-01T10:00:00Z', updatedAt: '2026-03-01T08:00:00Z' },
+
+    // More contacts for volume
+    { id: 'ct_51', firstName: 'Zoe', lastName: 'Adams', email: 'zoe.adams@gmail.com', phone: '+1 (720) 555-8001', company: 'Zoom', jobTitle: 'Product Manager', address: '55 Almaden Blvd, San Jose, CA 95113', birthday: '1994-11-15', notes: '', starred: false, groups: ['grp_6'], createdAt: '2022-09-05T12:00:00Z', updatedAt: '2025-07-20T10:00:00Z' },
+    { id: 'ct_52', firstName: 'Brandon', lastName: 'Cooper', email: 'brandon.cooper@microsoft.com', phone: '+1 (425) 555-8002', company: 'Microsoft', jobTitle: 'Azure Program Manager', address: '1 Microsoft Way, Redmond, WA 98052', birthday: '1988-06-08', notes: 'Cloud cost optimization workshop', starred: false, groups: ['grp_8', 'grp_9'], createdAt: '2025-09-15T14:00:00Z', updatedAt: '2026-03-10T09:00:00Z' },
+    { id: 'ct_53', firstName: 'Alicia', lastName: 'Hernandez', email: 'alicia.hernandez@stripe.com', phone: '+1 (415) 555-8003', company: 'Stripe', jobTitle: 'Payments Integration Lead', address: '354 Oyster Point Blvd, South San Francisco, CA 94080', birthday: '1990-09-22', notes: 'Kevin Chen introduced us', starred: false, groups: ['grp_2'], createdAt: '2024-06-01T10:00:00Z', updatedAt: '2026-02-20T11:00:00Z' },
+    { id: 'ct_54', firstName: 'Oscar', lastName: 'Lindqvist', email: 'oscar.lindqvist@klarna.com', phone: '+46 8 120 120 00', company: 'Klarna', jobTitle: 'Head of Risk', address: 'Sveavagen 46, Stockholm, Sweden', birthday: '1984-01-30', notes: 'Fintech meetup Stockholm', starred: false, groups: ['grp_8'], createdAt: '2025-10-05T10:00:00Z', updatedAt: '2026-01-20T09:00:00Z' },
+    { id: 'ct_55', firstName: 'Yuki', lastName: 'Nakamura', email: 'yuki.nakamura@rakuten.co.jp', phone: '+81 50 5581 1234', company: 'Rakuten', jobTitle: 'Senior Platform Engineer', address: 'Setagaya-ku, Tokyo 158-0094', birthday: '1992-12-05', notes: '', starred: false, groups: ['grp_8'], createdAt: '2025-09-18T10:00:00Z', updatedAt: '2025-12-05T09:00:00Z' },
+    { id: 'ct_56', firstName: 'Paula', lastName: 'Fernandez', email: 'paula.fernandez@mercadolibre.com', phone: '+54 11 4640 1234', company: 'MercadoLibre', jobTitle: 'Engineering Director', address: 'Arias 3751, Buenos Aires, Argentina', birthday: '1985-07-08', notes: 'LatAm expansion contact', starred: false, groups: ['grp_8'], createdAt: '2025-10-10T10:00:00Z', updatedAt: '2026-02-01T09:00:00Z' },
+    { id: 'ct_57', firstName: 'Henry', lastName: 'Wright', email: 'henry.wright@gmail.com', phone: '+1 (415) 555-8004', company: 'Self-employed', jobTitle: 'Real Estate Agent', address: '1 Market St, San Francisco, CA 94105', birthday: '1978-04-20', notes: 'Helped us find the office space', starred: false, groups: [], createdAt: '2023-05-01T10:00:00Z', updatedAt: '2025-05-01T10:00:00Z' },
+    { id: 'ct_58', firstName: 'Leah', lastName: 'Mitchell', email: 'leah.mitchell@gmail.com', phone: '+1 (415) 555-8005', company: 'Sutter Health', jobTitle: 'Physical Therapist', address: '2300 Sutter St, San Francisco, CA 94115', birthday: '1990-03-12', notes: 'PT for running injury', starred: false, groups: [], createdAt: '2025-06-01T10:00:00Z', updatedAt: '2026-01-15T14:00:00Z' },
+    { id: 'ct_59', firstName: 'Ethan', lastName: 'Goldstein', email: 'ethan.goldstein@ycombinator.com', phone: '+1 (415) 555-8006', company: 'Y Combinator', jobTitle: 'Group Partner', address: '335 Pioneer Way, Mountain View, CA 94041', birthday: '1986-11-02', notes: 'YC W22 batch advisor', starred: true, groups: ['grp_5', 'grp_10'], createdAt: '2023-03-05T09:00:00Z', updatedAt: '2026-03-15T09:00:00Z' },
+    { id: 'ct_60', firstName: 'Jasmine', lastName: 'Tran', email: 'jasmine.tran@notion.so', phone: '+1 (415) 555-8007', company: 'Notion', jobTitle: 'Chief of Staff', address: '2300 Harrison St, San Francisco, CA 94110', birthday: '1993-05-28', notes: 'Productivity tools discussion', starred: false, groups: [], createdAt: '2025-02-01T10:00:00Z', updatedAt: '2026-02-15T10:00:00Z' },
+
+    // Even more for realistic volume (abbreviated fields)
+    { id: 'ct_61', firstName: 'Adrian', lastName: 'Costa', email: 'adrian.costa@uber.com', phone: '+1 (415) 555-9001', company: 'Uber', jobTitle: 'Staff Engineer', address: '1515 3rd St, San Francisco, CA 94158', birthday: '1989-02-14', notes: '', starred: false, groups: ['grp_6'], createdAt: '2022-09-10T12:00:00Z', updatedAt: '2025-06-01T10:00:00Z' },
+    { id: 'ct_62', firstName: 'Nora', lastName: 'Eriksson', email: 'nora.eriksson@gmail.com', phone: '+46 73 456 7890', company: '', jobTitle: '', address: 'Goteborg, Sweden', birthday: '1996-08-30', notes: 'Sophia colleague, met at dinner', starred: false, groups: ['grp_3'], createdAt: '2024-01-15T19:00:00Z', updatedAt: '2025-08-30T10:00:00Z' },
+    { id: 'ct_63', firstName: 'Philip', lastName: 'Okonkwo', email: 'philip.okonkwo@andela.com', phone: '+234 802 987 6543', company: 'Andela', jobTitle: 'Senior Developer', address: 'Ikoyi, Lagos, Nigeria', birthday: '1991-04-18', notes: 'Remote contractor candidate', starred: false, groups: ['grp_4'], createdAt: '2025-05-01T10:00:00Z', updatedAt: '2026-01-15T09:00:00Z' },
+    { id: 'ct_64', firstName: 'Rebecca', lastName: 'Stone', email: 'rebecca.stone@aclu.org', phone: '+1 (212) 555-9002', company: 'ACLU', jobTitle: 'Digital Rights Attorney', address: '125 Broad St, New York, NY 10004', birthday: '1987-12-15', notes: 'Privacy policy review', starred: false, groups: [], createdAt: '2025-08-01T10:00:00Z', updatedAt: '2026-02-01T14:00:00Z' },
+    { id: 'ct_65', firstName: 'Marco', lastName: 'Rossi', email: 'marco.rossi@ferrari.com', phone: '+39 0536 949111', company: 'Ferrari', jobTitle: 'Head of Digital', address: 'Via Emilia Est 1163, Modena, Italy', birthday: '1982-09-14', notes: 'Met at Dreamforce - car enthusiast chat', starred: false, groups: ['grp_8'], createdAt: '2025-09-20T10:00:00Z', updatedAt: '2025-12-01T09:00:00Z' },
+    { id: 'ct_66', firstName: 'Diane', lastName: 'Chen', email: 'diane.chen@gmail.com', phone: '+1 (626) 555-9003', company: 'UCLA Health', jobTitle: 'Cardiologist', address: '757 Westwood Plaza, Los Angeles, CA 90095', birthday: '1968-05-22', notes: 'Cousin Diane - Pasadena branch of family', starred: false, groups: ['grp_1'], createdAt: '2021-04-05T10:00:00Z', updatedAt: '2025-05-22T09:00:00Z' },
+    { id: 'ct_67', firstName: 'Steven', lastName: 'Park', email: 'steven.park@coinbase.com', phone: '+1 (415) 555-9004', company: 'Coinbase', jobTitle: 'Compliance Officer', address: '100 Pine St, San Francisco, CA 94111', birthday: '1986-10-09', notes: 'Crypto regulatory advisor', starred: false, groups: ['grp_8'], createdAt: '2025-09-22T10:00:00Z', updatedAt: '2026-01-10T11:00:00Z' },
+    { id: 'ct_68', firstName: 'Laura', lastName: 'Chen-Watkins', email: 'laura.chenwatkins@gmail.com', phone: '+1 (415) 555-9005', company: '', jobTitle: 'Stay-at-home parent', address: '1200 Masonic Ave, San Francisco, CA 94117', birthday: '1993-11-08', notes: 'Kevin cousin, married Ben Watkins\'s brother', starred: false, groups: ['grp_1', 'grp_3'], createdAt: '2022-06-01T10:00:00Z', updatedAt: '2025-11-08T10:00:00Z' },
+    { id: 'ct_69', firstName: 'Anders', lastName: 'Bjornsson', email: 'anders.bjornsson@volvo.com', phone: '+46 31 325 0000', company: 'Volvo Group', jobTitle: 'Autonomous Driving Lead', address: 'Gotaverksgatan 2, Gothenburg, Sweden', birthday: '1980-03-25', notes: 'Connected through Ingrid Johansson', starred: false, groups: ['grp_8'], createdAt: '2025-11-01T10:00:00Z', updatedAt: '2026-02-15T09:00:00Z' },
+    { id: 'ct_70', firstName: 'Christine', lastName: 'Abara', email: 'c.abara@who.int', phone: '+41 22 791 2111', company: 'World Health Organization', jobTitle: 'Digital Health Specialist', address: 'Avenue Appia 20, Geneva, Switzerland', birthday: '1984-06-30', notes: 'Health tech initiative collaboration', starred: false, groups: ['grp_8'], createdAt: '2025-10-15T10:00:00Z', updatedAt: '2026-03-01T10:00:00Z' },
+
+    // More contacts for 100+ total
+    { id: 'ct_71', firstName: 'Martin', lastName: 'Schneider', email: 'martin.schneider@siemens.com', phone: '+49 89 636 00', company: 'Siemens', jobTitle: 'IoT Solutions Architect', address: 'Werner-von-Siemens-Str. 1, Munich, Germany', birthday: '1981-07-12', notes: '', starred: false, groups: ['grp_8'], createdAt: '2025-09-19T10:00:00Z', updatedAt: '2025-12-15T09:00:00Z' },
+    { id: 'ct_72', firstName: 'Aria', lastName: 'Pham', email: 'aria.pham@figma.com', phone: '+1 (415) 555-9006', company: 'Figma', jobTitle: 'Design Systems Lead', address: '760 Market St, San Francisco, CA 94102', birthday: '1994-12-20', notes: 'Design tool migration POC', starred: false, groups: ['grp_9'], createdAt: '2025-04-01T10:00:00Z', updatedAt: '2026-02-20T14:00:00Z' },
+    { id: 'ct_73', firstName: 'Jonathan', lastName: 'Price', email: 'j.price@mongodb.com', phone: '+1 (646) 555-9007', company: 'MongoDB', jobTitle: 'Senior Solutions Architect', address: '1633 Broadway, New York, NY 10019', birthday: '', notes: 'Database migration advisor', starred: false, groups: ['grp_9'], createdAt: '2024-09-01T10:00:00Z', updatedAt: '2026-01-05T10:00:00Z' },
+    { id: 'ct_74', firstName: 'Simone', lastName: 'Laurent', email: 'simone.laurent@doctolib.fr', phone: '+33 1 86 65 00 00', company: 'Doctolib', jobTitle: 'Head of Engineering', address: '54 Quai Charles Pasqua, Levallois-Perret, France', birthday: '1988-02-22', notes: 'Scaling advice for EU market', starred: false, groups: ['grp_8'], createdAt: '2025-09-25T10:00:00Z', updatedAt: '2026-01-22T09:00:00Z' },
+    { id: 'ct_75', firstName: 'Douglas', lastName: 'Kim', email: 'douglas.kim@samsung.com', phone: '+82 2 2255 0114', company: 'Samsung Electronics', jobTitle: 'VP Mobile Platforms', address: 'Seocho-gu, Seoul, South Korea', birthday: '1977-08-05', notes: 'SDK integration partner', starred: false, groups: ['grp_8', 'grp_10'], createdAt: '2025-10-01T10:00:00Z', updatedAt: '2026-03-08T08:00:00Z' },
+    { id: 'ct_76', firstName: 'Monica', lastName: 'Reyes', email: 'monica.reyes@gmail.com', phone: '+1 (305) 555-9008', company: 'Wix', jobTitle: 'Growth Marketing Manager', address: '1000 Brickell Ave, Miami, FL 33131', birthday: '1991-10-31', notes: 'Friend from marketing conference', starred: false, groups: ['grp_3'], createdAt: '2024-04-01T14:00:00Z', updatedAt: '2025-10-31T10:00:00Z' },
+    { id: 'ct_77', firstName: 'Tomas', lastName: 'Novak', email: 'tomas.novak@avast.com', phone: '+420 274 005 555', company: 'Avast', jobTitle: 'Threat Intelligence Analyst', address: 'Pikrtova 1737/1a, Prague, Czech Republic', birthday: '1990-01-17', notes: 'Security vendor evaluation', starred: false, groups: ['grp_9'], createdAt: '2025-02-01T10:00:00Z', updatedAt: '2026-02-01T14:00:00Z' },
+    { id: 'ct_78', firstName: 'Julia', lastName: 'Svensson', email: 'julia.svensson@king.com', phone: '+46 8 510 600 00', company: 'King (Activision Blizzard)', jobTitle: 'Game Economy Designer', address: 'Sveavagen 44, Stockholm, Sweden', birthday: '1993-03-19', notes: 'Gamification consulting', starred: false, groups: ['grp_8'], createdAt: '2025-09-20T10:00:00Z', updatedAt: '2026-01-19T09:00:00Z' },
+    { id: 'ct_79', firstName: 'Aaron', lastName: 'Blake', email: 'aaron.blake@hashicorp.com', phone: '+1 (415) 555-9009', company: 'HashiCorp', jobTitle: 'Developer Advocate', address: '101 2nd St, San Francisco, CA 94105', birthday: '1992-07-04', notes: 'Terraform workshop instructor', starred: false, groups: ['grp_9'], createdAt: '2024-10-01T10:00:00Z', updatedAt: '2026-03-04T10:00:00Z' },
+    { id: 'ct_80', firstName: 'Chloe', lastName: 'Delacroix', email: 'chloe.delacroix@airbus.com', phone: '+33 5 61 93 33 33', company: 'Airbus', jobTitle: 'AI Research Scientist', address: '1 Rond-Point Maurice Bellonte, Toulouse, France', birthday: '1989-09-15', notes: 'Met at NeurIPS poster session', starred: false, groups: ['grp_8'], createdAt: '2025-12-01T10:00:00Z', updatedAt: '2026-02-15T09:00:00Z' },
+
+    // Additional contacts to push past 100
+    { id: 'ct_81', firstName: 'Victor', lastName: 'Huang', email: 'victor.huang@tencent.com', phone: '+86 755 8601 3388', company: 'Tencent', jobTitle: 'VP Cloud Services', address: 'Nanshan District, Shenzhen, China', birthday: '1979-04-28', notes: '', starred: false, groups: ['grp_8'], createdAt: '2025-10-05T10:00:00Z', updatedAt: '2026-01-05T08:00:00Z' },
+    { id: 'ct_82', firstName: 'Anna', lastName: 'Kowalski', email: 'anna.kowalski@allegro.pl', phone: '+48 61 856 5000', company: 'Allegro', jobTitle: 'CTO', address: 'Grunwaldzka 182, Poznan, Poland', birthday: '1983-12-28', notes: 'Polish ecommerce leader', starred: false, groups: ['grp_8'], createdAt: '2025-09-28T10:00:00Z', updatedAt: '2025-12-28T09:00:00Z' },
+    { id: 'ct_83', firstName: 'Lucas', lastName: 'De Souza', email: 'lucas.desouza@nubank.com.br', phone: '+55 11 4020 1234', company: 'Nubank', jobTitle: 'Head of Platform Engineering', address: 'Rua Capote Valente 39, Sao Paulo, Brazil', birthday: '1987-05-02', notes: 'Fintech infrastructure discussion', starred: false, groups: ['grp_8'], createdAt: '2025-10-12T10:00:00Z', updatedAt: '2026-02-02T09:00:00Z' },
+    { id: 'ct_84', firstName: 'Sarah', lastName: 'Mitchell', email: 'sarah.mitchell@deloitte.com', phone: '+1 (212) 555-9010', company: 'Deloitte', jobTitle: 'Senior Manager, Tech Advisory', address: '30 Rockefeller Plaza, New York, NY 10112', birthday: '1985-06-11', notes: 'Compliance audit preparation', starred: false, groups: ['grp_9'], createdAt: '2025-03-01T10:00:00Z', updatedAt: '2026-03-11T10:00:00Z' },
+    { id: 'ct_85', firstName: 'George', lastName: 'Papadopoulos', email: 'george.papadopoulos@deliveryhero.com', phone: '+49 30 5444 590 00', company: 'Delivery Hero', jobTitle: 'Platform Architect', address: 'Oranienburger Str. 70, Berlin, Germany', birthday: '1986-11-23', notes: '', starred: false, groups: ['grp_8'], createdAt: '2025-09-22T10:00:00Z', updatedAt: '2025-11-23T09:00:00Z' },
+    { id: 'ct_86', firstName: 'Lily', lastName: 'Tan', email: 'lily.tan@grab.com', phone: '+65 6514 2323', company: 'Grab', jobTitle: 'Director of Engineering', address: '3 Media Close, Singapore 138498', birthday: '1988-08-18', notes: 'SEA market insights', starred: false, groups: ['grp_8'], createdAt: '2025-10-08T10:00:00Z', updatedAt: '2026-01-18T09:00:00Z' },
+    { id: 'ct_87', firstName: 'Robert', lastName: 'Campbell', email: 'robert.campbell@atlassian.com', phone: '+61 2 9262 1443', company: 'Atlassian', jobTitle: 'Head of Enterprise Sales', address: '341 George St, Sydney NSW 2000, Australia', birthday: '1981-03-07', notes: 'Jira enterprise license negotiation', starred: false, groups: ['grp_9'], createdAt: '2024-07-01T10:00:00Z', updatedAt: '2026-03-07T08:00:00Z' },
+    { id: 'ct_88', firstName: 'Karen', lastName: 'White', email: 'karen.white@gmail.com', phone: '+1 (415) 555-9011', company: '', jobTitle: 'Yoga Instructor', address: '3150 18th St, San Francisco, CA 94110', birthday: '1991-01-05', notes: 'Tuesday/Thursday yoga class', starred: false, groups: ['grp_3'], createdAt: '2024-09-01T08:00:00Z', updatedAt: '2025-09-01T08:00:00Z' },
+    { id: 'ct_89', firstName: 'Nathan', lastName: 'Ford', email: 'nathan.ford@palantir.com', phone: '+1 (650) 555-9012', company: 'Palantir Technologies', jobTitle: 'Forward Deployed Engineer', address: '100 Hamilton Ave, Palo Alto, CA 94301', birthday: '1990-12-12', notes: 'Data analytics platform demo', starred: false, groups: ['grp_9'], createdAt: '2025-06-01T10:00:00Z', updatedAt: '2026-02-12T14:00:00Z' },
+    { id: 'ct_90', firstName: 'Wendy', lastName: 'Zhao', email: 'wendy.zhao@pinduoduo.com', phone: '+86 21 6185 1234', company: 'Pinduoduo', jobTitle: 'International Growth Lead', address: 'Changning District, Shanghai, China', birthday: '1992-10-05', notes: '', starred: false, groups: ['grp_8'], createdAt: '2025-10-15T10:00:00Z', updatedAt: '2026-01-05T08:00:00Z' },
+    { id: 'ct_91', firstName: 'Chris', lastName: 'Evans', email: 'chris.evans@vercel.com', phone: '+1 (415) 555-9013', company: 'Vercel', jobTitle: 'Solutions Architect', address: '340 S Lemon Ave, Walnut, CA 91789', birthday: '1993-06-13', notes: 'Frontend deployment optimization', starred: false, groups: ['grp_9'], createdAt: '2025-07-01T10:00:00Z', updatedAt: '2026-03-13T10:00:00Z' },
+    { id: 'ct_92', firstName: 'Priscilla', lastName: 'Obi', email: 'priscilla.obi@flutterwave.com', phone: '+234 701 234 5678', company: 'Flutterwave', jobTitle: 'API Integration Lead', address: 'Victoria Island, Lagos, Nigeria', birthday: '1991-09-30', notes: 'African payments gateway partner', starred: false, groups: ['grp_9'], createdAt: '2025-04-01T10:00:00Z', updatedAt: '2026-02-28T09:00:00Z' },
+    { id: 'ct_93', firstName: 'Timothy', lastName: 'Buchanan', email: 'tim.buchanan@gmail.com', phone: '+1 (415) 555-9014', company: 'Retired', jobTitle: '', address: '1600 Holloway Ave, San Francisco, CA 94132', birthday: '1960-08-15', notes: 'Neighbor - helps with mail when traveling', starred: false, groups: [], createdAt: '2022-01-01T10:00:00Z', updatedAt: '2024-12-15T10:00:00Z' },
+    { id: 'ct_94', firstName: 'Fiona', lastName: 'MacLeod', email: 'fiona.macleod@skyscanner.net', phone: '+44 131 220 6012', company: 'Skyscanner', jobTitle: 'Head of ML', address: '1 Lochrin Square, Edinburgh EH3 9QA, UK', birthday: '1986-04-22', notes: 'Travel tech + ML discussion', starred: false, groups: ['grp_8'], createdAt: '2025-09-25T10:00:00Z', updatedAt: '2026-01-22T09:00:00Z' },
+    { id: 'ct_95', firstName: 'Hugo', lastName: 'Morales', email: 'hugo.morales@rappi.com', phone: '+57 1 381 1234', company: 'Rappi', jobTitle: 'VP of Technology', address: 'Carrera 13, Bogota, Colombia', birthday: '1984-11-08', notes: '', starred: false, groups: ['grp_8'], createdAt: '2025-10-20T10:00:00Z', updatedAt: '2026-01-08T09:00:00Z' },
+    { id: 'ct_96', firstName: 'Diana', lastName: 'Petrova', email: 'diana.petrova@wolt.com', phone: '+358 20 770 0123', company: 'Wolt', jobTitle: 'Engineering Manager', address: 'Arkadiankatu 6, Helsinki, Finland', birthday: '1990-07-16', notes: 'Nordic tech scene introduction', starred: false, groups: ['grp_8'], createdAt: '2025-11-05T10:00:00Z', updatedAt: '2026-02-16T09:00:00Z' },
+    { id: 'ct_97', firstName: 'Keith', lastName: 'Robinson', email: 'keith.robinson@twilio.com', phone: '+1 (415) 555-9015', company: 'Twilio', jobTitle: 'API Products Director', address: '101 Spear St, San Francisco, CA 94105', birthday: '1987-02-08', notes: 'SMS/voice notification integration', starred: false, groups: ['grp_9'], createdAt: '2024-12-01T10:00:00Z', updatedAt: '2026-03-08T10:00:00Z' },
+    { id: 'ct_98', firstName: 'Amelia', lastName: 'Chang', email: 'amelia.chang@shopify.com', phone: '+1 (613) 555-9016', company: 'Shopify', jobTitle: 'Staff Developer', address: '150 Elgin St, Ottawa, ON K2P 1L4, Canada', birthday: '1992-03-28', notes: 'E-commerce platform evaluation', starred: false, groups: ['grp_9'], createdAt: '2025-01-01T10:00:00Z', updatedAt: '2026-02-28T10:00:00Z' },
+    { id: 'ct_99', firstName: 'Walter', lastName: 'Brandt', email: 'walter.brandt@bosch.com', phone: '+49 711 811 0', company: 'Bosch', jobTitle: 'IoT Division Director', address: 'Robert-Bosch-Platz 1, Gerlingen, Germany', birthday: '1976-09-01', notes: 'Industrial IoT partnership exploration', starred: false, groups: ['grp_8'], createdAt: '2025-09-30T10:00:00Z', updatedAt: '2026-01-01T09:00:00Z' },
+    { id: 'ct_100', firstName: 'Isabelle', lastName: 'Martin', email: 'isabelle.martin@blablacar.com', phone: '+33 1 85 76 22 22', company: 'BlaBlaCar', jobTitle: 'Head of Platform', address: '84 Rue de Grenelle, Paris, France', birthday: '1988-12-10', notes: '', starred: false, groups: ['grp_8'], createdAt: '2025-10-25T10:00:00Z', updatedAt: '2025-12-10T09:00:00Z' },
+    { id: 'ct_101', firstName: 'Damian', lastName: 'Kowalczyk', email: 'damian.kowalczyk@gmail.com', phone: '+48 22 123 4567', company: '', jobTitle: 'Freelance DevOps', address: 'Warsaw, Poland', birthday: '1994-05-19', notes: 'Contractor for Kubernetes migration', starred: false, groups: ['grp_4'], createdAt: '2025-08-01T10:00:00Z', updatedAt: '2026-03-01T09:00:00Z' },
+    { id: 'ct_102', firstName: 'Naomi', lastName: 'Ito', email: 'naomi.ito@line.me', phone: '+81 3 4316 2500', company: 'LINE Corporation', jobTitle: 'Product Strategy Lead', address: 'Shibuya-ku, Tokyo 150-8512', birthday: '1990-01-23', notes: 'Messaging platform comparison', starred: false, groups: ['grp_8'], createdAt: '2025-10-28T10:00:00Z', updatedAt: '2026-01-23T09:00:00Z' },
+    { id: 'ct_103', firstName: 'Peter', lastName: 'Strand', email: 'peter.strand@ericsson.com', phone: '+46 10 719 0000', company: 'Ericsson', jobTitle: '5G Solutions Architect', address: 'Torshamnsgatan 21, Stockholm, Sweden', birthday: '1982-10-14', notes: '5G edge computing discussion', starred: false, groups: ['grp_8'], createdAt: '2025-09-23T10:00:00Z', updatedAt: '2025-12-14T09:00:00Z' },
+    { id: 'ct_104', firstName: 'Alice', lastName: 'Nakamura', email: 'alice.nakamura@gmail.com', phone: '+1 (408) 555-9017', company: 'Apple', jobTitle: 'Privacy Engineer', address: 'One Apple Park Way, Cupertino, CA 95014', birthday: '1993-07-07', notes: 'Met through Rachel Park - privacy-preserving ML', starred: false, groups: ['grp_6'], createdAt: '2023-01-15T12:00:00Z', updatedAt: '2026-01-07T10:00:00Z' },
+    { id: 'ct_105', firstName: 'Frank', lastName: 'Dubois', email: 'frank.dubois@gmail.com', phone: '+1 (415) 555-9018', company: '', jobTitle: 'Sommelier', address: '345 California St, San Francisco, CA 94104', birthday: '1975-11-20', notes: 'Wine tasting events organizer', starred: false, groups: ['grp_3'], createdAt: '2023-09-01T19:00:00Z', updatedAt: '2025-11-20T10:00:00Z' },
+    { id: 'ct_106', firstName: 'Megan', lastName: 'Foster-Kim', email: 'megan.fosterkim@techcorp.io', phone: '+1 (415) 555-1020', company: 'TechCorp', jobTitle: 'HR Business Partner', address: '500 Howard St, San Francisco, CA 94105', birthday: '1989-08-24', notes: 'HR contact for eng team', starred: false, groups: ['grp_2'], createdAt: '2022-04-01T09:00:00Z', updatedAt: '2026-02-24T10:00:00Z' },
+    { id: 'ct_107', firstName: 'Ivan', lastName: 'Volkov', email: 'ivan.volkov@kaspersky.com', phone: '+7 495 797 8700', company: 'Kaspersky', jobTitle: 'Threat Research Lead', address: 'Leningradskoe Shosse 39A, Moscow, Russia', birthday: '1985-03-02', notes: 'Cybersecurity intelligence sharing', starred: false, groups: ['grp_9'], createdAt: '2025-05-15T10:00:00Z', updatedAt: '2026-01-02T09:00:00Z' },
+    { id: 'ct_108', firstName: 'Sophie', lastName: 'Williams', email: 'sophie.williams@bbc.co.uk', phone: '+44 20 7580 4468', company: 'BBC', jobTitle: 'Technology Correspondent', address: 'Broadcasting House, London W1A 1AA, UK', birthday: '1990-06-15', notes: 'Interview request about AI ethics', starred: false, groups: [], createdAt: '2026-01-10T10:00:00Z', updatedAt: '2026-03-15T16:00:00Z' },
+    { id: 'ct_109', firstName: 'Takeshi', lastName: 'Mori', email: 'takeshi.mori@toyota.co.jp', phone: '+81 565 28 2121', company: 'Toyota Motor Corporation', jobTitle: 'Connected Services Director', address: 'Toyota City, Aichi, Japan', birthday: '1978-02-11', notes: 'Connected vehicle API partnership', starred: false, groups: ['grp_8'], createdAt: '2025-11-10T10:00:00Z', updatedAt: '2026-02-11T09:00:00Z' },
+    { id: 'ct_110', firstName: 'Gabriella', lastName: 'Romano', email: 'gabriella.romano@unicredit.eu', phone: '+39 02 8862 1', company: 'UniCredit', jobTitle: 'Head of Digital Banking', address: 'Piazza Gae Aulenti 3, Milan, Italy', birthday: '1983-04-30', notes: 'Banking API standardization', starred: false, groups: ['grp_8'], createdAt: '2025-10-30T10:00:00Z', updatedAt: '2026-01-30T09:00:00Z' },
+    { id: 'ct_111', firstName: 'Helen', lastName: 'Zhao', email: 'helen.zhao@bytedance.com', phone: '+86 10 5765 9999', company: 'ByteDance', jobTitle: 'Data Privacy Counsel', address: 'Zhongguancun, Haidian, Beijing', birthday: '1986-05-18', notes: 'Wei Zhao referred - data governance questions', starred: false, groups: ['grp_8'], createdAt: '2025-11-15T10:00:00Z', updatedAt: '2026-02-18T09:00:00Z' },
+    { id: 'ct_112', firstName: 'Omar', lastName: 'Hassan', email: 'omar.hassan@careem.com', phone: '+971 4 456 1234', company: 'Careem', jobTitle: 'CTO', address: 'Dubai Internet City, Dubai, UAE', birthday: '1982-01-15', notes: 'MENA market expansion discussion', starred: false, groups: ['grp_8'], createdAt: '2025-11-20T10:00:00Z', updatedAt: '2026-02-15T08:00:00Z' },
+    { id: 'ct_113', firstName: 'Penny', lastName: 'Crawford', email: 'penny.crawford@gmail.com', phone: '+1 (415) 555-9019', company: '', jobTitle: 'Dog Walker', address: '2750 Geary Blvd, San Francisco, CA 94118', birthday: '1998-09-10', notes: 'Walks Max on Wednesdays', starred: false, groups: [], createdAt: '2025-04-01T10:00:00Z', updatedAt: '2025-09-10T10:00:00Z' },
+    { id: 'ct_114', firstName: 'Raymond', lastName: 'Torres', email: 'raymond.torres@elastic.co', phone: '+1 (650) 555-9020', company: 'Elastic', jobTitle: 'Principal Consultant', address: '800 W El Camino Real, Mountain View, CA 94040', birthday: '1984-08-31', notes: 'Elasticsearch cluster optimization', starred: false, groups: ['grp_9'], createdAt: '2025-02-15T10:00:00Z', updatedAt: '2026-02-28T14:00:00Z' },
+    { id: 'ct_115', firstName: 'Kira', lastName: 'Volkov', email: 'kira.volkov@techcorp.io', phone: '+1 (415) 555-1021', company: 'TechCorp', jobTitle: 'Intern, Backend Engineering', address: '500 Howard St, San Francisco, CA 94105', birthday: '2002-04-15', notes: 'Summer 2026 intern - mentoring', starred: false, groups: ['grp_2', 'grp_4'], createdAt: '2026-03-01T09:00:00Z', updatedAt: '2026-03-15T10:00:00Z' },
+    { id: 'ct_116', firstName: 'Nicholas', lastName: 'Harper', email: 'nicholas.harper.esq@gmail.com', phone: '+1 (415) 555-9021', company: 'Harper & Associates', jobTitle: 'Attorney at Law', address: '580 California St, Suite 1200, San Francisco, CA 94104', birthday: '1970-10-05', notes: 'Corporate counsel - IP matters', starred: true, groups: ['grp_10'], createdAt: '2023-08-01T10:00:00Z', updatedAt: '2026-03-05T10:00:00Z' },
+    { id: 'ct_117', firstName: 'Sonia', lastName: 'Gupta', email: 'sonia.gupta@wipro.com', phone: '+91 80 2844 0011', company: 'Wipro', jobTitle: 'Cloud Practice Head', address: 'Sarjapur Road, Bengaluru 560035, India', birthday: '1982-11-28', notes: 'Managed services evaluation', starred: false, groups: ['grp_9'], createdAt: '2025-01-15T10:00:00Z', updatedAt: '2026-01-28T09:00:00Z' },
+    { id: 'ct_118', firstName: 'Felix', lastName: 'Bergmann', email: 'felix.bergmann@zalando.de', phone: '+49 30 2096 0', company: 'Zalando', jobTitle: 'Senior Data Engineer', address: 'Valeska-Gert-Str. 5, Berlin, Germany', birthday: '1991-06-25', notes: 'Data pipeline architecture discussion', starred: false, groups: ['grp_8'], createdAt: '2025-09-28T10:00:00Z', updatedAt: '2025-12-25T09:00:00Z' },
+    { id: 'ct_119', firstName: 'Rosa', lastName: 'Gonzalez', email: 'rosa.gonzalez@bbva.com', phone: '+34 91 374 6000', company: 'BBVA', jobTitle: 'Open Banking Director', address: 'Calle Azul 4, Madrid, Spain', birthday: '1984-08-08', notes: 'Open banking API standards', starred: false, groups: ['grp_8'], createdAt: '2025-10-18T10:00:00Z', updatedAt: '2026-02-08T09:00:00Z' },
+    { id: 'ct_120', firstName: 'Stanley', lastName: 'Chen', email: 'stanley.chen@gmail.com', phone: '+1 (510) 555-9022', company: 'UC Berkeley', jobTitle: 'Professor of EECS', address: 'Soda Hall, Berkeley, CA 94720', birthday: '1958-12-30', notes: 'Uncle Stanley - academic side of family', starred: false, groups: ['grp_1'], createdAt: '2021-04-10T10:00:00Z', updatedAt: '2025-12-30T09:00:00Z' }
+];
+
+// ─── Other Contacts (auto-saved from email interactions) ───
+const OTHER_CONTACTS = [
+    { id: 'oc_1', firstName: '', lastName: '', email: 'noreply@github.com', lastInteraction: '2026-03-18T05:00:00Z', interactionCount: 342 },
+    { id: 'oc_2', firstName: 'Jason', lastName: '', email: 'jason.recruiter@linkedin.com', lastInteraction: '2026-03-17T14:00:00Z', interactionCount: 3 },
+    { id: 'oc_3', firstName: 'Support', lastName: '', email: 'support@vercel.com', lastInteraction: '2026-03-16T10:00:00Z', interactionCount: 8 },
+    { id: 'oc_4', firstName: 'Meeting', lastName: 'Bot', email: 'meetingbot@calendly.com', lastInteraction: '2026-03-15T09:00:00Z', interactionCount: 45 },
+    { id: 'oc_5', firstName: '', lastName: '', email: 'billing@aws.amazon.com', lastInteraction: '2026-03-14T06:00:00Z', interactionCount: 24 },
+    { id: 'oc_6', firstName: 'Mike', lastName: '', email: 'mike.sales@hubspot.com', lastInteraction: '2026-03-13T11:00:00Z', interactionCount: 5 },
+    { id: 'oc_7', firstName: '', lastName: '', email: 'events@eventbrite.com', lastInteraction: '2026-03-10T15:00:00Z', interactionCount: 12 },
+    { id: 'oc_8', firstName: 'Sarah', lastName: '', email: 'sarah@restaurant-reservation.com', lastInteraction: '2026-03-08T18:00:00Z', interactionCount: 2 },
+    { id: 'oc_9', firstName: '', lastName: '', email: 'notifications@slack.com', lastInteraction: '2026-03-07T12:00:00Z', interactionCount: 156 },
+    { id: 'oc_10', firstName: 'Travel', lastName: 'Desk', email: 'travel@corporatetravel.com', lastInteraction: '2026-03-05T09:00:00Z', interactionCount: 18 },
+    { id: 'oc_11', firstName: '', lastName: '', email: 'receipts@uber.com', lastInteraction: '2026-03-04T22:00:00Z', interactionCount: 67 },
+    { id: 'oc_12', firstName: 'Newsletter', lastName: '', email: 'hello@morningbrew.com', lastInteraction: '2026-03-04T06:00:00Z', interactionCount: 89 },
+    { id: 'oc_13', firstName: '', lastName: '', email: 'no-reply@zoom.us', lastInteraction: '2026-03-03T14:00:00Z', interactionCount: 203 },
+    { id: 'oc_14', firstName: 'IT', lastName: 'Help', email: 'it-helpdesk@techcorp.io', lastInteraction: '2026-03-01T10:00:00Z', interactionCount: 31 },
+    { id: 'oc_15', firstName: '', lastName: '', email: 'alerts@sentry.io', lastInteraction: '2026-02-28T03:00:00Z', interactionCount: 112 },
+    { id: 'oc_16', firstName: 'Dr.', lastName: 'Patel', email: 'appointments@sfmedical.com', lastInteraction: '2026-02-25T09:00:00Z', interactionCount: 4 },
+    { id: 'oc_17', firstName: '', lastName: '', email: 'order-confirm@amazon.com', lastInteraction: '2026-02-20T16:00:00Z', interactionCount: 38 },
+    { id: 'oc_18', firstName: 'Lisa', lastName: '', email: 'lisa@drycleaners-sf.com', lastInteraction: '2026-02-15T10:00:00Z', interactionCount: 7 },
+    { id: 'oc_19', firstName: '', lastName: '', email: 'team@figma.com', lastInteraction: '2026-02-10T14:00:00Z', interactionCount: 15 },
+    { id: 'oc_20', firstName: 'Alex', lastName: '', email: 'alex@doordash-driver.com', lastInteraction: '2026-02-05T19:00:00Z', interactionCount: 1 },
+    { id: 'oc_21', firstName: '', lastName: '', email: 'security@1password.com', lastInteraction: '2026-01-30T08:00:00Z', interactionCount: 9 },
+    { id: 'oc_22', firstName: '', lastName: '', email: 'updates@linear.app', lastInteraction: '2026-01-25T11:00:00Z', interactionCount: 56 },
+    { id: 'oc_23', firstName: 'Amy', lastName: '', email: 'amy.realtor@compass.com', lastInteraction: '2026-01-20T14:00:00Z', interactionCount: 11 },
+    { id: 'oc_24', firstName: '', lastName: '', email: 'digest@medium.com', lastInteraction: '2026-01-15T06:00:00Z', interactionCount: 124 },
+    { id: 'oc_25', firstName: '', lastName: '', email: 'noreply@stripe.com', lastInteraction: '2026-01-10T10:00:00Z', interactionCount: 29 }
+];
+
+// ─── Directory (organization/workspace colleagues) ───
+const DIRECTORY = [
+    { id: 'dir_1', name: 'Sarah Chen', email: 'sarah.chen@techcorp.io', department: 'Engineering', title: 'Senior Software Engineer', location: 'San Francisco', phone: '+1 (415) 555-0192', manager: 'Priya Sharma' },
+    { id: 'dir_2', name: 'James Wu', email: 'james.wu@techcorp.io', department: 'Engineering', title: 'Senior Backend Engineer', location: 'San Francisco', phone: '+1 (415) 555-1001', manager: 'Priya Sharma' },
+    { id: 'dir_3', name: 'Priya Sharma', email: 'priya.sharma@techcorp.io', department: 'Engineering', title: 'Engineering Manager', location: 'San Francisco', phone: '+1 (415) 555-1002', manager: 'Marcus Johnson' },
+    { id: 'dir_4', name: 'Alex Martinez', email: 'alex.martinez@techcorp.io', department: 'Engineering', title: 'Frontend Engineer', location: 'San Francisco', phone: '+1 (415) 555-1003', manager: 'Priya Sharma' },
+    { id: 'dir_5', name: 'Mei Zhang', email: 'mei.zhang@techcorp.io', department: 'Engineering', title: 'DevOps Engineer', location: 'San Francisco', phone: '+1 (415) 555-1004', manager: 'Priya Sharma' },
+    { id: 'dir_6', name: 'Tom O\'Brien', email: 'tom.obrien@techcorp.io', department: 'Engineering', title: 'QA Lead', location: 'San Francisco', phone: '+1 (415) 555-1005', manager: 'Marcus Johnson' },
+    { id: 'dir_7', name: 'Nina Patel', email: 'nina.patel@techcorp.io', department: 'Engineering', title: 'Data Scientist', location: 'San Francisco', phone: '+1 (415) 555-1006', manager: 'Marcus Johnson' },
+    { id: 'dir_8', name: 'Marcus Johnson', email: 'marcus.johnson@techcorp.io', department: 'Engineering', title: 'VP of Engineering', location: 'San Francisco', phone: '+1 (415) 555-1007', manager: 'CEO' },
+    { id: 'dir_9', name: 'Lisa Kim', email: 'lisa.kim@techcorp.io', department: 'Design', title: 'Product Designer', location: 'San Francisco', phone: '+1 (415) 555-1008', manager: 'Diana Ross-Taylor' },
+    { id: 'dir_10', name: 'Ryan Nguyen', email: 'ryan.nguyen@techcorp.io', department: 'Engineering', title: 'Security Engineer', location: 'San Francisco', phone: '+1 (415) 555-1009', manager: 'Marcus Johnson' },
+    { id: 'dir_11', name: 'Hannah Cohen', email: 'hannah.cohen@techcorp.io', department: 'Engineering', title: 'Technical Writer', location: 'San Francisco', phone: '+1 (415) 555-1010', manager: 'Priya Sharma' },
+    { id: 'dir_12', name: 'Diana Ross-Taylor', email: 'diana.ross-taylor@techcorp.io', department: 'Finance', title: 'CFO', location: 'San Francisco', phone: '+1 (415) 555-1011', manager: 'CEO' },
+    { id: 'dir_13', name: 'Carlos Mendoza', email: 'carlos.mendoza@techcorp.io', department: 'Sales', title: 'Head of Sales', location: 'San Francisco', phone: '+1 (415) 555-1012', manager: 'CEO' },
+    { id: 'dir_14', name: 'Sophia Andersson', email: 'sophia.andersson@techcorp.io', department: 'Operations', title: 'Head of EU Operations', location: 'Stockholm', phone: '+46 70 123 4567', manager: 'CEO' },
+    { id: 'dir_15', name: 'Megan Foster-Kim', email: 'megan.fosterkim@techcorp.io', department: 'Human Resources', title: 'HR Business Partner', location: 'San Francisco', phone: '+1 (415) 555-1020', manager: 'Diana Ross-Taylor' },
+    { id: 'dir_16', name: 'Kira Volkov', email: 'kira.volkov@techcorp.io', department: 'Engineering', title: 'Intern, Backend Engineering', location: 'San Francisco', phone: '+1 (415) 555-1021', manager: 'Priya Sharma' },
+    { id: 'dir_17', name: 'David Park', email: 'david.park@techcorp.io', department: 'Product', title: 'Senior Product Manager', location: 'San Francisco', phone: '+1 (415) 555-1022', manager: 'Marcus Johnson' },
+    { id: 'dir_18', name: 'Jennifer Walsh', email: 'jennifer.walsh@techcorp.io', department: 'Legal', title: 'General Counsel', location: 'San Francisco', phone: '+1 (415) 555-1023', manager: 'CEO' },
+    { id: 'dir_19', name: 'Tony Russo', email: 'tony.russo@techcorp.io', department: 'Sales', title: 'Account Executive', location: 'New York', phone: '+1 (212) 555-1024', manager: 'Carlos Mendoza' },
+    { id: 'dir_20', name: 'Elaine Cho', email: 'elaine.cho@techcorp.io', department: 'Marketing', title: 'Marketing Director', location: 'San Francisco', phone: '+1 (415) 555-1025', manager: 'CEO' },
+    { id: 'dir_21', name: 'Brian Foster', email: 'brian.foster@techcorp.io', department: 'Engineering', title: 'Site Reliability Engineer', location: 'San Francisco', phone: '+1 (415) 555-1026', manager: 'Priya Sharma' },
+    { id: 'dir_22', name: 'Alisha Patel', email: 'alisha.patel@techcorp.io', department: 'Design', title: 'UX Researcher', location: 'San Francisco', phone: '+1 (415) 555-1027', manager: 'Lisa Kim' },
+    { id: 'dir_23', name: 'Kevin Zhang', email: 'kevin.zhang@techcorp.io', department: 'Engineering', title: 'Mobile Engineer', location: 'San Francisco', phone: '+1 (415) 555-1028', manager: 'Priya Sharma' },
+    { id: 'dir_24', name: 'Maria Santos', email: 'maria.santos@techcorp.io', department: 'Customer Support', title: 'Support Team Lead', location: 'San Francisco', phone: '+1 (415) 555-1029', manager: 'Carlos Mendoza' },
+    { id: 'dir_25', name: 'Eric Johansson', email: 'eric.johansson@techcorp.io', department: 'Engineering', title: 'Backend Engineer', location: 'Stockholm', phone: '+46 70 234 5678', manager: 'Sophia Andersson' }
+];
+
+// ─── App password entries (for sign-in security section) ───
+const APP_PASSWORDS = [
+    { id: 'ap_1', name: 'Thunderbird on MacBook', createdAt: '2025-06-15T10:00:00Z', lastUsed: '2026-03-18T07:00:00Z' },
+    { id: 'ap_2', name: 'Mail on iPhone', createdAt: '2024-12-01T14:00:00Z', lastUsed: '2026-03-17T22:00:00Z' },
+    { id: 'ap_3', name: 'Outlook Desktop', createdAt: '2025-09-20T09:00:00Z', lastUsed: '2026-03-10T08:00:00Z' }
+];
+
+// ─── Merge suggestions (duplicate contacts) ───
 const MERGE_SUGGESTIONS = [
     {
         id: 'merge_1',
-        contacts: ['contact_05', 'contact_36'],
-        reason: 'Same company (CloudNine)',
-        dismissed: false
-    },
-    {
-        id: 'merge_2',
-        contacts: ['contact_15', 'contact_37'],
-        reason: 'Same company (EuroDesign)',
+        contactIds: ['ct_46', 'oc_15_promoted'],
+        reason: 'Similar email domain: yandex.ru',
         dismissed: false
     }
 ];
+
+// ─── Reply-from setting ───
+const REPLY_FROM_SETTING = 'default'; // 'default' = always reply from default, 'same' = reply from same address message was sent to

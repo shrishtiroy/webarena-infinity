@@ -1,322 +1,219 @@
-# Gmail Accounts & Contacts
+# Gmail — Accounts & Contacts
 
 ## Summary
 
-A web application replicating Google Contacts and Gmail account management features, including contact management (CRUD, labels, search, star/unstar), email delegation, linked Google services management (EU DMA compliance), import/export, merge suggestions, and account settings (login security, privacy, sync, notifications). Built as a single-page app with a sidebar-based navigation system.
+A faithful replica of the Gmail Accounts and Contacts management area. The app covers account settings (profile, security, app passwords), email alias management (Send Mail As), delegation, mail import/export, a full contacts manager with labels/groups, merge duplicate contacts, an auto-saved "Other Contacts" list, and an organization directory. All data persists via localStorage and syncs to the server on every mutation.
 
-## Main Sections/Pages
+## Main Sections / Pages
 
-1. **Contacts** (default view) - Contact list with table view, search, sort, filter, pagination
-2. **Frequently Contacted** - Filtered view of frequently-used contacts
-3. **Starred** - Filtered view of starred contacts
-4. **Other Contacts** - Auto-saved contacts from email interactions
-5. **Merge & Fix** - Duplicate contact merge suggestions
-6. **Import & Export** - Import/export contacts in CSV and vCard formats
-7. **Delegates** - Email delegation management
-8. **Linked Services** - DMA-compliant Google service linking
-9. **Settings** - Five tabs: General, Account, Privacy, Notifications, Sync & Google Sync
+| Section | Route (hash) | Description |
+|---|---|---|
+| Contacts (All) | `#/contacts` | Paginated, searchable, sortable contact list with multi-select |
+| Contacts (Starred) | `#/contacts` (filter=starred) | Starred contacts filter |
+| Contacts (by Label) | `#/contacts` (filter=grp_*) | Contacts filtered by a specific label/group |
+| Contact Detail | `#/contact/{id}` | Full contact information display |
+| New Contact | `#/new-contact` | Create contact form |
+| Edit Contact | `#/edit-contact/{id}` | Edit contact form |
+| Group Detail | `#/group/{id}` | View contacts in a specific label, with remove option |
+| Merge Duplicates | `#/merge-duplicates` | Find and merge potential duplicate contacts |
+| Other Contacts | `#/other-contacts` | Auto-saved contacts from email interactions |
+| Directory | `#/directory` | Organization directory (TechCorp colleagues) |
+| Account Settings | `#/account` | Profile info, recovery options, password, 2FA, app passwords |
+| Send Mail As | `#/send-mail-as` | Email aliases and reply-from settings |
+| Delegation | `#/delegation` | Email delegates management |
+| Import/Export | `#/import-export` | POP3 mail import and contacts export |
 
-## Implemented Features and UI Interactions
+## Implemented Features & UI Interactions
 
-### Contact Management
-- View contacts in a table layout with columns: Name, Email, Phone, Company, Labels
-- Create new contacts via modal form (first name, last name, email, phone, company, job title, address, secondary email/phone, birthday, website, notes, labels)
-- Edit existing contacts via modal form
-- Delete contacts with confirmation dialog
-- Star/unstar contacts (toggle)
+### Contacts Manager
+- View all contacts in a paginated table (25 per page)
 - Search contacts by name, email, company, phone, or job title
-- Sort contacts by first name, last name, email, company, or last updated date
-- Toggle sort direction (ascending/descending)
-- Pagination (25 contacts per page)
-- Contact detail panel (right side) showing all fields, labels, edit history, metadata
+- Sort contacts by first name, last name, email, or recently added (custom dropdown)
+- Filter contacts by label (sidebar navigation) or starred
+- Star/unstar contacts (click star icon)
+- Select multiple contacts via checkboxes
+- Select all on current page via header checkbox
+- Bulk add selected contacts to label(s) via modal
+- Bulk delete selected contacts with confirmation
+- Create new contact with form fields: first name, last name, email, phone, company, job title, address, birthday, notes, label checkboxes
+- Edit existing contact (same form, pre-populated)
+- Delete contact with confirmation dialog
+- View contact detail page showing all info, labels, notes, and metadata
 
-### Contact Labels
-- 12 pre-defined labels: Family, Friends, Work, VIP Clients, Gym Buddies, College Alumni, Neighbors, Book Club, Vendors, Emergency, Travel Contacts, Healthcare
-- Create new labels with name and color picker (18 colors)
-- Edit label name and color
-- Delete labels
-- Filter contacts by label (sidebar click)
-- Add/remove labels from contacts via detail panel or edit form
-- Label chips displayed in contact table rows
+### Merge Duplicate Contacts
+- Accessible via "Merge duplicates" button on the contacts list
+- Finds potential duplicates by: same email address, same full name, or same last name + same company
+- Displays pairs side-by-side with matching reason badge
+- Shows key fields (phone, company, job title) for each contact in the pair
+- "Keep this" button on each side: keeps the selected contact, merges empty fields from the other, removes the duplicate
+- Groups from the merged contact are added to the kept contact
 
-### Other Contacts (Auto-saved)
+### Contact Labels/Groups
+- View labels in sidebar with member counts
+- Create new label via modal (+ button in sidebar)
+- Rename label via modal
+- Delete label with confirmation (contacts are preserved)
+- View contacts within a specific label
+- Remove individual contact from a label
+- Add contacts to labels via bulk action or contact edit form
+
+### Other Contacts
 - View auto-saved contacts from email interactions
-- Move other contacts to main contacts (person_add)
-- Delete other contacts
-- Sorted by last interaction date
+- Search other contacts by name or email
+- See interaction count and last interaction time
+- Promote an other contact to main contacts list
+- Delete an other contact
 
-### Merge & Fix
-- Duplicate contact merge suggestions (e.g., same company)
-- Merge contacts (combines data from secondary into primary)
-- Dismiss merge suggestions
+### Directory
+- View organization directory (TechCorp employees)
+- Search directory by name, email, department, or title
+- See department, title, and location for each colleague
 
-### Delegation
-- View delegates with status badges (active, pending, expired)
-- Add new delegates via modal (email + name)
-- Remove delegates with confirmation dialog
-- Maximum 10 delegates (configurable)
-- Info cards explaining delegation permissions and activation timeline
+### Account Settings
+- View profile (name, email) with avatar
+- Edit name via modal (first name, last name)
+- Edit recovery email via modal
+- Edit recovery phone via modal
+- Change password via modal (current, new, confirm; minimum 8 chars validation)
+- Toggle 2-Step Verification on/off
+- View app passwords list with creation date and last used
+- Generate new app password via modal (app name required)
+- Revoke (delete) app password with confirmation
 
-### Linked Services (DMA)
-- 7 linkable services: Google Search, YouTube, Google Ads, Google Play, Chrome, Google Shopping, Google Maps
-- Toggle link/unlink for each service
-- 15 always-linked services displayed (locked, cannot unlink)
-- Info box about data sharing policies
+### Send Mail As (Aliases)
+- View list of email aliases (primary, default, SMTP info)
+- Set reply-from behavior: always default address vs. same address message was sent to (radio buttons)
+- Set default "From" address for any alias
+- Add new email alias via modal (name, email, SMTP server, port, username, SSL toggle)
+- Edit existing alias via modal
+- Remove alias with confirmation (primary cannot be removed; if default is removed, primary becomes default)
 
-### Import & Export
-- Import area (drag-and-drop style, CSV/vCard)
-- Export with format dropdown: Google CSV, Outlook CSV, vCard
-- Export scope: All contacts, Starred, By label
-- Import/export history list with status badges
+### Email Delegation
+- View list of delegates with name, email, and status (active/pending)
+- Add delegate via modal (email, optional name; status starts as "pending")
+- Remove delegate with confirmation
 
-### Settings
-#### General Tab
-- Contact sort order (first name / last name)
-- Name display order (first-last / last-first)
-- Auto-save contacts toggle
-- Collaboration settings: Share Google Docs in email, Show contact info on emails
-
-#### Account Tab
-- Profile card with avatar
-- Editable fields: Name, Phone, Recovery email, Recovery phone
-- Alternate emails display (read-only)
-- Login & security: Remember password, Auto sign-in, Two-factor authentication toggle
-- 2FA method dropdown: Authenticator app, SMS, Security key (conditional on 2FA enabled)
-
-#### Privacy Tab
-- Profile photo visibility: Everyone, Contacts only, Nobody
-- Email visibility: Everyone, Contacts only, Nobody
-- Phone number visibility: Everyone, Contacts only, Nobody
-- Activity tracking toggle
-
-#### Notifications Tab
-- Delegate activity notifications
-- Contact changes notifications
-- Security alerts notifications
-- Linked service updates notifications
-
-#### Sync & Google Sync Tab
-- Google Sync deprecation warning banner
-- Contacts sync toggle
-- Calendar sync toggle
-- Email sync toggle
-- Google Sync transition instructions (iOS/iPad steps)
-- "I have transitioned off Google Sync" acknowledgment toggle
-
-### Global UI
-- Top bar with logo, search bar, help, settings, profile avatar
-- Collapsible sidebar with navigation
-- Custom dropdown menus (no native select elements)
-- Toggle switches for all boolean settings
-- Toast notifications (success, error, warning, info)
-- Confirmation dialogs for destructive actions
-- Empty states with icons and action buttons
+### Import/Export
+- View list of POP3 import accounts with status, server details, label, last checked
+- Add new POP3 import account via modal (email, server, port, username, label, SSL toggle, leave-on-server toggle)
+- Remove import account with confirmation
+- Export contacts: choose format (Google CSV / Outlook CSV / vCard) and scope (all / starred) via radio buttons
+- Export triggers browser file download
 
 ## Data Model
 
-### Contact
-- `id` (string, e.g., "contact_01")
-- `firstName`, `lastName` (strings)
-- `email` (string, primary email)
-- `phone` (string)
-- `company` (string)
-- `jobTitle` (string)
-- `address` (string)
-- `secondaryEmail`, `secondaryPhone` (strings)
-- `birthday` (string, "YYYY-MM-DD")
-- `website` (string)
-- `notes` (string)
-- `labels` (string[], label IDs like "clabel_1")
-- `isStarred` (boolean)
-- `avatarColor` (string, hex color)
-- `createdAt`, `updatedAt` (ISO timestamps)
-- `source` (string: "manual", "auto", "auto-promoted")
+### Entities and Fields
 
-### Other Contact (auto-saved)
-- `id` (string, e.g., "other_01")
-- `firstName`, `lastName` (strings, often empty)
-- `email` (string)
-- `name` (string, display name)
-- `source` ("auto")
-- `savedAt` (ISO timestamp)
-- `interactionCount` (number)
-- `lastInteraction` (ISO timestamp)
+**currentUser** (single object)
+- `id`, `firstName`, `lastName`, `email`, `recoveryEmail`, `recoveryPhone`, `profilePhoto`, `twoStepVerification` (boolean), `lastPasswordChange` (ISO timestamp), `createdAt`
 
-### Contact Label
-- `id` (string, e.g., "clabel_1")
-- `name` (string)
-- `color` (string, hex color)
-- `contactCount` (number, auto-calculated)
+**contacts** (array, 120 seed records)
+- `id` (ct_1..ct_120), `firstName`, `lastName`, `email`, `phone`, `company`, `jobTitle`, `address`, `birthday` (YYYY-MM-DD), `notes`, `starred` (boolean), `groups` (array of group IDs), `createdAt`, `updatedAt`
 
-### Delegate
-- `id` (string, e.g., "delegate_1")
-- `email` (string)
-- `name` (string)
-- `status` (string: "active", "pending", "expired")
-- `addedAt` (ISO timestamp)
-- `activatedAt` (ISO timestamp or null)
-- `permissions` (object: readEmail, sendEmail, deleteEmail, manageChat, changePassword - all booleans)
+**contactGroups** (array, 10 seed records)
+- `id` (grp_1..grp_10), `name`, `system` (boolean), `createdAt`, `updatedAt`
 
-### Linked Service
-- `id` (string, e.g., "svc_1")
-- `name` (string)
-- `icon` (string, Material Icons name)
-- `isLinked` (boolean)
-- `category` (string: "core", "advertising", "commerce")
-- `description` (string)
+**aliases** (array, 4 seed records)
+- `id` (alias_1..alias_4), `name`, `email`, `isPrimary` (boolean), `isDefault` (boolean), `replyFrom` ("default"|"alias"), `smtpServer`, `smtpPort`, `smtpUsername`, `useSSL` (boolean), `createdAt`
 
-### Always Linked Service
-- `id` (string, e.g., "asvc_1")
-- `name` (string)
-- `description` (string)
+**delegates** (array, 3 seed records)
+- `id` (del_1..del_3), `email`, `name`, `status` ("active"|"pending"), `addedAt`
 
-### Current User
-- `id`, `name`, `email` (strings)
-- `alternateEmails` (string[])
-- `phone` (string)
-- `avatarColor` (string)
-- `recoveryEmail`, `recoveryPhone` (strings)
-- `language`, `timezone` (strings)
-- `createdAt`, `lastLogin` (ISO timestamps)
+**importAccounts** (array, 2 seed records)
+- `id` (imp_1..imp_2), `email`, `server`, `port`, `username`, `useSSL` (boolean), `leaveOnServer` (boolean), `labelIncoming`, `status` ("active"|"error"), `lastChecked`, `errorMessage` (optional), `addedAt`
 
-### Account Settings
-- `autoSaveContacts` (boolean)
-- `contactsSortBy` (string: "firstName" or "lastName")
-- `contactsDisplayOrder` (string: "firstLast" or "lastFirst")
-- `loginSettings` (object): rememberPassword, autoSignIn, twoFactorEnabled (booleans); twoFactorMethod (string: "authenticator", "sms", "security_key"); recoveryEmailVerified, recoveryPhoneVerified (booleans)
-- `syncSettings` (object): googleSyncEnabled, googleSyncDeprecationAcknowledged, contactsSync, calendarSync, emailSync (booleans)
-- `collaborationSettings` (object): allowDelegates (boolean), maxDelegates (number), shareDocsInEmail, showContactInfo (booleans)
-- `privacySettings` (object): showProfilePhoto, showEmail, showPhone (strings: "everyone", "contacts_only", "nobody"); activityTracking (boolean)
-- `notificationSettings` (object): delegateActivity, contactChanges, securityAlerts, linkedServiceUpdates (booleans)
+**otherContacts** (array, 25 seed records)
+- `id` (oc_1..oc_25), `firstName`, `lastName`, `email`, `lastInteraction` (ISO timestamp), `interactionCount` (number)
 
-### Contact History
-- `id` (string)
-- `contactId` (string)
-- `action` (string: "created", "edited", "label_added", "label_removed")
-- `field` (string or null)
-- `oldValue`, `newValue` (string or null)
-- `timestamp` (ISO timestamp)
-- `actor` (string, email)
+**directory** (array, 25 seed records)
+- `id` (dir_1..dir_25), `name`, `email`, `department`, `title`, `location`, `phone`, `manager`
 
-### Import/Export History
-- `id` (string)
-- `type` (string: "import" or "export")
-- `format` (string: "CSV", "Google CSV", "Outlook CSV", "vCard")
-- `fileName` (string)
-- `count` (number)
-- `timestamp` (ISO timestamp)
-- `status` (string: "completed")
+**appPasswords** (array, 3 seed records)
+- `id` (ap_1..ap_3), `name`, `createdAt`, `lastUsed`
 
-### Merge Suggestion
-- `id` (string)
-- `contacts` (string[], contact IDs)
-- `reason` (string)
-- `dismissed` (boolean)
+**replyFromSetting** (string: "default" | "same")
+
+### Relationships
+- contacts ↔ contactGroups: many-to-many via `contact.groups[]` array of group IDs
+- delegates reference TechCorp employees by email
+- directory entries correspond to some contacts (same email addresses)
+- importAccounts are independent entities
 
 ## Navigation Structure
 
-- **Sidebar** (always visible, collapsible):
-  - Create contact button
-  - Contacts (default)
-  - Frequently contacted
-  - Starred
-  - Other contacts
-  - Merge & fix
-  - Labels section (12 labels with counts, each clickable to filter)
-  - Import & Export
-  - Delegates
-  - Linked Services
-  - Settings
-- **Top bar**: Menu toggle, brand logo, global search, help, settings shortcut, profile avatar
-- Contact detail panel opens on the right when a contact is selected (contacts view only)
+**Sidebar sections:**
+1. **Contacts** — "All Contacts", "Starred", then Labels (each contact group with count)
+2. **Other** — "Other contacts", "Directory"
+3. **Settings** — "Account", "Send mail as", "Delegation", "Import/Export"
+
+Clicking a sidebar item navigates via hash routing. Contact rows in the table are clickable to go to detail. Breadcrumbs provide back navigation. The "Merge duplicates" button on the contact list navigates to the merge view.
 
 ## Available Form Controls
 
-### Dropdowns
-- Sort by: First name, Last name, Email, Company, Last updated
-- Export format: Google CSV, Outlook CSV, vCard
-- Contact sort setting: First name, Last name
-- Name display order: First name first, Last name first
-- 2FA method: Authenticator app, Text message (SMS), Security key
-- Privacy - photo visibility: Everyone, Contacts only, Nobody
-- Privacy - email visibility: Everyone, Contacts only, Nobody
-- Privacy - phone visibility: Everyone, Contacts only, Nobody
+### Dropdowns (custom, not native `<select>`)
+- **Sort contacts:** First name, Last name, Email, Recently added
 
-### Toggles
-- Auto-save contacts
-- Share Google Docs in email
-- Show contact info on emails
-- Remember password
-- Auto sign-in
-- Two-factor authentication
-- Activity tracking
-- Delegate activity notifications
-- Contact changes notifications
-- Security alerts notifications
-- Linked service updates notifications
-- Contacts sync
-- Calendar sync
-- Email sync
-- Google Sync deprecation acknowledged
-- Linked service toggles (7 services)
+### Toggle switches
+- SSL toggle (alias form, import form)
+- Leave on server toggle (import form)
+- 2-Step Verification toggle (account settings)
 
-### Buttons
-- Create contact
-- Create label
-- Add a delegate
-- Save changes (profile)
-- Export contacts
-- Merge contacts
-- Dismiss merge suggestion
-- Delete label
-- Remove delegate
+### Radio buttons
+- Reply-from setting: "Always reply from default address" / "Reply from same address"
+- Export format: Google CSV / Outlook CSV / vCard
+- Export scope: All contacts / Starred contacts
+
+### Checkboxes
+- Contact selection (per row + select all)
+- Label assignment in contact form (one checkbox per label)
+- Bulk add-to-label modal (one checkbox per label)
+
+### Text inputs
+- Contact fields: first name, last name, email, phone, company, job title, address, birthday (text, YYYY-MM-DD), notes (textarea)
+- Search inputs: contacts, other contacts, directory
+- Account: name, recovery email, recovery phone, password fields
+- Alias: name, email, SMTP server, port, username
+- Delegate: email, name
+- Import: email, server, port, username, label
+- App password: name
 
 ## Seed Data Summary
 
-### Current User
-- Alex Johnson (alex.johnson@gmail.com) with alternate emails a.johnson@workplace.io and alexj.dev@gmail.com
+### Contacts (120 total)
+- **Family (grp_1):** David Chen, Linda Chen, Kevin Chen, Amy Chen-Wu, Robert Chen, Diane Chen, Laura Chen-Watkins, Stanley Chen (8 members)
+- **Work (grp_2):** James Wu, Priya Sharma, Alex Martinez, Mei Zhang, Tom O'Brien, Nina Patel, Marcus Johnson, Lisa Kim, Ryan Nguyen, Hannah Cohen, Diana Ross-Taylor, Carlos Mendoza, Sophia Andersson, Alicia Hernandez, Megan Foster-Kim, Kira Volkov (16 members)
+- **Friends (grp_3):** Jake Morrison, Emma Thompson, Liam O'Sullivan, Aisha Rahman, Ben Watkins, Max Wellington, Samantha Park-Williams, Nora Eriksson, Laura Chen-Watkins, Monica Reyes, Karen White, Frank Dubois (12 members)
+- **Engineering Team (grp_4):** James Wu, Priya Sharma, Alex Martinez, Mei Zhang, Tom O'Brien, Nina Patel, Marcus Johnson, Ryan Nguyen, Philip Okonkwo, Damian Kowalczyk, Kira Volkov (11 members)
+- **Investors (grp_5):** Derek Hoffman, Victoria Blackwell, Hiroshi Tanaka, Catherine Duval, Ibrahim Okafor, Ethan Goldstein (6 members)
+- **College Alumni (grp_6):** Jake Morrison, Rachel Park, Derek Hoffman, Mia Santos-Rivera, Tyler Brooks, Zoe Adams, Samantha Park-Williams, Adrian Costa, Alice Nakamura (9 members)
+- **Book Club (grp_7):** Ben Watkins, Olivia Grant, Daniel Reeves, Grace Liu (4 members)
+- **Conference Contacts (grp_8):** Satoshi Yamamoto, Fatima Al-Hassan, Patrick van der Berg, Ingrid Johansson, Wei Zhao, Elena Petrova, Charlotte Müller, + 25 more international contacts (39 members total)
+- **Vendors (grp_9):** Gregory Foster (Datadog), Michelle Torres (Cloudflare), Andrew Blackstone (Snowflake), Jessica Singh (AWS), Samuel Lee (PagerDuty), + 17 more vendor contacts (22 members total)
+- **VIP (grp_10):** Marcus Johnson, Diana Ross-Taylor, Derek Hoffman, Victoria Blackwell, Catherine Duval, Satoshi Yamamoto, Douglas Kim, Jessica Singh, Ethan Goldstein, Nicholas Harper (10 members)
+- Contacts with no group: Natalie Dubois, Henry Wright, Leah Mitchell, Jasmine Tran, Rebecca Stone, Timothy Buchanan, Sophie Williams, Penny Crawford (8 ungrouped)
+- **Starred contacts:** David Chen, Linda Chen, Kevin Chen, James Wu, Priya Sharma, Marcus Johnson, Jake Morrison, Ben Watkins, Derek Hoffman, Victoria Blackwell, Satoshi Yamamoto, Jessica Singh, Ethan Goldstein, Nicholas Harper (14 starred)
 
-### Contacts (40 total)
-- 24 professional contacts: Sarah Chen (TechCorp VP), Marcus Williams (DesignHub Creative Director), Emily Rodriguez (StartupVentures Managing Partner), James O'Brien (Morrison & Associates Senior Partner), Priya Sharma (CloudNine Lead Backend Engineer), David Kim (FinancePlus CFO), and others across various companies and roles
-- 4 family contacts: Margaret Johnson (mom), Richard Johnson (dad), Laura Johnson-Martinez (sister), Leo Martinez (brother-in-law)
-- 4 healthcare/services: Dr. Patricia Nguyen, Mike Chen (dentist), Greg Hoffman (financial advisor), Diana Castillo (yoga instructor)
-- 8 friends/social: Jake Morrison, Samantha Lee, Chris Evans, Ben Walker, Yuki Tanaka, Tony Russo, and others
-- Starred contacts: Sarah Chen, Marcus Williams, Emily Rodriguez, Priya Sharma, Kevin Zhao, Maya Patel, Margaret Johnson, Richard Johnson, Laura Johnson-Martinez, Jake Morrison
+### Other Contacts (25)
+- Mix of automated services (noreply@github.com, notifications@slack.com), businesses (support@vercel.com), and individuals
+- Interaction counts range from 1 to 342
+- Last interactions span from Jan 2026 to Mar 2026
 
-### Other Contacts (20 total)
-- Mix of service emails (support@vercel.com, billing@aws.amazon.com, noreply@github.com) and personal contacts (Jason Blake, Tina Marshall, Alex Rivera, etc.)
-- Interaction counts ranging from 1 to 55
+### Directory (25 TechCorp employees)
+- Departments: Engineering (12), Sales (2), Finance (1), Design (2), Operations (1), HR (1), Legal (1), Marketing (1), Product (1), Customer Support (1), Data Science (1), DevOps (1)
+- Locations: San Francisco, Stockholm, New York
 
-### Contact Labels (12)
-- Family (#EA4335), Friends (#34A853), Work (#4285F4), VIP Clients (#FBBC04), Gym Buddies (#FF6D01), College Alumni (#9C27B0), Neighbors (#009688), Book Club (#795548), Vendors (#607D8B), Emergency (#F44336), Travel Contacts (#00BCD4), Healthcare (#E91E63)
+### Aliases (4)
+- sarah.chen@techcorp.io (primary, default)
+- support@techcorp.io (via SMTP)
+- schen@alumni.stanford.edu (via SMTP)
+- sarah@chen-family.org (via SMTP)
 
-### Delegates (4)
-- Maya Patel (active since Jun 2025)
-- Laura Johnson-Martinez (active since Dec 2024)
-- Priya Sharma (pending, added Mar 5, 2026)
-- Jake Morrison (expired, added Feb 20, 2026)
+### Delegates (3)
+- James Wu (active), Priya Sharma (active), Alex Martinez (pending)
 
-### Linked Services (7 linkable)
-- Linked: Google Search, YouTube, Google Play, Chrome, Google Maps
-- Unlinked: Google Ads, Google Shopping
+### Import Accounts (2)
+- sarahchen.personal@gmail.com (active)
+- sarah@old-startup.com (error: server unreachable)
 
-### Always Linked Services (15)
-- Google Contacts, Android Services, Google Drive, Gmail, Google Calendar, Google Photos, Google Keep, Google Meet, Google Chat, Google Docs, Google Sheets, Google Slides, Google Translate, Google Assistant, Google Fit
-
-### Account Settings Defaults
-- Auto-save contacts: enabled
-- Two-factor auth: enabled (authenticator app)
-- Remember password: enabled
-- Auto sign-in: enabled
-- Contacts/Calendar/Email sync: all enabled
-- Google Sync deprecated: acknowledged
-- Privacy: Profile photo (everyone), Email (contacts only), Phone (nobody)
-- Notifications: Delegate activity and security alerts enabled; contact changes disabled
-
-### Import/Export History (4 entries)
-- 2 imports (Outlook CSV 2020, iPhone vCard 2024)
-- 2 exports (Google CSV 2025, vCard 2026)
-
-### Merge Suggestions (2)
-- Priya Sharma + Raj Kapoor (same company: CloudNine)
-- Sophie Laurent + Elena Volkov (same company: EuroDesign)
+### App Passwords (3)
+- Thunderbird on MacBook, Mail on iPhone, Outlook Desktop

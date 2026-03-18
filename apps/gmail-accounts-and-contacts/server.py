@@ -3,17 +3,13 @@
 Custom HTTP server for the Gmail Accounts & Contacts app.
 
 Serves static files and exposes API endpoints:
-  GET  /api/state  -- Read the current application state (for verifiers)
-  PUT  /api/state  -- Update the server-side state copy (called by browser)
-  POST /api/reset  -- Reset the app state to seed data
+  GET  /api/state  — Read the current application state (for verifiers)
+  PUT  /api/state  — Update the server-side state copy (called by browser)
+  POST /api/reset  — Reset the app state to seed data
+  GET  /api/events — SSE stream for reset notifications
 
 Usage:
     python3 server.py [--port PORT]
-
-Example (Python verifier):
-    import requests
-    state = requests.get('http://localhost:8000/api/state').json()
-    assert state['contacts'][0]['firstName'] == 'Sarah'
 """
 
 import http.server
@@ -28,11 +24,9 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     daemon_threads = True
 
 
-# SSE client queues
 _clients = []
 _clients_lock = threading.Lock()
 
-# Server-side copy of application state
 _app_state = None
 _seed_state = None
 _state_lock = threading.Lock()
@@ -59,8 +53,6 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_sse()
         else:
             super().do_GET()
-
-    # ---- State sync ----
 
     def _handle_put_state(self):
         global _app_state, _seed_state
@@ -93,8 +85,6 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(state).encode())
 
-    # ---- Reset ----
-
     def _handle_reset(self):
         global _app_state
         with _state_lock:
@@ -114,8 +104,6 @@ class AppHandler(http.server.SimpleHTTPRequestHandler):
             'seed_restored': _seed_state is not None,
             'clients_notified': len(_clients)
         }).encode())
-
-    # ---- SSE ----
 
     def _handle_sse(self):
         self.send_response(200)

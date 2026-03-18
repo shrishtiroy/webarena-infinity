@@ -1,1053 +1,678 @@
-// ============================================================
-// views.js — View renderers for Gmail Accounts & Contacts
-// ============================================================
+/* views.js — View renderers for Gmail Accounts & Contacts */
 
 const Views = {
 
-    // ---- Sidebar ----
     renderSidebar() {
-        const C = Components;
-        const filter = AppState.contactsFilter;
-        let html = `<div class="sidebar">`;
+        const v = AppState.currentView;
+        const contactCount = AppState.contacts.length;
+        const starredCount = AppState.getStarredContacts().length;
+        const otherCount = AppState.otherContacts.length;
+        const groupsHtml = AppState.contactGroups.map(g => {
+            const count = AppState.getContactsForGroup(g.id).length;
+            const active = (v === 'contacts' && AppState.contactFilter === g.id) || (v === 'group-detail' && AppState.currentGroupId === g.id);
+            return `<a class="nav-item nav-sub${active ? ' active' : ''}" data-route="contacts" data-filter="${Components.escapeAttr(g.id)}" data-testid="nav-group-${Components.escapeAttr(g.id)}">
+                <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                <span class="nav-label">${Components.escapeHtml(g.name)}</span>
+                <span class="nav-count">${count}</span>
+            </a>`;
+        }).join('');
 
-        // Logo / header
-        html += `<div class="sidebar-header">
-            <div class="sidebar-logo">
-                <span class="material-icons" style="color:#4285F4;font-size:28px;">contacts</span>
-                <span class="sidebar-title">Contacts</span>
+        return `
+            <div class="nav-section">
+                <div class="nav-section-title">Contacts</div>
+                ${this._navItem('contacts', 'all', 'All Contacts', this._iconContacts(), contactCount, v === 'contacts' && AppState.contactFilter === 'all')}
+                ${this._navItem('contacts', 'starred', 'Starred', this._iconStar(), starredCount, v === 'contacts' && AppState.contactFilter === 'starred')}
+                <div class="nav-group-header">
+                    <span>Labels</span>
+                    <button class="nav-group-add" data-action="new-group" data-testid="new-group-btn" title="Create label">+</button>
+                </div>
+                ${groupsHtml}
             </div>
-        </div>`;
-
-        // Create contact button
-        html += `<div class="sidebar-action">
-            <button class="btn btn-primary btn-create" data-action="open-create-contact">
-                <span class="material-icons btn-icon">add</span> Create contact
-            </button>
-        </div>`;
-
-        // Navigation
-        html += `<nav class="sidebar-nav">`;
-        html += this._navItem('contacts', 'all', 'people', 'Contacts', AppState.contacts.length);
-        html += this._navItem('contacts', 'frequently', 'history', 'Frequently contacted', null);
-        html += this._navItem('contacts', 'starred', 'star', 'Starred', AppState.contacts.filter(c => c.isStarred).length);
-        html += this._navItem('other-contacts', 'other', 'person_outline', 'Other contacts', AppState.otherContacts.length);
-        html += this._navItem('merge-suggestions', 'merge', 'merge_type', 'Merge & fix', AppState.mergeSuggestions.filter(s => !s.dismissed).length);
-        html += `</nav>`;
-
-        // Labels section
-        html += `<div class="sidebar-section">`;
-        html += `<div class="sidebar-section-header">
-            <span class="sidebar-section-title">Labels</span>
-            <button class="icon-btn icon-btn-sm" data-action="open-create-label" title="Create label">
-                <span class="material-icons">add</span>
-            </button>
-        </div>`;
-        for (const label of AppState.contactLabels) {
-            const isActive = filter === label.id;
-            html += `<div class="nav-item ${isActive ? 'nav-active' : ''}" data-action="filter-by-label" data-label-id="${label.id}">
-                <span class="label-dot" style="background:${label.color}"></span>
-                <span class="nav-label">${C.escapeHtml(label.name)}</span>
-                <span class="nav-count">${label.contactCount}</span>
-                <button class="icon-btn icon-btn-xs nav-edit" data-action="edit-label" data-label-id="${label.id}" title="Edit label">
-                    <span class="material-icons">edit</span>
-                </button>
-            </div>`;
-        }
-        html += `</div>`;
-
-        // More navigation
-        html += `<nav class="sidebar-nav sidebar-nav-bottom">`;
-        html += this._sidebarNavItem('import-export', 'import_export', 'Import & Export');
-        html += this._sidebarNavItem('delegates', 'supervisor_account', 'Delegates');
-        html += this._sidebarNavItem('linked-services', 'link', 'Linked Services');
-        html += this._sidebarNavItem('settings', 'settings', 'Settings');
-        html += `</nav>`;
-
-        html += `</div>`;
-        return html;
+            <div class="nav-section">
+                <div class="nav-section-title">Other</div>
+                ${this._navItemSimple('other-contacts', 'Other contacts', this._iconOther(), otherCount, v === 'other-contacts')}
+                ${this._navItemSimple('directory', 'Directory', this._iconDirectory(), AppState.directory.length, v === 'directory')}
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Settings</div>
+                ${this._navItemSimple('account', 'Account', this._iconAccount(), null, v === 'account')}
+                ${this._navItemSimple('send-mail-as', 'Send mail as', this._iconSendAs(), null, v === 'send-mail-as')}
+                ${this._navItemSimple('delegation', 'Delegation', this._iconDelegation(), null, v === 'delegation')}
+                ${this._navItemSimple('import-export', 'Import/Export', this._iconImport(), null, v === 'import-export')}
+            </div>
+        `;
     },
 
-    _navItem(view, filter, icon, label, count) {
-        const isActive = (AppState.currentView === view || AppState.currentView === 'contacts') && AppState.contactsFilter === filter;
-        const isOther = view === 'other-contacts' && AppState.currentView === 'other-contacts';
-        const isMerge = view === 'merge-suggestions' && AppState.currentView === 'merge-suggestions';
-        const active = isActive || isOther || isMerge ? ' nav-active' : '';
-        return `<div class="nav-item${active}" data-action="navigate" data-view="${view}" data-filter="${filter}">
-            <span class="material-icons nav-icon">${icon}</span>
-            <span class="nav-label">${label}</span>
-            ${count !== null && count !== undefined ? `<span class="nav-count">${count}</span>` : ''}
-        </div>`;
+    _navItem(route, filter, label, icon, count, active) {
+        return `<a class="nav-item${active ? ' active' : ''}" data-route="${Components.escapeAttr(route)}" data-filter="${Components.escapeAttr(filter)}" data-testid="nav-${Components.escapeAttr(filter)}">
+            <span class="nav-icon">${icon}</span>
+            <span class="nav-label">${Components.escapeHtml(label)}</span>
+            ${count != null ? `<span class="nav-count">${count}</span>` : ''}
+        </a>`;
     },
 
-    _sidebarNavItem(view, icon, label) {
-        const active = AppState.currentView === view ? ' nav-active' : '';
-        return `<div class="nav-item${active}" data-action="navigate" data-view="${view}">
-            <span class="material-icons nav-icon">${icon}</span>
-            <span class="nav-label">${label}</span>
-        </div>`;
+    _navItemSimple(route, label, icon, count, active) {
+        return `<a class="nav-item${active ? ' active' : ''}" data-route="${Components.escapeAttr(route)}" data-testid="nav-${Components.escapeAttr(route)}">
+            <span class="nav-icon">${icon}</span>
+            <span class="nav-label">${Components.escapeHtml(label)}</span>
+            ${count != null ? `<span class="nav-count">${count}</span>` : ''}
+        </a>`;
     },
 
-    // ---- Main Content ----
-    renderMain() {
+    // ─── Content dispatcher ───
+    renderContent() {
         switch (AppState.currentView) {
-            case 'contacts': return this.renderContacts();
+            case 'contacts': return AppState.currentContactId ? this.renderContactDetail() : this.renderContactList();
+            case 'contact-detail': return this.renderContactDetail();
+            case 'new-contact': return this.renderContactForm();
+            case 'edit-contact': return this.renderContactForm(AppState.currentContactId);
+            case 'group-detail': return this.renderGroupDetail();
             case 'other-contacts': return this.renderOtherContacts();
-            case 'merge-suggestions': return this.renderMergeSuggestions();
-            case 'delegates': return this.renderDelegates();
-            case 'linked-services': return this.renderLinkedServices();
+            case 'directory': return this.renderDirectory();
+            case 'merge-duplicates': return this.renderMergeDuplicates();
+            case 'account': return this.renderAccountSettings();
+            case 'send-mail-as': return this.renderSendMailAs();
+            case 'delegation': return this.renderDelegation();
             case 'import-export': return this.renderImportExport();
-            case 'settings': return this.renderSettings();
-            default: return this.renderContacts();
+            default: return this.renderContactList();
         }
     },
 
-    // ---- Contacts View ----
-    renderContacts() {
-        const C = Components;
-        const paged = AppState.getPagedContacts();
-        let html = `<div class="main-content">`;
+    // ─── Contact List ───
+    renderContactList() {
+        const contacts = AppState.getFilteredContacts();
+        const total = contacts.length;
+        const page = AppState.currentPage;
+        const pageSize = AppState.pageSize;
+        const paged = contacts.slice((page - 1) * pageSize, page * pageSize);
+        const selected = AppState.selectedContactIds;
+        const allOnPageSelected = paged.length > 0 && paged.every(c => selected.includes(c.id));
+
+        let filterLabel = 'All Contacts';
+        if (AppState.contactFilter === 'starred') {
+            filterLabel = 'Starred';
+        } else if (AppState.contactFilter !== 'all') {
+            const grp = AppState.getGroupById(AppState.contactFilter);
+            if (grp) filterLabel = grp.name;
+        }
+
+        let html = '<div class="content-header">';
+        html += `<h1>${Components.escapeHtml(filterLabel)} <span class="count-label">(${total})</span></h1>`;
+        html += '<div class="header-actions">';
+        html += '<button class="btn btn-secondary" data-action="merge-duplicates" data-testid="merge-duplicates-btn">Merge duplicates</button>';
+        html += '<button class="btn btn-primary" data-action="new-contact" data-testid="new-contact-btn">+ Create contact</button>';
+        html += '</div></div>';
 
         // Toolbar
-        html += `<div class="toolbar">`;
-        html += `<div class="toolbar-left">`;
-        html += C.searchBar('contact-search', AppState.searchQuery, 'Search contacts');
-        html += `</div>`;
-        html += `<div class="toolbar-right">`;
-        html += `<div class="toolbar-sort">`;
-        html += C.dropdown('sort-by', [
+        html += '<div class="toolbar">';
+        html += `<div class="search-box"><input type="text" class="form-input search-input" id="contactSearch" placeholder="Search contacts..." value="${Components.escapeAttr(AppState.searchQuery)}" data-testid="contact-search"></div>`;
+        html += '<div class="toolbar-right">';
+        html += Components.dropdown('sortDropdown', [
             { value: 'firstName', label: 'First name' },
             { value: 'lastName', label: 'Last name' },
             { value: 'email', label: 'Email' },
-            { value: 'company', label: 'Company' },
-            { value: 'updatedAt', label: 'Last updated' }
-        ], AppState.contactsSortBy, 'Sort by');
-        html += `</div>`;
-        html += `<button class="icon-btn" data-action="toggle-sort-dir" title="Toggle sort direction">
-            <span class="material-icons">${AppState.contactsSortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}</span>
-        </button>`;
-        html += `</div>`;
-        html += `</div>`;
+            { value: 'recentlyAdded', label: 'Recently added' }
+        ], AppState.contactSort, 'Sort by');
+        html += '</div></div>';
 
-        // Filter title
-        const filterTitle = this._getFilterTitle();
-        html += `<div class="content-header">
-            <h1 class="content-title">${C.escapeHtml(filterTitle)}</h1>
-            <span class="content-count">${paged.total} contact${paged.total !== 1 ? 's' : ''}</span>
-        </div>`;
-
-        // Contact list
-        if (paged.contacts.length === 0) {
-            html += C.emptyState('person_off', 'No contacts found',
-                AppState.searchQuery ? 'Try a different search term.' : 'Create a new contact to get started.',
-                AppState.searchQuery ? null : 'Create contact', 'open-create-contact');
-        } else {
-            // Table header
-            html += `<div class="contact-table">`;
-            html += `<div class="contact-table-header">
-                <div class="ct-col ct-name">Name</div>
-                <div class="ct-col ct-email">Email</div>
-                <div class="ct-col ct-phone">Phone number</div>
-                <div class="ct-col ct-company">Company</div>
-                <div class="ct-col ct-labels">Labels</div>
-                <div class="ct-col ct-actions"></div>
-            </div>`;
-
-            for (const contact of paged.contacts) {
-                const name = (contact.firstName + ' ' + contact.lastName).trim();
-                const selected = contact.id === AppState.selectedContactId;
-                html += `<div class="contact-row ${selected ? 'contact-selected' : ''}" data-contact-id="${contact.id}" data-action="select-contact">`;
-                html += `<div class="ct-col ct-name">
-                    <div class="ct-name-cell">
-                        ${C.avatar(name || contact.email, contact.avatarColor, 32)}
-                        <span class="ct-name-text">${C.escapeHtml(name || contact.email)}</span>
-                    </div>
-                </div>`;
-                html += `<div class="ct-col ct-email">${C.escapeHtml(contact.email)}</div>`;
-                html += `<div class="ct-col ct-phone">${C.escapeHtml(contact.phone || '')}</div>`;
-                html += `<div class="ct-col ct-company">${C.escapeHtml(contact.company || '')}</div>`;
-                html += `<div class="ct-col ct-labels">`;
-                if (contact.labels) {
-                    for (const lblId of contact.labels.slice(0, 3)) {
-                        const lbl = AppState.contactLabels.find(l => l.id === lblId);
-                        if (lbl) html += C.labelChip(lbl);
-                    }
-                    if (contact.labels.length > 3) {
-                        html += `<span class="label-more">+${contact.labels.length - 3}</span>`;
-                    }
-                }
-                html += `</div>`;
-                html += `<div class="ct-col ct-actions">
-                    <button class="icon-btn contact-star ${contact.isStarred ? 'starred' : ''}"
-                        data-action="toggle-star" data-contact-id="${contact.id}">
-                        <span class="material-icons">${contact.isStarred ? 'star' : 'star_border'}</span>
-                    </button>
-                    <button class="icon-btn" data-action="edit-contact" data-contact-id="${contact.id}">
-                        <span class="material-icons">edit</span>
-                    </button>
-                    <button class="icon-btn" data-action="delete-contact" data-contact-id="${contact.id}">
-                        <span class="material-icons">delete</span>
-                    </button>
-                </div>`;
-                html += `</div>`;
-            }
-            html += `</div>`;
+        // Bulk actions bar
+        if (selected.length > 0) {
+            html += '<div class="bulk-actions">';
+            html += `<span>${selected.length} selected</span>`;
+            html += '<button class="btn btn-sm" data-action="bulk-add-to-group" data-testid="bulk-add-group">Add to label</button>';
+            html += '<button class="btn btn-sm btn-danger" data-action="bulk-delete" data-testid="bulk-delete">Delete</button>';
+            html += '<button class="btn btn-sm" data-action="clear-selection">Clear</button>';
+            html += '</div>';
         }
 
-        html += C.pagination(paged.page, paged.totalPages, paged.total);
-        html += `</div>`;
+        if (paged.length === 0) {
+            html += Components.emptyState(this._iconContacts(), 'No contacts found',
+                AppState.searchQuery ? 'Try a different search term' : 'Create your first contact');
+        } else {
+            html += '<div class="contact-table">';
+            html += '<div class="contact-table-header">';
+            html += `<div class="col-check"><input type="checkbox" data-action="select-all-page" ${allOnPageSelected ? 'checked' : ''} data-testid="select-all"></div>`;
+            html += '<div class="col-name">Name</div>';
+            html += '<div class="col-email">Email</div>';
+            html += '<div class="col-phone">Phone</div>';
+            html += '<div class="col-company">Company / Title</div>';
+            html += '<div class="col-labels">Labels</div>';
+            html += '</div>';
+
+            paged.forEach(c => {
+                html += this._renderContactRow(c, selected.includes(c.id));
+            });
+            html += '</div>';
+        }
+
+        html += Components.pagination(page, total, pageSize);
         return html;
     },
 
-    _getFilterTitle() {
-        if (AppState.contactsFilter === 'all') return 'Contacts';
-        if (AppState.contactsFilter === 'starred') return 'Starred';
-        if (AppState.contactsFilter === 'frequently') return 'Frequently contacted';
-        const label = AppState.contactLabels.find(l => l.id === AppState.contactsFilter);
-        return label ? label.name : 'Contacts';
+    _renderContactRow(c, isSelected) {
+        const name = ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || c.email;
+        const color = Components.getAvatarColor(name);
+        const groups = (c.groups || []).map(gid => AppState.getGroupById(gid)).filter(Boolean);
+        const groupBadges = groups.slice(0, 3).map(g => Components.groupBadge(g)).join('');
+        const moreGroups = groups.length > 3 ? `<span class="more-badge">+${groups.length - 3}</span>` : '';
+
+        let html = `<div class="contact-row${isSelected ? ' selected' : ''}" data-contact-id="${Components.escapeAttr(c.id)}" data-testid="contact-row-${Components.escapeAttr(c.id)}">`;
+        html += `<div class="col-check"><input type="checkbox" data-action="toggle-select" data-id="${Components.escapeAttr(c.id)}" ${isSelected ? 'checked' : ''}></div>`;
+        html += `<div class="col-name"><div class="contact-name-cell">${Components.avatar(name, 28, color)}`;
+        html += `<span class="contact-name-text">${Components.escapeHtml(name)}</span>`;
+        if (c.starred) html += '<span class="star-icon filled" data-action="toggle-star" data-id="' + Components.escapeAttr(c.id) + '">&#9733;</span>';
+        else html += '<span class="star-icon" data-action="toggle-star" data-id="' + Components.escapeAttr(c.id) + '">&#9734;</span>';
+        html += '</div></div>';
+        html += `<div class="col-email">${Components.escapeHtml(c.email || '')}</div>`;
+        html += `<div class="col-phone">${Components.escapeHtml(c.phone || '')}</div>`;
+        html += `<div class="col-company">${Components.escapeHtml(c.company || '')}${c.jobTitle ? '<br><small>' + Components.escapeHtml(c.jobTitle) + '</small>' : ''}</div>`;
+        html += `<div class="col-labels">${groupBadges}${moreGroups}</div>`;
+        html += '</div>';
+        return html;
     },
 
-    // ---- Contact Detail Panel ----
+    // ─── Contact Detail ───
     renderContactDetail() {
-        const C = Components;
-        const contact = AppState.getContactById(AppState.selectedContactId);
-        if (!contact) return '';
+        const c = AppState.getContactById(AppState.currentContactId);
+        if (!c) return Components.emptyState('', 'Contact not found', 'This contact may have been deleted.');
 
-        const name = (contact.firstName + ' ' + contact.lastName).trim();
-        let html = `<div class="detail-panel">`;
+        const name = ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || c.email;
+        const color = Components.getAvatarColor(name);
+        const groups = (c.groups || []).map(gid => AppState.getGroupById(gid)).filter(Boolean);
 
-        // Header
-        html += `<div class="detail-header">
-            <button class="icon-btn" data-action="close-detail" title="Close">
-                <span class="material-icons">close</span>
-            </button>
-            <div class="detail-actions">
-                <button class="icon-btn" data-action="edit-contact" data-contact-id="${contact.id}" title="Edit">
-                    <span class="material-icons">edit</span>
-                </button>
-                <button class="icon-btn" data-action="delete-contact" data-contact-id="${contact.id}" title="Delete">
-                    <span class="material-icons">delete</span>
-                </button>
-            </div>
-        </div>`;
+        let html = '<div class="content-header">';
+        html += '<div class="breadcrumb"><a data-route="contacts" data-filter="all">Contacts</a> / <span>' + Components.escapeHtml(name) + '</span></div>';
+        html += '</div>';
 
-        // Profile
-        html += `<div class="detail-profile">
-            ${C.avatar(name, contact.avatarColor, 80)}
-            <h2 class="detail-name">${C.escapeHtml(name || contact.email)}</h2>
-            ${contact.jobTitle ? `<p class="detail-title">${C.escapeHtml(contact.jobTitle)}</p>` : ''}
-            ${contact.company ? `<p class="detail-company">${C.escapeHtml(contact.company)}</p>` : ''}
-            <button class="icon-btn contact-star ${contact.isStarred ? 'starred' : ''}"
-                data-action="toggle-star" data-contact-id="${contact.id}">
-                <span class="material-icons">${contact.isStarred ? 'star' : 'star_border'}</span>
-            </button>
-        </div>`;
+        html += '<div class="contact-detail">';
+        html += '<div class="contact-detail-header">';
+        html += Components.avatar(name, 80, color);
+        html += '<div class="contact-detail-title">';
+        html += `<h1>${Components.escapeHtml(name)}`;
+        if (c.starred) html += ' <span class="star-icon filled" data-action="toggle-star" data-id="' + Components.escapeAttr(c.id) + '">&#9733;</span>';
+        else html += ' <span class="star-icon" data-action="toggle-star" data-id="' + Components.escapeAttr(c.id) + '">&#9734;</span>';
+        html += '</h1>';
+        if (c.company || c.jobTitle) {
+            html += '<p class="contact-subtitle">';
+            if (c.jobTitle) html += Components.escapeHtml(c.jobTitle);
+            if (c.jobTitle && c.company) html += ' at ';
+            if (c.company) html += Components.escapeHtml(c.company);
+            html += '</p>';
+        }
+        html += '</div>';
+        html += '<div class="contact-detail-actions">';
+        html += `<button class="btn btn-primary" data-action="edit-contact" data-id="${Components.escapeAttr(c.id)}" data-testid="edit-contact-btn">Edit</button>`;
+        html += `<button class="btn btn-danger" data-action="delete-contact" data-id="${Components.escapeAttr(c.id)}" data-testid="delete-contact-btn">Delete</button>`;
+        html += '</div></div>';
 
-        // Contact details
-        html += `<div class="detail-section">
-            <h3 class="detail-section-title">Contact details</h3>`;
+        html += '<div class="detail-grid">';
 
-        html += this._detailRow('email', 'Email', contact.email);
-        if (contact.secondaryEmail) html += this._detailRow('email', 'Secondary email', contact.secondaryEmail);
-        if (contact.phone) html += this._detailRow('phone', 'Phone', contact.phone);
-        if (contact.secondaryPhone) html += this._detailRow('phone', 'Secondary phone', contact.secondaryPhone);
-        if (contact.address) html += this._detailRow('location_on', 'Address', contact.address);
-        if (contact.birthday) html += this._detailRow('cake', 'Birthday', this._formatBirthday(contact.birthday));
-        if (contact.website) html += this._detailRow('language', 'Website', contact.website);
-        html += `</div>`;
+        // Contact info
+        html += '<div class="detail-section"><h3>Contact Information</h3>';
+        html += '<div class="detail-fields">';
+        if (c.email) html += this._detailField('Email', c.email);
+        if (c.phone) html += this._detailField('Phone', c.phone);
+        if (c.address) html += this._detailField('Address', c.address);
+        if (c.birthday) html += this._detailField('Birthday', Components.formatDate(c.birthday + 'T00:00:00Z'));
+        html += '</div></div>';
 
         // Labels
-        html += `<div class="detail-section">
-            <h3 class="detail-section-title">Labels</h3>
-            <div class="detail-labels">`;
-        if (contact.labels && contact.labels.length > 0) {
-            for (const lblId of contact.labels) {
-                const lbl = AppState.contactLabels.find(l => l.id === lblId);
-                if (lbl) {
-                    html += `<div class="detail-label-chip">
-                        ${C.labelChip(lbl)}
-                        <button class="icon-btn icon-btn-xs" data-action="remove-label-from-contact"
-                            data-contact-id="${contact.id}" data-label-id="${lblId}" title="Remove label">
-                            <span class="material-icons">close</span>
-                        </button>
-                    </div>`;
-                }
-            }
+        html += '<div class="detail-section"><h3>Labels</h3>';
+        if (groups.length > 0) {
+            html += '<div class="detail-labels">' + groups.map(g => Components.groupBadge(g)).join('') + '</div>';
+        } else {
+            html += '<p class="text-muted">No labels assigned</p>';
         }
-        html += `<button class="btn btn-text btn-sm" data-action="open-label-picker" data-contact-id="${contact.id}">
-            <span class="material-icons btn-icon">label</span> Add label
-        </button>`;
-        html += `</div></div>`;
+        html += '</div>';
 
         // Notes
-        html += `<div class="detail-section">
-            <h3 class="detail-section-title">Notes</h3>
-            <p class="detail-notes">${C.escapeHtml(contact.notes || 'No notes')}</p>
-        </div>`;
-
-        // History
-        const history = AppState.getHistoryForContact(contact.id);
-        if (history.length > 0) {
-            html += `<div class="detail-section">
-                <h3 class="detail-section-title">Edit history</h3>
-                <div class="detail-history">`;
-            for (const h of history.slice(0, 5)) {
-                html += `<div class="history-item">
-                    <span class="material-icons history-icon">${this._historyIcon(h.action)}</span>
-                    <div class="history-info">
-                        <span class="history-text">${this._historyText(h)}</span>
-                        <span class="history-time">${C.formatDateTime(h.timestamp)}</span>
-                    </div>
-                </div>`;
-            }
-            html += `</div></div>`;
+        if (c.notes) {
+            html += '<div class="detail-section"><h3>Notes</h3>';
+            html += `<p>${Components.escapeHtml(c.notes)}</p></div>`;
         }
 
         // Metadata
-        html += `<div class="detail-section detail-meta">
-            <div class="meta-row"><span class="meta-label">Source:</span> <span class="meta-value">${C.escapeHtml(contact.source)}</span></div>
-            <div class="meta-row"><span class="meta-label">Created:</span> <span class="meta-value">${C.formatDateTime(contact.createdAt)}</span></div>
-            <div class="meta-row"><span class="meta-label">Updated:</span> <span class="meta-value">${C.formatDateTime(contact.updatedAt)}</span></div>
-        </div>`;
+        html += '<div class="detail-section"><h3>Details</h3>';
+        html += '<div class="detail-fields">';
+        html += this._detailField('Created', Components.formatDateTime(c.createdAt));
+        html += this._detailField('Updated', Components.timeAgo(c.updatedAt));
+        html += '</div></div>';
 
-        html += `</div>`;
+        html += '</div></div>';
         return html;
     },
 
-    _detailRow(icon, label, value) {
-        return `<div class="detail-row">
-            <span class="material-icons detail-row-icon">${icon}</span>
-            <div class="detail-row-content">
-                <span class="detail-row-label">${Components.escapeHtml(label)}</span>
-                <span class="detail-row-value">${Components.escapeHtml(value)}</span>
-            </div>
-        </div>`;
+    _detailField(label, value) {
+        return `<div class="detail-field"><span class="detail-label">${Components.escapeHtml(label)}</span><span class="detail-value">${Components.escapeHtml(value)}</span></div>`;
     },
 
-    _formatBirthday(dateStr) {
-        if (!dateStr) return '';
-        const parts = dateStr.split('-');
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        return `${months[parseInt(parts[1]) - 1]} ${parseInt(parts[2])}, ${parts[0]}`;
+    // ─── Contact Form ───
+    renderContactForm(contactId) {
+        const c = contactId ? AppState.getContactById(contactId) : null;
+        const title = c ? 'Edit Contact' : 'New Contact';
+        const breadcrumb = c ? `<a data-route="contacts" data-filter="all">Contacts</a> / <a data-route="contact-detail" data-id="${Components.escapeAttr(c.id)}">${Components.escapeHtml((c.firstName + ' ' + c.lastName).trim())}</a> / Edit` :
+            '<a data-route="contacts" data-filter="all">Contacts</a> / New';
+
+        let html = '<div class="content-header"><div class="breadcrumb">' + breadcrumb + '</div></div>';
+        html += `<div class="form-container"><h2>${Components.escapeHtml(title)}</h2>`;
+        html += '<div class="form-grid">';
+        html += '<div class="form-row two-col">';
+        html += '<div class="form-field">' + Components.textInput('firstName', c ? c.firstName : '', 'First name', 'First name') + '</div>';
+        html += '<div class="form-field">' + Components.textInput('lastName', c ? c.lastName : '', 'Last name', 'Last name') + '</div>';
+        html += '</div>';
+        html += '<div class="form-field">' + Components.textInput('contactEmail', c ? c.email : '', 'email@example.com', 'Email *') + '</div>';
+        html += '<div class="form-field">' + Components.textInput('contactPhone', c ? c.phone : '', '+1 (555) 123-4567', 'Phone') + '</div>';
+        html += '<div class="form-row two-col">';
+        html += '<div class="form-field">' + Components.textInput('contactCompany', c ? c.company : '', 'Company name', 'Company') + '</div>';
+        html += '<div class="form-field">' + Components.textInput('contactJobTitle', c ? c.jobTitle : '', 'Job title', 'Job title') + '</div>';
+        html += '</div>';
+        html += '<div class="form-field">' + Components.textInput('contactAddress', c ? c.address : '', 'Full address', 'Address') + '</div>';
+        html += '<div class="form-field">' + Components.textInput('contactBirthday', c ? c.birthday : '', 'YYYY-MM-DD', 'Birthday') + '</div>';
+        html += '<div class="form-field">' + Components.textarea('contactNotes', c ? c.notes : '', 'Add notes...', 'Notes') + '</div>';
+
+        // Group checkboxes
+        html += '<div class="form-field"><label class="form-label">Labels</label><div class="checkbox-grid">';
+        AppState.contactGroups.forEach(g => {
+            const checked = c && c.groups && c.groups.includes(g.id);
+            html += Components.checkbox('group-' + g.id, checked, g.name);
+        });
+        html += '</div></div>';
+
+        html += '</div>';
+        html += '<div class="form-actions">';
+        html += '<button class="btn btn-secondary" data-action="cancel-form">Cancel</button>';
+        html += `<button class="btn btn-primary" data-action="save-contact" data-id="${Components.escapeAttr(contactId || '')}" data-testid="save-contact-btn">Save</button>`;
+        html += '</div></div>';
+
+        return html;
     },
 
-    _historyIcon(action) {
-        const icons = { created: 'person_add', edited: 'edit', label_added: 'label', label_removed: 'label_off' };
-        return icons[action] || 'history';
+    // ─── Group Detail ───
+    renderGroupDetail() {
+        const g = AppState.getGroupById(AppState.currentGroupId);
+        if (!g) return Components.emptyState('', 'Label not found', '');
+
+        const contacts = AppState.getContactsForGroup(g.id);
+
+        let html = '<div class="content-header">';
+        html += `<div class="breadcrumb"><a data-route="contacts" data-filter="all">Contacts</a> / ${Components.escapeHtml(g.name)}</div>`;
+        html += '<div class="header-actions">';
+        html += `<button class="btn btn-sm" data-action="rename-group" data-id="${Components.escapeAttr(g.id)}" data-testid="rename-group-btn">Rename</button>`;
+        html += `<button class="btn btn-sm btn-danger" data-action="delete-group" data-id="${Components.escapeAttr(g.id)}" data-testid="delete-group-btn">Delete</button>`;
+        html += '</div></div>';
+
+        html += `<h2>${Components.escapeHtml(g.name)} <span class="count-label">(${contacts.length} contacts)</span></h2>`;
+
+        if (contacts.length === 0) {
+            html += Components.emptyState('', 'No contacts in this label', 'Add contacts to this label from the contact list');
+        } else {
+            html += '<div class="contact-table"><div class="contact-table-header">';
+            html += '<div class="col-name">Name</div>';
+            html += '<div class="col-email">Email</div>';
+            html += '<div class="col-phone">Phone</div>';
+            html += '<div class="col-company">Company</div>';
+            html += '<div class="col-actions">Actions</div>';
+            html += '</div>';
+            contacts.forEach(c => {
+                const name = ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || c.email;
+                const color = Components.getAvatarColor(name);
+                html += `<div class="contact-row" data-contact-id="${Components.escapeAttr(c.id)}">`;
+                html += `<div class="col-name"><div class="contact-name-cell">${Components.avatar(name, 28, color)}<span class="contact-name-text">${Components.escapeHtml(name)}</span></div></div>`;
+                html += `<div class="col-email">${Components.escapeHtml(c.email || '')}</div>`;
+                html += `<div class="col-phone">${Components.escapeHtml(c.phone || '')}</div>`;
+                html += `<div class="col-company">${Components.escapeHtml(c.company || '')}</div>`;
+                html += `<div class="col-actions"><button class="btn btn-sm btn-danger" data-action="remove-from-group" data-contact-id="${Components.escapeAttr(c.id)}" data-group-id="${Components.escapeAttr(g.id)}">Remove</button></div>`;
+                html += '</div>';
+            });
+            html += '</div>';
+        }
+        return html;
     },
 
-    _historyText(h) {
-        if (h.action === 'created') return 'Contact created';
-        if (h.action === 'edited') return `Changed ${h.field}: "${h.oldValue || ''}" → "${h.newValue || ''}"`;
-        if (h.action === 'label_added') return `Added label "${h.newValue}"`;
-        if (h.action === 'label_removed') return `Removed label "${h.oldValue}"`;
-        return h.action;
-    },
-
-    // ---- Other Contacts ----
+    // ─── Other Contacts ───
     renderOtherContacts() {
-        const C = Components;
-        let html = `<div class="main-content">`;
-        html += `<div class="content-header">
-            <h1 class="content-title">Other contacts</h1>
-            <span class="content-count">${AppState.otherContacts.length} contact${AppState.otherContacts.length !== 1 ? 's' : ''}</span>
-        </div>`;
-        html += `<p class="content-description">Contacts auto-saved from people you've emailed. You can add them to your contacts or delete them.</p>`;
+        const contacts = AppState.getFilteredOtherContacts();
 
-        if (AppState.otherContacts.length === 0) {
-            html += C.emptyState('person_outline', 'No other contacts', 'Auto-saved contacts from email interactions will appear here.');
+        let html = '<div class="content-header"><h1>Other Contacts <span class="count-label">(' + contacts.length + ')</span></h1></div>';
+        html += '<p class="section-description">People you\'ve interacted with via email who aren\'t in your contacts.</p>';
+        html += `<div class="toolbar"><div class="search-box"><input type="text" class="form-input search-input" id="otherContactSearch" placeholder="Search other contacts..." value="${Components.escapeAttr(AppState.otherContactSearch)}" data-testid="other-contact-search"></div></div>`;
+
+        if (contacts.length === 0) {
+            html += Components.emptyState('', 'No other contacts found', '');
         } else {
-            html += `<div class="other-contacts-list">`;
-            const sorted = [...AppState.otherContacts].sort((a, b) =>
-                new Date(b.lastInteraction) - new Date(a.lastInteraction));
-            for (const contact of sorted) {
-                html += C.otherContactCard(contact);
-            }
-            html += `</div>`;
+            html += '<div class="contact-table"><div class="contact-table-header">';
+            html += '<div class="col-name">Name / Email</div>';
+            html += '<div class="col-interactions">Interactions</div>';
+            html += '<div class="col-last-contact">Last interaction</div>';
+            html += '<div class="col-actions">Actions</div>';
+            html += '</div>';
+            contacts.forEach(c => {
+                const displayName = ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || c.email;
+                const color = Components.getAvatarColor(c.email);
+                html += `<div class="contact-row" data-other-contact-id="${Components.escapeAttr(c.id)}">`;
+                html += `<div class="col-name"><div class="contact-name-cell">${Components.avatar(displayName, 28, color)}<div><span class="contact-name-text">${Components.escapeHtml(displayName)}</span>`;
+                if (displayName !== c.email) html += `<br><small class="text-muted">${Components.escapeHtml(c.email)}</small>`;
+                html += '</div></div></div>';
+                html += `<div class="col-interactions">${c.interactionCount} emails</div>`;
+                html += `<div class="col-last-contact">${Components.timeAgo(c.lastInteraction)}</div>`;
+                html += '<div class="col-actions">';
+                html += `<button class="btn btn-sm btn-primary" data-action="promote-other" data-id="${Components.escapeAttr(c.id)}" data-testid="promote-${Components.escapeAttr(c.id)}">Add to contacts</button>`;
+                html += `<button class="btn btn-sm btn-danger" data-action="delete-other" data-id="${Components.escapeAttr(c.id)}">Delete</button>`;
+                html += '</div></div>';
+            });
+            html += '</div>';
         }
-        html += `</div>`;
         return html;
     },
 
-    // ---- Merge Suggestions ----
-    renderMergeSuggestions() {
-        const C = Components;
-        const suggestions = AppState.mergeSuggestions.filter(s => !s.dismissed);
-        let html = `<div class="main-content">`;
-        html += `<div class="content-header">
-            <h1 class="content-title">Merge & fix</h1>
-            <span class="content-count">${suggestions.length} suggestion${suggestions.length !== 1 ? 's' : ''}</span>
-        </div>`;
+    // ─── Directory ───
+    renderDirectory() {
+        const entries = AppState.getFilteredDirectory();
+        const departments = [...new Set(AppState.directory.map(d => d.department))].sort();
 
-        if (suggestions.length === 0) {
-            html += C.emptyState('check_circle', 'All clean!', 'No duplicate contacts found.');
+        let html = '<div class="content-header"><h1>Directory <span class="count-label">(' + entries.length + ')</span></h1></div>';
+        html += '<p class="section-description">Your organization\'s directory at TechCorp.</p>';
+        html += `<div class="toolbar"><div class="search-box"><input type="text" class="form-input search-input" id="directorySearch" placeholder="Search by name, email, department..." value="${Components.escapeAttr(AppState.directorySearch)}" data-testid="directory-search"></div></div>`;
+
+        if (entries.length === 0) {
+            html += Components.emptyState('', 'No results found', 'Try a different search term');
         } else {
-            for (const suggestion of suggestions) {
-                html += `<div class="merge-card" data-merge-id="${suggestion.id}">
-                    <div class="merge-header">
-                        <span class="material-icons merge-icon">merge_type</span>
-                        <span class="merge-reason">${C.escapeHtml(suggestion.reason)}</span>
-                    </div>
-                    <div class="merge-contacts">`;
-                for (const cId of suggestion.contacts) {
-                    const c = AppState.getContactById(cId);
-                    if (c) {
-                        const name = (c.firstName + ' ' + c.lastName).trim();
-                        html += `<div class="merge-contact-item">
-                            ${C.avatar(name, c.avatarColor, 32)}
-                            <div>
-                                <div class="merge-contact-name">${C.escapeHtml(name)}</div>
-                                <div class="merge-contact-email">${C.escapeHtml(c.email)}</div>
-                            </div>
-                        </div>`;
-                    }
-                }
-                html += `</div>`;
-                html += `<div class="merge-actions">
-                    <button class="btn btn-primary btn-sm" data-action="merge-contacts" data-merge-id="${suggestion.id}">Merge</button>
-                    <button class="btn btn-secondary btn-sm" data-action="dismiss-merge" data-merge-id="${suggestion.id}">Dismiss</button>
-                </div>`;
-                html += `</div>`;
-            }
+            html += '<div class="contact-table"><div class="contact-table-header">';
+            html += '<div class="col-name">Name</div>';
+            html += '<div class="col-email">Email</div>';
+            html += '<div class="col-dept">Department</div>';
+            html += '<div class="col-title">Title</div>';
+            html += '<div class="col-location">Location</div>';
+            html += '</div>';
+            entries.forEach(d => {
+                const color = Components.getAvatarColor(d.name);
+                html += '<div class="contact-row directory-row">';
+                html += `<div class="col-name"><div class="contact-name-cell">${Components.avatar(d.name, 28, color)}<span class="contact-name-text">${Components.escapeHtml(d.name)}</span></div></div>`;
+                html += `<div class="col-email">${Components.escapeHtml(d.email)}</div>`;
+                html += `<div class="col-dept"><span class="dept-badge">${Components.escapeHtml(d.department)}</span></div>`;
+                html += `<div class="col-title">${Components.escapeHtml(d.title)}</div>`;
+                html += `<div class="col-location">${Components.escapeHtml(d.location)}</div>`;
+                html += '</div>';
+            });
+            html += '</div>';
         }
-        html += `</div>`;
         return html;
     },
 
-    // ---- Delegates ----
-    renderDelegates() {
-        const C = Components;
-        const settings = AppState.accountSettings;
-        let html = `<div class="main-content">`;
-        html += `<div class="content-header">
-            <h1 class="content-title">Delegate access</h1>
-        </div>`;
-        html += `<p class="content-description">Grant others access to read, send, and delete emails on your behalf. Delegates cannot use chat or change your password. You can add up to ${settings.collaborationSettings.maxDelegates} delegates.</p>`;
+    // ─── Account Settings ───
+    renderAccountSettings() {
+        const u = AppState.currentUser;
+        let html = '<div class="content-header"><h1>Account Settings</h1></div>';
+        html += '<div class="settings-container">';
 
-        // Add delegate button
-        html += `<div class="section-actions">
-            <button class="btn btn-primary" data-action="open-add-delegate">
-                <span class="material-icons btn-icon">person_add</span> Add a delegate
-            </button>
-        </div>`;
+        // Profile info
+        html += '<div class="settings-section">';
+        html += '<h2>Google Account</h2>';
+        html += '<div class="settings-card">';
+        html += '<div class="profile-header">';
+        html += Components.avatar(u.firstName + ' ' + u.lastName, 64, '#1a73e8');
+        html += '<div class="profile-info">';
+        html += `<h3>${Components.escapeHtml(u.firstName + ' ' + u.lastName)}</h3>`;
+        html += `<p class="text-muted">${Components.escapeHtml(u.email)}</p>`;
+        html += '</div></div>';
+        html += '<div class="settings-fields">';
+        html += this._settingsField('Name', u.firstName + ' ' + u.lastName, 'edit-name');
+        html += this._settingsField('Email', u.email, null);
+        html += this._settingsField('Recovery email', u.recoveryEmail || 'Not set', 'edit-recovery-email');
+        html += this._settingsField('Recovery phone', u.recoveryPhone || 'Not set', 'edit-recovery-phone');
+        html += '</div></div></div>';
 
-        // Delegates list
+        // Security
+        html += '<div class="settings-section">';
+        html += '<h2>Sign-in &amp; Security</h2>';
+        html += '<div class="settings-card">';
+        html += '<div class="settings-fields">';
+        html += this._settingsField('Password', 'Last changed ' + Components.formatDate(u.lastPasswordChange), 'change-password');
+        html += `<div class="settings-field-row"><span class="settings-field-label">2-Step Verification</span><span class="settings-field-value">${u.twoStepVerification ? '<span class="badge badge-success">On</span>' : '<span class="badge badge-warning">Off</span>'}</span><button class="btn btn-sm" data-action="toggle-2sv" data-testid="toggle-2sv-btn">${u.twoStepVerification ? 'Turn off' : 'Turn on'}</button></div>`;
+        html += '</div></div>';
+
+        // App Passwords
+        html += '<div class="settings-card">';
+        html += '<h3>App Passwords</h3>';
+        html += '<p class="text-muted">App-specific passwords for third-party mail clients.</p>';
+        if (AppState.appPasswords.length > 0) {
+            html += '<div class="app-password-list">';
+            AppState.appPasswords.forEach(ap => {
+                html += `<div class="app-password-item" data-testid="app-password-${Components.escapeAttr(ap.id)}">`;
+                html += `<div><strong>${Components.escapeHtml(ap.name)}</strong><br><small class="text-muted">Created ${Components.formatDate(ap.createdAt)}${ap.lastUsed ? ' &middot; Last used ' + Components.timeAgo(ap.lastUsed) : ''}</small></div>`;
+                html += `<button class="btn btn-sm btn-danger" data-action="delete-app-password" data-id="${Components.escapeAttr(ap.id)}">Revoke</button>`;
+                html += '</div>';
+            });
+            html += '</div>';
+        }
+        html += '<button class="btn btn-sm btn-primary" data-action="new-app-password" data-testid="new-app-password-btn">Generate app password</button>';
+        html += '</div></div>';
+
+        html += '</div>';
+        return html;
+    },
+
+    _settingsField(label, value, action) {
+        let html = '<div class="settings-field-row">';
+        html += `<span class="settings-field-label">${Components.escapeHtml(label)}</span>`;
+        html += `<span class="settings-field-value">${value}</span>`;
+        if (action) {
+            html += `<button class="btn btn-sm" data-action="${Components.escapeAttr(action)}" data-testid="${Components.escapeAttr(action)}-btn">Edit</button>`;
+        }
+        html += '</div>';
+        return html;
+    },
+
+    // ─── Send Mail As ───
+    renderSendMailAs() {
+        let html = '<div class="content-header"><h1>Send Mail As</h1></div>';
+        html += '<div class="settings-container">';
+
+        // Reply-from setting
+        html += '<div class="settings-section">';
+        html += '<h2>When replying to a message</h2>';
+        html += '<div class="settings-card">';
+        html += Components.radioGroup('replyFrom', [
+            { value: 'default', label: 'Always reply from default address', description: 'Replies will always come from your default "From" address' },
+            { value: 'same', label: 'Reply from the same address the message was sent to', description: 'Replies will use the address the original message was delivered to' }
+        ], AppState.replyFromSetting);
+        html += '</div></div>';
+
+        // Aliases list
+        html += '<div class="settings-section">';
+        html += '<h2>Email Addresses</h2>';
+        html += '<p class="section-description">You can send mail as any of these addresses.</p>';
+        html += '<div class="alias-list">';
+        AppState.aliases.forEach(a => {
+            html += `<div class="alias-item${a.isDefault ? ' alias-default' : ''}" data-testid="alias-${Components.escapeAttr(a.id)}">`;
+            html += '<div class="alias-info">';
+            html += `<strong>${Components.escapeHtml(a.name)}</strong> &lt;${Components.escapeHtml(a.email)}&gt;`;
+            if (a.isPrimary) html += ' <span class="badge badge-default">Primary</span>';
+            if (a.isDefault) html += ' <span class="badge badge-success">Default</span>';
+            if (a.smtpServer) html += `<br><small class="text-muted">via ${Components.escapeHtml(a.smtpServer)}:${Components.escapeHtml(a.smtpPort)}</small>`;
+            html += '</div>';
+            html += '<div class="alias-actions">';
+            if (!a.isDefault) html += `<button class="btn btn-sm" data-action="set-default-alias" data-id="${Components.escapeAttr(a.id)}" data-testid="default-${Components.escapeAttr(a.id)}">Make default</button>`;
+            if (!a.isPrimary) {
+                html += `<button class="btn btn-sm" data-action="edit-alias" data-id="${Components.escapeAttr(a.id)}" data-testid="edit-alias-${Components.escapeAttr(a.id)}">Edit</button>`;
+                html += `<button class="btn btn-sm btn-danger" data-action="delete-alias" data-id="${Components.escapeAttr(a.id)}" data-testid="delete-alias-${Components.escapeAttr(a.id)}">Remove</button>`;
+            }
+            html += '</div></div>';
+        });
+        html += '</div>';
+        html += '<button class="btn btn-primary" data-action="new-alias" data-testid="new-alias-btn">Add another email address</button>';
+        html += '</div></div>';
+
+        return html;
+    },
+
+    // ─── Delegation ───
+    renderDelegation() {
+        let html = '<div class="content-header"><h1>Email Delegation</h1></div>';
+        html += '<div class="settings-container">';
+        html += '<p class="section-description">Grant other people access to read, send, and delete messages on your behalf. Delegates can also manage your contacts.</p>';
+
+        html += '<div class="settings-section">';
+        html += '<h2>Delegates</h2>';
         if (AppState.delegates.length === 0) {
-            html += C.emptyState('supervisor_account', 'No delegates', 'Add a delegate to grant them access to your email.');
+            html += '<p class="text-muted">No delegates configured.</p>';
         } else {
-            html += `<div class="delegates-list">`;
-            for (const d of AppState.delegates) {
-                html += `<div class="delegate-card" data-delegate-id="${d.id}">
-                    <div class="delegate-info">
-                        ${C.avatar(d.name, '#757575', 40)}
-                        <div class="delegate-details">
-                            <div class="delegate-name">${C.escapeHtml(d.name)}</div>
-                            <div class="delegate-email">${C.escapeHtml(d.email)}</div>
-                            <div class="delegate-meta">Added ${C.formatDate(d.addedAt)}${d.activatedAt ? ' · Activated ' + C.formatDate(d.activatedAt) : ''}</div>
-                        </div>
-                    </div>
-                    <div class="delegate-actions">
-                        ${C.statusBadge(d.status)}
-                        <button class="icon-btn" data-action="remove-delegate" data-delegate-id="${d.id}" title="Remove delegate">
-                            <span class="material-icons">close</span>
-                        </button>
-                    </div>
-                </div>`;
-            }
-            html += `</div>`;
+            html += '<div class="delegate-list">';
+            AppState.delegates.forEach(d => {
+                html += `<div class="delegate-item" data-testid="delegate-${Components.escapeAttr(d.id)}">`;
+                html += '<div class="delegate-info">';
+                html += `${Components.avatar(d.name, 32, Components.getAvatarColor(d.name))}`;
+                html += `<div><strong>${Components.escapeHtml(d.name)}</strong><br><small class="text-muted">${Components.escapeHtml(d.email)}</small></div>`;
+                html += '</div>';
+                html += `<div class="delegate-status">${Components.statusBadge(d.status)}</div>`;
+                html += `<button class="btn btn-sm btn-danger" data-action="remove-delegate" data-id="${Components.escapeAttr(d.id)}" data-testid="remove-delegate-${Components.escapeAttr(d.id)}">Remove</button>`;
+                html += '</div>';
+            });
+            html += '</div>';
         }
+        html += '<button class="btn btn-primary" data-action="add-delegate" data-testid="add-delegate-btn">Add delegate</button>';
+        html += '</div></div>';
 
-        // Delegate info
-        html += `<div class="info-section">
-            <h3 class="info-title">About delegation</h3>
-            <div class="info-grid">
-                <div class="info-card">
-                    <span class="material-icons info-card-icon">check_circle</span>
-                    <div class="info-card-content">
-                        <strong>What delegates can do:</strong>
-                        <ul><li>Read your email</li><li>Send email on your behalf</li><li>Delete email messages</li></ul>
-                    </div>
-                </div>
-                <div class="info-card">
-                    <span class="material-icons info-card-icon" style="color:var(--color-danger);">cancel</span>
-                    <div class="info-card-content">
-                        <strong>What delegates cannot do:</strong>
-                        <ul><li>Use Google Chat</li><li>Change your password</li><li>Change account settings</li></ul>
-                    </div>
-                </div>
-                <div class="info-card">
-                    <span class="material-icons info-card-icon" style="color:var(--color-warning);">schedule</span>
-                    <div class="info-card-content">
-                        <strong>Activation:</strong>
-                        <p>After adding a delegate, they must confirm. Invitations expire in 1 week. It can take up to 24 hours for access to activate.</p>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-
-        html += `</div>`;
         return html;
     },
 
-    // ---- Linked Services ----
-    renderLinkedServices() {
-        const C = Components;
-        let html = `<div class="main-content">`;
-        html += `<div class="content-header">
-            <h1 class="content-title">Linked Google Services</h1>
-        </div>`;
-        html += `<p class="content-description">Under the EU's Digital Markets Act (DMA), you can choose which Google services are linked to your account. Linked services can share data to personalize your experience.</p>`;
-
-        // Linkable services
-        html += `<div class="section-block">
-            <h3 class="section-title">Services you can link or unlink</h3>
-            <div class="services-list">`;
-        for (const svc of AppState.linkedServices) {
-            html += `<div class="service-card" data-service-id="${svc.id}">
-                <div class="service-info">
-                    <span class="material-icons service-icon">${svc.icon}</span>
-                    <div class="service-details">
-                        <div class="service-name">${C.escapeHtml(svc.name)}</div>
-                        <div class="service-desc">${C.escapeHtml(svc.description)}</div>
-                    </div>
-                </div>
-                <label class="toggle-switch">
-                    <input type="checkbox" data-toggle="linked-service" data-service-id="${svc.id}" ${svc.isLinked ? 'checked' : ''}>
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>`;
-        }
-        html += `</div></div>`;
-
-        // Always linked services
-        html += `<div class="section-block">
-            <h3 class="section-title">Always linked services</h3>
-            <p class="section-description">These services are always linked to your Google Account and cannot be unlinked.</p>
-            <div class="services-list services-always-linked">`;
-        for (const svc of AppState.alwaysLinkedServices) {
-            html += `<div class="service-card service-always-linked">
-                <div class="service-info">
-                    <span class="material-icons service-icon">check_circle</span>
-                    <div class="service-details">
-                        <div class="service-name">${C.escapeHtml(svc.name)}</div>
-                        <div class="service-desc">${C.escapeHtml(svc.description)}</div>
-                    </div>
-                </div>
-                <span class="service-locked">
-                    <span class="material-icons">lock</span> Always linked
-                </span>
-            </div>`;
-        }
-        html += `</div></div>`;
-
-        // Info note
-        html += `<div class="info-box">
-            <span class="material-icons">info</span>
-            <p>Regardless of your linking choices, Google may still use data across services for fraud prevention, spam protection, security, and legal compliance. You remain signed into all Google services.</p>
-        </div>`;
-
-        html += `</div>`;
-        return html;
-    },
-
-    // ---- Import & Export ----
+    // ─── Import / Export ───
     renderImportExport() {
-        const C = Components;
-        let html = `<div class="main-content">`;
-        html += `<div class="content-header">
-            <h1 class="content-title">Import & Export</h1>
-        </div>`;
+        let html = '<div class="content-header"><h1>Import &amp; Export</h1></div>';
+        html += '<div class="settings-container">';
 
-        // Import section
-        html += `<div class="section-block">
-            <h3 class="section-title">Import contacts</h3>
-            <p class="section-description">Import contacts from a CSV or vCard file.</p>
-            <div class="import-area" data-action="trigger-import">
-                <span class="material-icons import-icon">cloud_upload</span>
-                <p class="import-text">Click to select a file</p>
-                <p class="import-formats">Supported formats: CSV, vCard (.vcf)</p>
-            </div>
-        </div>`;
-
-        // Export section
-        html += `<div class="section-block">
-            <h3 class="section-title">Export contacts</h3>
-            <p class="section-description">Export your contacts to a file for backup or transfer.</p>
-            <div class="export-options">`;
-        html += C.dropdown('export-format', [
-            { value: 'google_csv', label: 'Google CSV' },
-            { value: 'outlook_csv', label: 'Outlook CSV' },
-            { value: 'vcard', label: 'vCard (for iOS contacts)' }
-        ], 'google_csv', 'Export format');
-        html += `<div class="export-scope">`;
-        html += `<label class="radio-option"><input type="radio" name="export-scope" value="all" checked data-radio="export-scope"> All contacts (${AppState.contacts.length})</label>`;
-        html += `<label class="radio-option"><input type="radio" name="export-scope" value="starred" data-radio="export-scope"> Starred contacts (${AppState.contacts.filter(c => c.isStarred).length})</label>`;
-        html += `<label class="radio-option"><input type="radio" name="export-scope" value="label" data-radio="export-scope"> By label</label>`;
-        html += `</div>`;
-        html += `<button class="btn btn-primary" data-action="export-contacts">
-            <span class="material-icons btn-icon">download</span> Export
-        </button>`;
-        html += `</div></div>`;
-
-        // History
-        if (AppState.importExportHistory.length > 0) {
-            html += `<div class="section-block">
-                <h3 class="section-title">History</h3>
-                <div class="ie-history-list">`;
-            for (const entry of AppState.importExportHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))) {
-                html += `<div class="ie-history-item">
-                    <span class="material-icons ie-icon">${entry.type === 'import' ? 'cloud_upload' : 'cloud_download'}</span>
-                    <div class="ie-details">
-                        <div class="ie-name">${C.escapeHtml(entry.fileName)}</div>
-                        <div class="ie-meta">${entry.type === 'import' ? 'Imported' : 'Exported'} ${entry.count} contacts · ${C.formatDate(entry.timestamp)} · ${C.escapeHtml(entry.format)}</div>
-                    </div>
-                    ${C.statusBadge(entry.status)}
-                </div>`;
-            }
-            html += `</div></div>`;
+        // Check mail from other accounts
+        html += '<div class="settings-section">';
+        html += '<h2>Check Mail From Other Accounts</h2>';
+        html += '<p class="section-description">Import mail from other email accounts using POP3.</p>';
+        if (AppState.importAccounts.length > 0) {
+            html += '<div class="import-list">';
+            AppState.importAccounts.forEach(imp => {
+                html += `<div class="import-item" data-testid="import-${Components.escapeAttr(imp.id)}">`;
+                html += '<div class="import-info">';
+                html += `<strong>${Components.escapeHtml(imp.email)}</strong>`;
+                html += ` ${Components.statusBadge(imp.status)}`;
+                html += `<br><small class="text-muted">Server: ${Components.escapeHtml(imp.server)}:${Components.escapeHtml(imp.port)} (${imp.useSSL ? 'SSL' : 'No SSL'})</small>`;
+                if (imp.labelIncoming) html += `<br><small class="text-muted">Label: ${Components.escapeHtml(imp.labelIncoming)}</small>`;
+                if (imp.errorMessage) html += `<br><small class="text-danger">${Components.escapeHtml(imp.errorMessage)}</small>`;
+                html += `<br><small class="text-muted">Last checked: ${Components.timeAgo(imp.lastChecked)}</small>`;
+                html += '</div>';
+                html += `<button class="btn btn-sm btn-danger" data-action="remove-import" data-id="${Components.escapeAttr(imp.id)}" data-testid="remove-import-${Components.escapeAttr(imp.id)}">Remove</button>`;
+                html += '</div>';
+            });
+            html += '</div>';
         }
+        html += '<button class="btn btn-primary" data-action="add-import" data-testid="add-import-btn">Add a mail account</button>';
+        html += '</div>';
 
-        html += `</div>`;
+        // Export
+        html += '<div class="settings-section">';
+        html += '<h2>Export Contacts</h2>';
+        html += '<p class="section-description">Download your contacts in CSV or vCard format.</p>';
+        html += '<div class="settings-card">';
+        html += '<div class="export-options">';
+        html += Components.radioGroup('exportFormat', [
+            { value: 'csv', label: 'Google CSV', description: 'Compatible with Google Contacts import' },
+            { value: 'outlook-csv', label: 'Outlook CSV', description: 'Compatible with Microsoft Outlook' },
+            { value: 'vcard', label: 'vCard', description: 'Compatible with Apple Contacts and other apps' }
+        ], 'csv');
+        html += '<div class="export-scope">';
+        html += Components.radioGroup('exportScope', [
+            { value: 'all', label: 'All contacts (' + AppState.contacts.length + ')' },
+            { value: 'starred', label: 'Starred contacts (' + AppState.getStarredContacts().length + ')' }
+        ], 'all');
+        html += '</div>';
+        html += '<button class="btn btn-primary" data-action="export-contacts" data-testid="export-btn">Export</button>';
+        html += '</div></div></div>';
+
+        html += '</div>';
         return html;
     },
 
-    // ---- Settings ----
-    renderSettings() {
-        const C = Components;
-        const settings = AppState.accountSettings;
-        const user = AppState.currentUser;
-        const tab = AppState.settingsTab;
-        let html = `<div class="main-content">`;
-        html += `<div class="content-header">
-            <h1 class="content-title">Settings</h1>
-        </div>`;
+    // ─── Merge Duplicates ───
+    renderMergeDuplicates() {
+        const pairs = AppState.findDuplicates();
 
-        // Tab bar
-        html += `<div class="tabs">`;
-        html += `<button class="tab ${tab === 'general' ? 'tab-active' : ''}" data-action="settings-tab" data-tab="general">General</button>`;
-        html += `<button class="tab ${tab === 'account' ? 'tab-active' : ''}" data-action="settings-tab" data-tab="account">Account</button>`;
-        html += `<button class="tab ${tab === 'privacy' ? 'tab-active' : ''}" data-action="settings-tab" data-tab="privacy">Privacy</button>`;
-        html += `<button class="tab ${tab === 'notifications' ? 'tab-active' : ''}" data-action="settings-tab" data-tab="notifications">Notifications</button>`;
-        html += `<button class="tab ${tab === 'sync' ? 'tab-active' : ''}" data-action="settings-tab" data-tab="sync">Sync & Google Sync</button>`;
-        html += `</div>`;
+        let html = '<div class="content-header">';
+        html += '<div class="breadcrumb"><a data-route="contacts" data-filter="all">Contacts</a> / Merge duplicates</div>';
+        html += '</div>';
+        html += '<h1>Merge Duplicate Contacts</h1>';
+        html += '<p class="section-description">Review potential duplicate contacts and merge them. The primary contact\'s data is kept; empty fields are filled from the duplicate.</p>';
 
-        html += `<div class="settings-content">`;
-
-        if (tab === 'general') {
-            html += this._renderGeneralSettings(settings);
-        } else if (tab === 'account') {
-            html += this._renderAccountSettings(user);
-        } else if (tab === 'privacy') {
-            html += this._renderPrivacySettings(settings);
-        } else if (tab === 'notifications') {
-            html += this._renderNotificationSettings(settings);
-        } else if (tab === 'sync') {
-            html += this._renderSyncSettings(settings);
-        }
-
-        html += `</div></div>`;
-        return html;
-    },
-
-    _renderGeneralSettings(settings) {
-        const C = Components;
-        let html = '';
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Contacts display</h3>`;
-        html += C.dropdown('contacts-sort-setting', [
-            { value: 'firstName', label: 'First name' },
-            { value: 'lastName', label: 'Last name' }
-        ], settings.contactsSortBy, 'Sort contacts by');
-        html += `<div class="form-field">
-            <label class="form-label">Name display order</label>`;
-        html += C.dropdown('contacts-display-order', [
-            { value: 'firstLast', label: 'First name first (e.g., John Smith)' },
-            { value: 'lastFirst', label: 'Last name first (e.g., Smith, John)' }
-        ], settings.contactsDisplayOrder, 'Display order');
-        html += `</div></div>`;
-
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Auto-save contacts</h3>
-            <p class="settings-description">When enabled, Gmail automatically saves contacts when you send emails to new people.</p>`;
-        html += C.toggle('auto-save-contacts', 'Automatically add contacts',
-            settings.autoSaveContacts, 'Save contacts from people you email');
-        html += `</div>`;
-
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Collaboration</h3>`;
-        html += C.toggle('share-docs-in-email', 'Share Google Docs in email',
-            settings.collaborationSettings.shareDocsInEmail, 'Allow sharing and updating permissions for Google Docs directly in Gmail');
-        html += C.toggle('show-contact-info', 'Show contact info on emails',
-            settings.collaborationSettings.showContactInfo, 'Display sender contact information when viewing emails');
-        html += `</div>`;
-        return html;
-    },
-
-    _renderAccountSettings(user) {
-        const C = Components;
-        let html = '';
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Your profile</h3>
-            <div class="profile-card">
-                ${C.avatar(user.name, user.avatarColor, 64)}
-                <div class="profile-info">
-                    <div class="profile-name">${C.escapeHtml(user.name)}</div>
-                    <div class="profile-email">${C.escapeHtml(user.email)}</div>
-                </div>
-            </div>`;
-
-        html += C.textInput('user-name', 'Name', user.name, 'Your name', true);
-        html += C.textInput('user-email', 'Primary email', user.email, '', false, 'email');
-        html += `<div class="form-field">
-            <label class="form-label">Alternate email addresses</label>`;
-        for (let i = 0; i < user.alternateEmails.length; i++) {
-            html += `<div class="inline-field">
-                <input type="email" class="form-input" value="${C.escapeAttr(user.alternateEmails[i])}" data-alt-email-idx="${i}" disabled>
-            </div>`;
-        }
-        html += `</div>`;
-        html += C.textInput('user-phone', 'Phone', user.phone, '+1 (xxx) xxx-xxxx');
-        html += C.textInput('user-recovery-email', 'Recovery email', user.recoveryEmail, 'Recovery email address');
-        html += C.textInput('user-recovery-phone', 'Recovery phone', user.recoveryPhone, 'Recovery phone number');
-        html += `<button class="btn btn-primary" data-action="save-profile">Save changes</button>`;
-        html += `</div>`;
-
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Login & security</h3>`;
-        html += C.toggle('remember-password', 'Remember password',
-            AppState.accountSettings.loginSettings.rememberPassword,
-            'Allow your browser to save your password');
-        html += C.toggle('auto-sign-in', 'Auto sign-in',
-            AppState.accountSettings.loginSettings.autoSignIn,
-            'Automatically sign you in when you visit Gmail');
-        html += C.toggle('two-factor-enabled', 'Two-factor authentication',
-            AppState.accountSettings.loginSettings.twoFactorEnabled,
-            'Require a second step when signing in');
-
-        if (AppState.accountSettings.loginSettings.twoFactorEnabled) {
-            html += `<div class="form-field nested-setting">
-                <label class="form-label">2FA method</label>`;
-            html += C.dropdown('two-factor-method', [
-                { value: 'authenticator', label: 'Authenticator app' },
-                { value: 'sms', label: 'Text message (SMS)' },
-                { value: 'security_key', label: 'Security key' }
-            ], AppState.accountSettings.loginSettings.twoFactorMethod);
-            html += `</div>`;
-        }
-        html += `</div>`;
-
-        return html;
-    },
-
-    _renderPrivacySettings(settings) {
-        const C = Components;
-        let html = '';
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Profile visibility</h3>`;
-
-        html += `<div class="form-field">
-            <label class="form-label">Who can see your profile photo</label>`;
-        html += C.dropdown('privacy-photo', [
-            { value: 'everyone', label: 'Everyone' },
-            { value: 'contacts_only', label: 'Contacts only' },
-            { value: 'nobody', label: 'Nobody' }
-        ], settings.privacySettings.showProfilePhoto);
-        html += `</div>`;
-
-        html += `<div class="form-field">
-            <label class="form-label">Who can see your email address</label>`;
-        html += C.dropdown('privacy-email', [
-            { value: 'everyone', label: 'Everyone' },
-            { value: 'contacts_only', label: 'Contacts only' },
-            { value: 'nobody', label: 'Nobody' }
-        ], settings.privacySettings.showEmail);
-        html += `</div>`;
-
-        html += `<div class="form-field">
-            <label class="form-label">Who can see your phone number</label>`;
-        html += C.dropdown('privacy-phone', [
-            { value: 'everyone', label: 'Everyone' },
-            { value: 'contacts_only', label: 'Contacts only' },
-            { value: 'nobody', label: 'Nobody' }
-        ], settings.privacySettings.showPhone);
-        html += `</div>`;
-
-        html += C.toggle('activity-tracking', 'Activity tracking',
-            settings.privacySettings.activityTracking,
-            'Allow Google to track your activity for personalized recommendations');
-        html += `</div>`;
-
-        return html;
-    },
-
-    _renderNotificationSettings(settings) {
-        const C = Components;
-        let html = '';
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Email notifications</h3>`;
-        html += C.toggle('notif-delegate-activity', 'Delegate activity',
-            settings.notificationSettings.delegateActivity,
-            'Get notified when delegates read, send, or delete emails');
-        html += C.toggle('notif-contact-changes', 'Contact changes',
-            settings.notificationSettings.contactChanges,
-            'Get notified when contacts update their information');
-        html += C.toggle('notif-security-alerts', 'Security alerts',
-            settings.notificationSettings.securityAlerts,
-            'Get notified about security events like new sign-ins');
-        html += C.toggle('notif-linked-service-updates', 'Linked service updates',
-            settings.notificationSettings.linkedServiceUpdates,
-            'Get notified about changes to your linked Google services');
-        html += `</div>`;
-        return html;
-    },
-
-    _renderSyncSettings(settings) {
-        const C = Components;
-        let html = '';
-
-        // Google Sync deprecation warning
-        html += `<div class="warning-box">
-            <span class="material-icons">warning</span>
-            <div>
-                <strong>Google Sync has been deprecated</strong>
-                <p>Google Sync ended on March 14, 2025. It did not support OAuth, 2-Step Verification, or security keys. If you were using Google Sync, please transition to native Google Account sign-in on your iOS/iPad devices.</p>
-            </div>
-        </div>`;
-
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Sync settings</h3>`;
-        html += C.toggle('contacts-sync', 'Contacts sync',
-            settings.syncSettings.contactsSync,
-            'Sync contacts across your devices');
-        html += C.toggle('calendar-sync', 'Calendar sync',
-            settings.syncSettings.calendarSync,
-            'Sync calendar events across your devices');
-        html += C.toggle('email-sync', 'Email sync',
-            settings.syncSettings.emailSync,
-            'Sync email across your devices');
-        html += `</div>`;
-
-        html += `<div class="settings-section">
-            <h3 class="settings-section-title">Transition from Google Sync</h3>
-            <p class="settings-description">If you were previously using Google Sync on iOS/iPad:</p>
-            <ol class="transition-steps">
-                <li>Go to your device's <strong>Settings</strong> > <strong>Mail</strong> > <strong>Accounts</strong></li>
-                <li>Find and remove the Google Sync account</li>
-                <li>Tap <strong>Add Account</strong> > <strong>Google</strong></li>
-                <li>Sign in with your Google Account</li>
-                <li>Enable Mail, Contacts, and Calendar sync</li>
-            </ol>`;
-        html += C.toggle('google-sync-deprecation-ack', 'I have transitioned off Google Sync',
-            settings.syncSettings.googleSyncDeprecationAcknowledged,
-            'Acknowledge that you have moved away from Google Sync');
-        html += `</div>`;
-
-        return html;
-    },
-
-    // ---- Modals ----
-
-    renderCreateContactModal() {
-        const C = Components;
-        let body = '';
-        body += `<div class="modal-form">`;
-        body += `<div class="form-row">`;
-        body += C.textInput('new-contact-first', 'First name', '', 'First name', true);
-        body += C.textInput('new-contact-last', 'Last name', '', 'Last name');
-        body += `</div>`;
-        body += C.textInput('new-contact-email', 'Email', '', 'email@example.com', true, 'email');
-        body += C.textInput('new-contact-phone', 'Phone', '', '+1 (xxx) xxx-xxxx');
-        body += C.textInput('new-contact-company', 'Company', '', 'Company name');
-        body += C.textInput('new-contact-job', 'Job title', '', 'Job title');
-        body += C.textInput('new-contact-address', 'Address', '', 'Street address');
-        body += C.textInput('new-contact-secondary-email', 'Secondary email', '', 'Secondary email', false, 'email');
-        body += C.textInput('new-contact-secondary-phone', 'Secondary phone', '', 'Secondary phone');
-        body += C.textInput('new-contact-birthday', 'Birthday', '', 'YYYY-MM-DD');
-        body += C.textInput('new-contact-website', 'Website', '', 'https://...');
-        body += C.textarea('new-contact-notes', 'Notes', '', 'Add notes about this contact');
-
-        // Labels checkboxes
-        body += `<div class="form-field">
-            <label class="form-label">Labels</label>
-            <div class="label-checkboxes">`;
-        for (const label of AppState.contactLabels) {
-            body += `<label class="checkbox-option">
-                <input type="checkbox" data-new-contact-label="${label.id}">
-                <span class="label-dot" style="background:${label.color}"></span>
-                ${C.escapeHtml(label.name)}
-            </label>`;
-        }
-        body += `</div></div>`;
-        body += `</div>`;
-
-        const footer = `
-            <button class="btn btn-secondary" data-action="close-modal" data-modal="create-contact-modal">Cancel</button>
-            <button class="btn btn-primary" data-action="save-new-contact">Save</button>
-        `;
-        return C.modal('create-contact-modal', 'Create contact', body, footer);
-    },
-
-    renderEditContactModal(contact) {
-        const C = Components;
-        let body = '';
-        body += `<div class="modal-form">`;
-        body += `<div class="form-row">`;
-        body += C.textInput('edit-contact-first', 'First name', contact.firstName, 'First name', true);
-        body += C.textInput('edit-contact-last', 'Last name', contact.lastName, 'Last name');
-        body += `</div>`;
-        body += C.textInput('edit-contact-email', 'Email', contact.email, 'email@example.com', true, 'email');
-        body += C.textInput('edit-contact-phone', 'Phone', contact.phone, '+1 (xxx) xxx-xxxx');
-        body += C.textInput('edit-contact-company', 'Company', contact.company, 'Company name');
-        body += C.textInput('edit-contact-job', 'Job title', contact.jobTitle, 'Job title');
-        body += C.textInput('edit-contact-address', 'Address', contact.address, 'Street address');
-        body += C.textInput('edit-contact-secondary-email', 'Secondary email', contact.secondaryEmail, 'Secondary email', false, 'email');
-        body += C.textInput('edit-contact-secondary-phone', 'Secondary phone', contact.secondaryPhone, 'Secondary phone');
-        body += C.textInput('edit-contact-birthday', 'Birthday', contact.birthday, 'YYYY-MM-DD');
-        body += C.textInput('edit-contact-website', 'Website', contact.website, 'https://...');
-        body += C.textarea('edit-contact-notes', 'Notes', contact.notes, 'Add notes about this contact');
-
-        body += `<div class="form-field">
-            <label class="form-label">Labels</label>
-            <div class="label-checkboxes">`;
-        for (const label of AppState.contactLabels) {
-            const checked = contact.labels && contact.labels.includes(label.id) ? 'checked' : '';
-            body += `<label class="checkbox-option">
-                <input type="checkbox" data-edit-contact-label="${label.id}" ${checked}>
-                <span class="label-dot" style="background:${label.color}"></span>
-                ${C.escapeHtml(label.name)}
-            </label>`;
-        }
-        body += `</div></div>`;
-        body += `</div>`;
-
-        const footer = `
-            <button class="btn btn-secondary" data-action="close-modal" data-modal="edit-contact-modal">Cancel</button>
-            <button class="btn btn-primary" data-action="save-edited-contact" data-contact-id="${contact.id}">Save</button>
-        `;
-        return C.modal('edit-contact-modal', 'Edit contact', body, footer);
-    },
-
-    renderCreateLabelModal() {
-        const C = Components;
-        const colors = ['#EA4335', '#34A853', '#4285F4', '#FBBC04', '#FF6D01', '#9C27B0',
-            '#009688', '#795548', '#607D8B', '#F44336', '#00BCD4', '#E91E63',
-            '#FF9800', '#673AB7', '#2196F3', '#8BC34A', '#CDDC39', '#FF5722'];
-        let body = '';
-        body += `<div class="modal-form">`;
-        body += C.textInput('new-label-name', 'Label name', '', 'Enter label name', true);
-        body += `<div class="form-field">
-            <label class="form-label">Color</label>
-            <div class="color-picker">`;
-        for (const color of colors) {
-            body += `<button class="color-swatch" data-color="${color}" style="background:${color}" title="${color}"></button>`;
-        }
-        body += `</div></div>`;
-        body += `</div>`;
-        const footer = `
-            <button class="btn btn-secondary" data-action="close-modal" data-modal="create-label-modal">Cancel</button>
-            <button class="btn btn-primary" data-action="save-new-label">Create</button>
-        `;
-        return C.modal('create-label-modal', 'Create label', body, footer);
-    },
-
-    renderEditLabelModal(label) {
-        const C = Components;
-        const colors = ['#EA4335', '#34A853', '#4285F4', '#FBBC04', '#FF6D01', '#9C27B0',
-            '#009688', '#795548', '#607D8B', '#F44336', '#00BCD4', '#E91E63',
-            '#FF9800', '#673AB7', '#2196F3', '#8BC34A', '#CDDC39', '#FF5722'];
-        let body = '';
-        body += `<div class="modal-form">`;
-        body += C.textInput('edit-label-name', 'Label name', label.name, 'Enter label name', true);
-        body += `<div class="form-field">
-            <label class="form-label">Color</label>
-            <div class="color-picker">`;
-        for (const color of colors) {
-            const selected = color === label.color ? ' color-selected' : '';
-            body += `<button class="color-swatch${selected}" data-color="${color}" style="background:${color}" title="${color}"></button>`;
-        }
-        body += `</div></div>`;
-        body += `</div>`;
-        const footer = `
-            <button class="btn btn-danger" data-action="delete-label" data-label-id="${label.id}" style="margin-right:auto">Delete</button>
-            <button class="btn btn-secondary" data-action="close-modal" data-modal="edit-label-modal">Cancel</button>
-            <button class="btn btn-primary" data-action="save-edited-label" data-label-id="${label.id}">Save</button>
-        `;
-        return C.modal('edit-label-modal', 'Edit label', body, footer);
-    },
-
-    renderAddDelegateModal() {
-        const C = Components;
-        const activeCount = AppState.delegates.filter(d => d.status === 'active' || d.status === 'pending').length;
-        const maxDelegates = AppState.accountSettings.collaborationSettings.maxDelegates;
-        let body = '';
-        body += `<div class="modal-form">`;
-        if (activeCount >= maxDelegates) {
-            body += `<div class="error-box">You have reached the maximum number of delegates (${maxDelegates}).</div>`;
+        if (pairs.length === 0) {
+            html += Components.emptyState('', 'No duplicates found', 'Your contacts look clean — no potential duplicates detected.');
         } else {
-            body += `<p class="modal-description">Enter the Gmail address of the person you'd like to add as a delegate. They'll need to confirm the invitation within 1 week.</p>`;
-            body += C.textInput('delegate-email', 'Email address', '', 'name@gmail.com', true, 'email');
-            body += C.textInput('delegate-name', 'Name (optional)', '', 'Delegate name');
-            body += `<div class="info-box info-box-sm">
-                <span class="material-icons">info</span>
-                <p>Identity verification may be required. It can take up to 24 hours for delegate access to activate after confirmation.</p>
-            </div>`;
-        }
-        body += `</div>`;
-        const footer = activeCount >= maxDelegates ? `
-            <button class="btn btn-secondary" data-action="close-modal" data-modal="add-delegate-modal">Close</button>
-        ` : `
-            <button class="btn btn-secondary" data-action="close-modal" data-modal="add-delegate-modal">Cancel</button>
-            <button class="btn btn-primary" data-action="save-new-delegate">Add delegate</button>
-        `;
-        return C.modal('add-delegate-modal', 'Add a delegate', body, footer);
-    },
+            html += `<p style="margin-bottom:16px"><strong>${pairs.length}</strong> potential duplicate${pairs.length !== 1 ? 's' : ''} found.</p>`;
+            pairs.forEach((pair, idx) => {
+                const a = pair.a;
+                const b = pair.b;
+                const nameA = ((a.firstName || '') + ' ' + (a.lastName || '')).trim() || a.email;
+                const nameB = ((b.firstName || '') + ' ' + (b.lastName || '')).trim() || b.email;
+                const colorA = Components.getAvatarColor(nameA);
+                const colorB = Components.getAvatarColor(nameB);
 
-    renderLabelPickerModal(contactId) {
-        const C = Components;
-        const contact = AppState.getContactById(contactId);
-        if (!contact) return '';
-        let body = `<div class="label-picker-list">`;
-        for (const label of AppState.contactLabels) {
-            const checked = contact.labels && contact.labels.includes(label.id) ? 'checked' : '';
-            body += `<label class="label-picker-item">
-                <input type="checkbox" data-label-picker="${label.id}" data-contact-id="${contactId}" ${checked}>
-                <span class="label-dot" style="background:${label.color}"></span>
-                <span>${C.escapeHtml(label.name)}</span>
-            </label>`;
-        }
-        body += `</div>`;
-        const footer = `<button class="btn btn-primary" data-action="close-modal" data-modal="label-picker-modal">Done</button>`;
-        return C.modal('label-picker-modal', 'Manage labels', body, footer);
-    },
+                html += '<div class="merge-pair" data-testid="merge-pair-' + idx + '">';
+                html += '<div class="merge-pair-header">';
+                html += '<span class="badge badge-warning">' + Components.escapeHtml(pair.reason) + '</span>';
+                html += '</div>';
+                html += '<div class="merge-pair-body">';
 
-    // ---- Top Bar ----
-    renderTopBar() {
-        const C = Components;
-        const user = AppState.currentUser;
-        let html = `<div class="topbar">`;
-        html += `<div class="topbar-left">
-            <button class="icon-btn" data-action="toggle-sidebar" title="Menu">
-                <span class="material-icons">menu</span>
-            </button>
-            <div class="topbar-brand">
-                <span class="material-icons topbar-logo-icon" style="color:#4285F4;">contacts</span>
-                <span class="topbar-app-name">Contacts</span>
-            </div>
-        </div>`;
-        html += `<div class="topbar-center">`;
-        html += C.searchBar('global-search', '', 'Search contacts');
-        html += `</div>`;
-        html += `<div class="topbar-right">
-            <button class="icon-btn" data-action="open-help" title="Help">
-                <span class="material-icons">help_outline</span>
-            </button>
-            <button class="icon-btn" data-action="open-settings-menu" title="Settings">
-                <span class="material-icons">settings</span>
-            </button>
-            <div class="topbar-profile" data-action="toggle-profile-menu">
-                ${C.avatar(user.name, user.avatarColor, 32)}
-            </div>
-        </div>`;
-        html += `</div>`;
+                // Contact A
+                html += '<div class="merge-card">';
+                html += '<div class="merge-card-header">' + Components.avatar(nameA, 36, colorA);
+                html += '<div><strong>' + Components.escapeHtml(nameA) + '</strong>';
+                if (a.email) html += '<br><small class="text-muted">' + Components.escapeHtml(a.email) + '</small>';
+                html += '</div></div>';
+                if (a.phone) html += '<div class="merge-field"><span class="detail-label">Phone</span><span>' + Components.escapeHtml(a.phone) + '</span></div>';
+                if (a.company) html += '<div class="merge-field"><span class="detail-label">Company</span><span>' + Components.escapeHtml(a.company) + '</span></div>';
+                if (a.jobTitle) html += '<div class="merge-field"><span class="detail-label">Title</span><span>' + Components.escapeHtml(a.jobTitle) + '</span></div>';
+                html += '<button class="btn btn-sm btn-primary merge-keep-btn" data-action="merge-keep" data-keep-id="' + Components.escapeAttr(a.id) + '" data-merge-id="' + Components.escapeAttr(b.id) + '">Keep this</button>';
+                html += '</div>';
+
+                // VS divider
+                html += '<div class="merge-vs">VS</div>';
+
+                // Contact B
+                html += '<div class="merge-card">';
+                html += '<div class="merge-card-header">' + Components.avatar(nameB, 36, colorB);
+                html += '<div><strong>' + Components.escapeHtml(nameB) + '</strong>';
+                if (b.email) html += '<br><small class="text-muted">' + Components.escapeHtml(b.email) + '</small>';
+                html += '</div></div>';
+                if (b.phone) html += '<div class="merge-field"><span class="detail-label">Phone</span><span>' + Components.escapeHtml(b.phone) + '</span></div>';
+                if (b.company) html += '<div class="merge-field"><span class="detail-label">Company</span><span>' + Components.escapeHtml(b.company) + '</span></div>';
+                if (b.jobTitle) html += '<div class="merge-field"><span class="detail-label">Title</span><span>' + Components.escapeHtml(b.jobTitle) + '</span></div>';
+                html += '<button class="btn btn-sm btn-primary merge-keep-btn" data-action="merge-keep" data-keep-id="' + Components.escapeAttr(b.id) + '" data-merge-id="' + Components.escapeAttr(a.id) + '">Keep this</button>';
+                html += '</div>';
+
+                html += '</div></div>';
+            });
+        }
         return html;
+    },
+
+    // ─── Icons ───
+    _iconContacts() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    },
+    _iconStar() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+    },
+    _iconOther() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>';
+    },
+    _iconDirectory() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+    },
+    _iconAccount() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+    },
+    _iconSendAs() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+    },
+    _iconDelegation() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+    },
+    _iconImport() {
+        return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
     }
 };
