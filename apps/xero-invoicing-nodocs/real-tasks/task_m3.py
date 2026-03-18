@@ -13,25 +13,27 @@ def verify(server_url: str) -> tuple[bool, str]:
 
     invoices = state.get("invoices", [])
 
+    # Known seed invoice IDs for Pinnacle Construction Co (con_9)
+    seed_invoice_ids = {"inv_9", "inv_34", "inv_59", "inv_84", "inv_109"}
+
     # Count invoices for Pinnacle Construction Co (con_9)
     con_9_invoices = [inv for inv in invoices if inv.get("contactId") == "con_9"]
 
-    # The original data should have some invoices for con_9; after copying INV-0009 there should be more
-    # We need at least one NEW draft invoice for con_9 that is not inv_9 itself
+    # We need at least one NEW draft invoice for con_9 that was not in the original seed data
     original_inv = None
     new_drafts = []
     for inv in con_9_invoices:
         if inv.get("id") == "inv_9" or inv.get("invoiceNumber") == "INV-0009":
             original_inv = inv
-        elif inv.get("status") == "draft":
+        elif inv.get("id") not in seed_invoice_ids and inv.get("status") == "draft":
             new_drafts.append(inv)
 
     if original_inv is None:
         return False, "Original invoice INV-0009 not found in state"
 
     if not new_drafts:
-        # Also check if there are any new invoices (non-original) for con_9 regardless of status
-        all_new = [inv for inv in con_9_invoices if inv.get("id") != "inv_9" and inv.get("invoiceNumber") != "INV-0009"]
+        # Also check if there are any new invoices (not in seed) for con_9 regardless of status
+        all_new = [inv for inv in con_9_invoices if inv.get("id") not in seed_invoice_ids]
         if not all_new:
             return False, "No new invoice found for Pinnacle Construction Co (con_9). Expected a copy of INV-0009."
         # There are new invoices but none are drafts
