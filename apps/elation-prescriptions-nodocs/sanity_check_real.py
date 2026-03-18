@@ -630,6 +630,175 @@ def solve_task_h20(state):
     renew_rx(state, "rx_001", 3)
 
 
+# ── solve functions: HARDENING ROUND 1 ─────────────────────────────
+
+def solve_task_h21(state):
+    """Modify Levothyroxine dosage to 88mcg and update sig."""
+    modify_rx(state, "rx_004", {
+        "dosage": "88mcg",
+        "sig": "Take 1 tablet by mouth once daily on an empty stomach, 60 minutes before breakfast"
+    })
+
+
+def solve_task_h22(state):
+    """Switch to Robert Fitzgerald (Metformin allergy), prescribe Sitagliptin."""
+    state["currentPatientId"] = "pat_006"
+    new_rx(state, "pat_006", "drug_015", "Sitagliptin", "Januvia",
+           "100mg Tablet", "100mg", "Once daily", "Oral", 30, 30, 5,
+           "Take 1 tablet by mouth once daily", "pharm_004")
+
+
+def solve_task_h23(state):
+    """Renew cardiologist's rx (Apixaban) with 3, increase Amlodipine to 10mg."""
+    renew_rx(state, "rx_014", 3)
+    modify_rx(state, "rx_002", {"dosage": "10mg"})
+
+
+def solve_task_h24(state):
+    """Renew all active Margaret prescriptions with < 3 refills remaining."""
+    renew_rx(state, "rx_001", 5)
+    renew_rx(state, "rx_005", 5)
+    renew_rx(state, "rx_006", 5)
+    renew_rx(state, "rx_008", 5)
+
+
+def solve_task_h25(state):
+    """Increase David's Escitalopram to 20mg, Aisha's to 10mg."""
+    modify_rx(state, "rx_018", {"dosage": "20mg"})
+    modify_rx(state, "rx_021", {"dosage": "10mg"})
+
+
+def solve_task_h26(state):
+    """Settings: Safeway pharmacy, 5 refills, no sig required. Remove Sertraline + Levothyroxine from favorites."""
+    state["settings"]["defaultPharmacy"] = "pharm_012"
+    state["settings"]["defaultRefills"] = 5
+    state["settings"]["signatureRequired"] = False
+    favs = state["settings"]["favoritesDrugIds"]
+    if "drug_033" in favs:
+        favs.remove("drug_033")
+    if "drug_018" in favs:
+        favs.remove("drug_018")
+
+
+def solve_task_h27(state):
+    """Resume on-hold diuretic (HCTZ), modify-approve urgent Pantoprazole refill."""
+    resume_rx(state, "rx_012")
+    modify_approve_rr(state, "rr_003", "Dose verified, approved per protocol")
+
+
+def solve_task_h28(state):
+    """Switch to William Thornton, prescribe Rosuvastatin, approve Furosemide refill."""
+    state["currentPatientId"] = "pat_004"
+    new_rx(state, "pat_004", "drug_003", "Rosuvastatin", "Crestor",
+           "10mg Tablet", "10mg", "Once daily", "Oral", 90, 90, 3,
+           "Take 1 tablet by mouth once daily at bedtime", "pharm_005")
+    approve_rr(state, "rr_010")
+
+
+def solve_task_h29(state):
+    """Prescribe Azithromycin 250mg for Margaret (avoiding Clarithromycin interaction)."""
+    new_rx(state, "pat_001", "drug_028", "Azithromycin", "Zithromax",
+           "250mg Tablet", "250mg", "Once daily", "Oral", 6, 5, 0,
+           "Take 2 tablets on day 1, then 1 tablet once daily for 4 days", "pharm_001")
+
+
+def solve_task_h30(state):
+    """Prescribe Amlodipine for Aisha Rahman, discontinue Cephalexin for Jessica Morales."""
+    state["currentPatientId"] = "pat_003"
+    new_rx(state, "pat_003", "drug_005", "Amlodipine", "Norvasc",
+           "5mg Tablet", "5mg", "Once daily", "Oral", 30, 30, 5,
+           "Take 1 tablet by mouth once daily", "pharm_002")
+    state["currentPatientId"] = "pat_005"
+    discontinue_rx(state, "rx_025", "Cellulitis resolved")
+
+
+def solve_task_h31(state):
+    """William Thornton: increase insulin dosage to 30 units, renew with 5, increase Furosemide qty to 60."""
+    state["currentPatientId"] = "pat_004"
+    modify_rx(state, "rx_023", {"dosage": "30 units"})
+    renew_rx(state, "rx_023", 5)
+    modify_rx(state, "rx_024", {"quantity": 60})
+
+
+def solve_task_h32(state):
+    """3-patient SSRI management: Aisha 10mg, David on-hold, Margaret twice daily."""
+    modify_rx(state, "rx_021", {"dosage": "10mg"})
+    hold_rx(state, "rx_018", "Patient wants to try discontinuing")
+    modify_rx(state, "rx_013", {"frequency": "Twice daily"})
+
+
+def solve_task_h33(state):
+    """Remove NSAID + corticosteroid from favorites, add Clopidogrel + Rosuvastatin, print compact."""
+    favs = state["settings"]["favoritesDrugIds"]
+    if "drug_043" in favs:
+        favs.remove("drug_043")
+    if "drug_045" in favs:
+        favs.remove("drug_045")
+    if "drug_048" not in favs:
+        favs.append("drug_048")
+    if "drug_003" not in favs:
+        favs.append("drug_003")
+    state["settings"]["printFormat"] = "compact"
+
+
+def solve_task_h34(state):
+    """Switch to David Kowalski, prescribe Apixaban with DAW and prior auth."""
+    state["currentPatientId"] = "pat_002"
+    new_rx(state, "pat_002", "drug_012", "Apixaban", "Eliquis",
+           "5mg Tablet", "5mg", "Twice daily", "Oral", 60, 30, 5,
+           "Take 1 tablet by mouth twice daily", "pharm_003",
+           daw=True, prior_auth=True, prior_auth_number="PA-2026-DK-001")
+
+
+def solve_task_h35(state):
+    """Hold Flonase, reduce Metformin to 500mg, approve Atorvastatin refill."""
+    hold_rx(state, "rx_008", "Seasonal review")
+    modify_rx(state, "rx_003", {"dosage": "500mg"})
+    approve_rr(state, "rr_001")
+
+
+def solve_task_h36(state):
+    """Switch to William Thornton (ACE allergy patient), prescribe Amlodipine 10mg."""
+    state["currentPatientId"] = "pat_004"
+    new_rx(state, "pat_004", "drug_005", "Amlodipine", "Norvasc",
+           "10mg Tablet", "10mg", "Once daily", "Oral", 30, 30, 5,
+           "Take 1 tablet by mouth once daily", "pharm_005")
+
+
+def solve_task_h37(state):
+    """Settings: Costco, 90 days, 3 refills, no allergy review. Prescribe Omeprazole."""
+    state["settings"]["defaultPharmacy"] = "pharm_006"
+    state["settings"]["defaultDaysSupply"] = 90
+    state["settings"]["defaultRefills"] = 3
+    state["settings"]["requireAllergyReview"] = False
+    new_rx(state, "pat_001", "drug_021", "Omeprazole", "Prilosec",
+           "20mg Capsule, Delayed Release", "20mg", "Once daily", "Oral", 30, 30, 2,
+           "Take 1 capsule by mouth once daily before breakfast", "pharm_006")
+
+
+def solve_task_h38(state):
+    """Deny Metformin refill, discontinue Metformin, prescribe Metformin ER 500mg."""
+    deny_rr(state, "rr_002", "Need lab work before renewal")
+    discontinue_rx(state, "rx_003", "Switching to extended release formulation")
+    new_rx(state, "pat_001", "drug_014", "Metformin", "Glucophage",
+           "500mg Tablet, Extended Release", "500mg", "Once daily", "Oral", 30, 30, 5,
+           "Take 1 tablet by mouth once daily with dinner", "pharm_001")
+
+
+def solve_task_h39(state):
+    """Switch to Robert Fitzgerald: increase Jardiance to 25mg, renew Carvedilol with 5, increase Spironolactone qty."""
+    state["currentPatientId"] = "pat_006"
+    modify_rx(state, "rx_027", {"dosage": "25mg"})
+    renew_rx(state, "rx_028", 5)
+    modify_rx(state, "rx_029", {"quantity": 60})
+
+
+def solve_task_h40(state):
+    """Increase Apixaban (blood thinner with PA) quantity to 90, deny Sertraline refill."""
+    modify_rx(state, "rx_014", {"quantity": 90})
+    deny_rr(state, "rr_011", "Changed therapy")
+
+
 SOLVERS = {
     "task_e1": solve_task_e1, "task_e2": solve_task_e2, "task_e3": solve_task_e3,
     "task_e4": solve_task_e4, "task_e5": solve_task_e5, "task_e6": solve_task_e6,
@@ -652,6 +821,13 @@ SOLVERS = {
     "task_h13": solve_task_h13, "task_h14": solve_task_h14, "task_h15": solve_task_h15,
     "task_h16": solve_task_h16, "task_h17": solve_task_h17, "task_h18": solve_task_h18,
     "task_h19": solve_task_h19, "task_h20": solve_task_h20,
+    "task_h21": solve_task_h21, "task_h22": solve_task_h22, "task_h23": solve_task_h23,
+    "task_h24": solve_task_h24, "task_h25": solve_task_h25, "task_h26": solve_task_h26,
+    "task_h27": solve_task_h27, "task_h28": solve_task_h28, "task_h29": solve_task_h29,
+    "task_h30": solve_task_h30, "task_h31": solve_task_h31, "task_h32": solve_task_h32,
+    "task_h33": solve_task_h33, "task_h34": solve_task_h34, "task_h35": solve_task_h35,
+    "task_h36": solve_task_h36, "task_h37": solve_task_h37, "task_h38": solve_task_h38,
+    "task_h39": solve_task_h39, "task_h40": solve_task_h40,
 }
 
 
