@@ -858,6 +858,398 @@ def solve_task_h20(state):
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# Solve functions — HARD (Hardening Round 1)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def solve_task_h21(state):
+    """Set share visibility to public on presentation with most slides (pres_013, 25 slides)."""
+    p = find_pres(state, "Mobile Design System Components")
+    p["shareSettings"]["visibility"] = "public"
+    p["updatedAt"] = NOW
+
+
+def solve_task_h22(state):
+    """Share fewest-slides pres with everyone from most-slides pres."""
+    most = find_pres(state, "Mobile Design System Components")  # pres_013, 25 slides
+    fewest = find_pres(state, "Design Workshop Materials")       # pres_018, 5 slides
+    for uid in most["shareSettings"]["sharedWith"]:
+        if uid not in fewest["shareSettings"]["sharedWith"]:
+            fewest["shareSettings"]["sharedWith"].append(uid)
+    fewest["updatedAt"] = NOW
+
+
+def solve_task_h23(state):
+    """Marcus Rivera's presentations: unstar starred, archive published+unstarred, leave drafts."""
+    marcus_pres_ids = {
+        "pres_001", "pres_002", "pres_004", "pres_006", "pres_008",
+        "pres_010", "pres_013", "pres_014", "pres_018"
+    }
+    for p in state["presentations"]:
+        if p["id"] not in marcus_pres_ids:
+            continue
+        if p["starred"]:
+            p["starred"] = False
+            p["updatedAt"] = NOW
+        elif p["status"] == "published":
+            p["status"] = "archived"
+            p["updatedAt"] = NOW
+        # drafts left alone
+
+
+def solve_task_h24(state):
+    """Both client-tagged presentations: team vis, comments on, editing off, copy older→newer users."""
+    older = find_pres(state, "Client Proposal \u2014 TechVentures Redesign")  # pres_007
+    newer = find_pres(state, "Website Redesign Proposal \u2014 TechStartup.io")  # pres_016
+
+    for p in [older, newer]:
+        p["shareSettings"]["visibility"] = "team"
+        p["shareSettings"]["allowComments"] = True
+        p["shareSettings"]["allowEditing"] = False
+        p["updatedAt"] = NOW
+
+    for uid in older["shareSettings"]["sharedWith"]:
+        if uid not in newer["shareSettings"]["sharedWith"]:
+            newer["shareSettings"]["sharedWith"].append(uid)
+
+
+def solve_task_h25(state):
+    """Toggle starred on every presentation tagged 'quarterly'."""
+    for p in state["presentations"]:
+        if "quarterly" in p.get("tags", []):
+            p["starred"] = not p["starred"]
+            p["updatedAt"] = NOW
+
+
+def solve_task_h26(state):
+    """Create 'Onboarding Feedback Q1' with ocean theme, share with All-Hands non-viewers."""
+    pid = next_pres_id(state)
+    sid = next_slide_id(state)
+    eid = next_elem_id(state)
+
+    # pres_006 sharedWith minus viewers (user_005, user_007)
+    allhands = find_pres(state, "Annual Company All-Hands 2026")
+    viewer_ids = {"user_005", "user_007"}
+    shared = [uid for uid in allhands["shareSettings"]["sharedWith"] if uid not in viewer_ids]
+    if "user_001" not in shared:
+        shared.append("user_001")
+
+    state["presentations"].append({
+        "id": pid,
+        "title": "Onboarding Feedback Q1",
+        "description": "",
+        "createdAt": NOW,
+        "updatedAt": NOW,
+        "createdBy": "user_001",
+        "theme": "ocean",
+        "tags": ["onboarding", "feedback"],
+        "starred": False,
+        "status": "draft",
+        "slideCount": 1,
+        "shareSettings": {
+            "visibility": "private",
+            "allowComments": True,
+            "allowEditing": False,
+            "shareLink": "",
+            "embedLink": "",
+            "sharedWith": shared
+        }
+    })
+    state["slides"].append({
+        "id": sid, "presentationId": pid, "order": 0, "layout": "title",
+        "backgroundColor": "#ffffff",
+        "transition": {"type": "none", "duration": 500},
+        "speakerNotes": "",
+        "elements": [{
+            "id": eid, "type": "text", "x": 80, "y": 180, "width": 800, "height": 70,
+            "rotation": 0, "opacity": 1, "locked": False,
+            "content": "Onboarding Feedback Q1",
+            "shapeType": None, "fill": None, "stroke": None, "strokeWidth": 0,
+            "cornerRadius": 0, "imageUrl": None, "imagePlaceholder": None,
+            "style": {"fontFamily": "Inter", "fontSize": 48, "fontWeight": "bold",
+                       "color": "#1a1a2e", "textAlign": "center", "italic": False,
+                       "underline": False, "lineHeight": 1.2, "letterSpacing": -1,
+                       "listType": "none"},
+            "animation": {"type": "none", "duration": 300, "delay": 0, "order": 0}
+        }]
+    })
+
+
+def solve_task_h27(state):
+    """Remove Anika Patel from all presentations except ones she created."""
+    anika_id = "user_003"
+    anika_created = {"pres_004", "pres_011", "pres_018"}
+    for p in state["presentations"]:
+        if p["id"] in anika_created:
+            continue
+        sw = p["shareSettings"]["sharedWith"]
+        if anika_id in sw:
+            sw.remove(anika_id)
+            p["updatedAt"] = NOW
+
+
+def solve_task_h28(state):
+    """Resolve comments on Eng Architecture, set org vis, add Brand Identity users."""
+    # Resolve comments on pres_005
+    for c in state["comments"]:
+        if c["presentationId"] == "pres_005":
+            c["resolved"] = True
+
+    p = find_pres(state, "Engineering Architecture Overview")
+    p["shareSettings"]["visibility"] = "organization"
+
+    brand = find_pres(state, "Brand Identity Guidelines v2.0")
+    for uid in brand["shareSettings"]["sharedWith"]:
+        if uid not in p["shareSettings"]["sharedWith"]:
+            p["shareSettings"]["sharedWith"].append(uid)
+    p["updatedAt"] = NOW
+
+
+def solve_task_h29(state):
+    """Find Yuki Tanaka's published pres (pres_012), resolve comments, archive."""
+    # Resolve all comments on pres_012
+    for c in state["comments"]:
+        if c["presentationId"] == "pres_012":
+            c["resolved"] = True
+
+    p = find_pres(state, "Q4 2025 Revenue Analysis")
+    p["status"] = "archived"
+    p["updatedAt"] = NOW
+
+
+def solve_task_h30(state):
+    """Delete every comment by someone with a viewer role."""
+    viewer_ids = {"user_005", "user_007"}
+    state["comments"] = [c for c in state["comments"] if c["authorId"] not in viewer_ids]
+
+
+def solve_task_h31(state):
+    """Presentations with 1 comment: star if unresolved, delete comment if resolved."""
+    # Count comments per presentation
+    from collections import Counter
+    pres_comment_count = Counter(c["presentationId"] for c in state["comments"])
+    single_comment_pres = {pid for pid, count in pres_comment_count.items() if count == 1}
+
+    to_delete = set()
+    for c in state["comments"]:
+        if c["presentationId"] in single_comment_pres:
+            if c["resolved"]:
+                to_delete.add(c["id"])
+            else:
+                # Star the presentation
+                for p in state["presentations"]:
+                    if p["id"] == c["presentationId"]:
+                        p["starred"] = True
+                        p["updatedAt"] = NOW
+                        break
+
+    state["comments"] = [c for c in state["comments"] if c["id"] not in to_delete]
+
+
+def solve_task_h32(state):
+    """Find pres with most comments (pres_001), add all comment authors to sharedWith."""
+    # Collect authors of comments on pres_001
+    authors = set()
+    for c in state["comments"]:
+        if c["presentationId"] == "pres_001":
+            authors.add(c["authorId"])
+
+    p = find_pres(state, "Q1 2026 Product Roadmap")
+    for uid in authors:
+        if uid not in p["shareSettings"]["sharedWith"]:
+            p["shareSettings"]["sharedWith"].append(uid)
+    p["updatedAt"] = NOW
+
+
+def solve_task_h33(state):
+    """Create 'All-Team Sync Q2', share with intersection of Roadmap and Mobile DS users."""
+    roadmap = find_pres(state, "Q1 2026 Product Roadmap")
+    mobile_ds = find_pres(state, "Mobile Design System Components")
+
+    roadmap_users = set(roadmap["shareSettings"]["sharedWith"])
+    mobile_users = set(mobile_ds["shareSettings"]["sharedWith"])
+    intersection = roadmap_users & mobile_users
+
+    shared = list(intersection | {"user_001"})
+
+    pid = next_pres_id(state)
+    sid = next_slide_id(state)
+    eid = next_elem_id(state)
+
+    state["presentations"].append({
+        "id": pid,
+        "title": "All-Team Sync Q2",
+        "description": "",
+        "createdAt": NOW,
+        "updatedAt": NOW,
+        "createdBy": "user_001",
+        "theme": "warm",
+        "tags": ["team", "sync"],
+        "starred": False,
+        "status": "draft",
+        "slideCount": 1,
+        "shareSettings": {
+            "visibility": "private",
+            "allowComments": True,
+            "allowEditing": False,
+            "shareLink": "",
+            "embedLink": "",
+            "sharedWith": shared
+        }
+    })
+    state["slides"].append({
+        "id": sid, "presentationId": pid, "order": 0, "layout": "title",
+        "backgroundColor": "#ffffff",
+        "transition": {"type": "none", "duration": 500},
+        "speakerNotes": "",
+        "elements": [{
+            "id": eid, "type": "text", "x": 80, "y": 180, "width": 800, "height": 70,
+            "rotation": 0, "opacity": 1, "locked": False,
+            "content": "All-Team Sync Q2",
+            "shapeType": None, "fill": None, "stroke": None, "strokeWidth": 0,
+            "cornerRadius": 0, "imageUrl": None, "imagePlaceholder": None,
+            "style": {"fontFamily": "Inter", "fontSize": 48, "fontWeight": "bold",
+                       "color": "#1a1a2e", "textAlign": "center", "italic": False,
+                       "underline": False, "lineHeight": 1.2, "letterSpacing": -1,
+                       "listType": "none"},
+            "animation": {"type": "none", "duration": 300, "delay": 0, "order": 0}
+        }]
+    })
+
+
+def solve_task_h34(state):
+    """Series B Pitch: team vis, add all editors, enable comments, keep editing disabled."""
+    p = find_pres(state, "Series B Fundraising Pitch")
+    p["shareSettings"]["visibility"] = "team"
+    p["shareSettings"]["allowComments"] = True
+    # allowEditing stays False (already is)
+
+    editor_ids = [u["id"] for u in state["users"] if u["role"] == "editor"]
+    for uid in editor_ids:
+        if uid not in p["shareSettings"]["sharedWith"]:
+            p["shareSettings"]["sharedWith"].append(uid)
+    if "user_001" not in p["shareSettings"]["sharedWith"]:
+        p["shareSettings"]["sharedWith"].append("user_001")
+    p["updatedAt"] = NOW
+
+
+def solve_task_h35(state):
+    """Sprint-tagged presentations: disable editing, add Priya, star."""
+    priya_id = "user_006"
+    for p in state["presentations"]:
+        if "sprint" in p.get("tags", []):
+            p["shareSettings"]["allowEditing"] = False
+            if priya_id not in p["shareSettings"]["sharedWith"]:
+                p["shareSettings"]["sharedWith"].append(priya_id)
+            p["starred"] = True
+            p["updatedAt"] = NOW
+
+
+def solve_task_h36(state):
+    """Replace Marketing Campaign shared users with Accessibility Audit users."""
+    audit = find_pres(state, "Accessibility Audit Results")
+    campaign = find_pres(state, "Marketing Campaign: Design Without Limits")
+    campaign["shareSettings"]["sharedWith"] = list(audit["shareSettings"]["sharedWith"])
+    campaign["updatedAt"] = NOW
+
+
+def solve_task_h37(state):
+    """Brand Identity: org→team vis, disable editing, remove viewers."""
+    p = find_pres(state, "Brand Identity Guidelines v2.0")
+    p["shareSettings"]["visibility"] = "team"
+    p["shareSettings"]["allowEditing"] = False
+    viewer_ids = {"user_005", "user_007"}
+    p["shareSettings"]["sharedWith"] = [
+        uid for uid in p["shareSettings"]["sharedWith"] if uid not in viewer_ids
+    ]
+    p["updatedAt"] = NOW
+
+
+def solve_task_h38(state):
+    """Star every published presentation created by an editor with team visibility."""
+    editor_ids = {u["id"] for u in state["users"] if u["role"] == "editor"}
+    for p in state["presentations"]:
+        if (p["status"] == "published"
+                and p["createdBy"] in editor_ids
+                and p["shareSettings"]["visibility"] == "team"):
+            p["starred"] = True
+            p["updatedAt"] = NOW
+
+
+def solve_task_h39(state):
+    """Create 'Quarterly Design Review', share with Mobile DS non-viewers."""
+    mobile_ds = find_pres(state, "Mobile Design System Components")
+    viewer_ids = {"user_005", "user_007"}
+    shared = [uid for uid in mobile_ds["shareSettings"]["sharedWith"] if uid not in viewer_ids]
+    if "user_001" not in shared:
+        shared.append("user_001")
+
+    pid = next_pres_id(state)
+    sid = next_slide_id(state)
+    eid = next_elem_id(state)
+
+    state["presentations"].append({
+        "id": pid,
+        "title": "Quarterly Design Review",
+        "description": "",
+        "createdAt": NOW,
+        "updatedAt": NOW,
+        "createdBy": "user_001",
+        "theme": "creative",
+        "tags": ["design", "review"],
+        "starred": False,
+        "status": "draft",
+        "slideCount": 1,
+        "shareSettings": {
+            "visibility": "private",
+            "allowComments": True,
+            "allowEditing": False,
+            "shareLink": "",
+            "embedLink": "",
+            "sharedWith": shared
+        }
+    })
+    state["slides"].append({
+        "id": sid, "presentationId": pid, "order": 0, "layout": "title",
+        "backgroundColor": "#ffffff",
+        "transition": {"type": "none", "duration": 500},
+        "speakerNotes": "",
+        "elements": [{
+            "id": eid, "type": "text", "x": 80, "y": 180, "width": 800, "height": 70,
+            "rotation": 0, "opacity": 1, "locked": False,
+            "content": "Quarterly Design Review",
+            "shapeType": None, "fill": None, "stroke": None, "strokeWidth": 0,
+            "cornerRadius": 0, "imageUrl": None, "imagePlaceholder": None,
+            "style": {"fontFamily": "Inter", "fontSize": 48, "fontWeight": "bold",
+                       "color": "#1a1a2e", "textAlign": "center", "italic": False,
+                       "underline": False, "lineHeight": 1.2, "letterSpacing": -1,
+                       "listType": "none"},
+            "animation": {"type": "none", "duration": 300, "delay": 0, "order": 0}
+        }]
+    })
+
+
+def solve_task_h40(state):
+    """Delete resolved comments, disable comments on presentations with none remaining."""
+    # Build set of presentations that have unresolved comments
+    pres_with_unresolved = set()
+    for c in state["comments"]:
+        if not c["resolved"]:
+            pres_with_unresolved.add(c["presentationId"])
+
+    # Delete resolved comments
+    state["comments"] = [c for c in state["comments"] if not c["resolved"]]
+
+    # Find all presentations that have any remaining comments
+    pres_with_comments = {c["presentationId"] for c in state["comments"]}
+
+    # Disable comments on presentations with no remaining comments
+    for p in state["presentations"]:
+        if p["id"] not in pres_with_comments:
+            p["shareSettings"]["allowComments"] = False
+            p["updatedAt"] = NOW
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # Solver registry
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -922,6 +1314,26 @@ SOLVERS = {
     "task_h18": solve_task_h18,
     "task_h19": solve_task_h19,
     "task_h20": solve_task_h20,
+    "task_h21": solve_task_h21,
+    "task_h22": solve_task_h22,
+    "task_h23": solve_task_h23,
+    "task_h24": solve_task_h24,
+    "task_h25": solve_task_h25,
+    "task_h26": solve_task_h26,
+    "task_h27": solve_task_h27,
+    "task_h28": solve_task_h28,
+    "task_h29": solve_task_h29,
+    "task_h30": solve_task_h30,
+    "task_h31": solve_task_h31,
+    "task_h32": solve_task_h32,
+    "task_h33": solve_task_h33,
+    "task_h34": solve_task_h34,
+    "task_h35": solve_task_h35,
+    "task_h36": solve_task_h36,
+    "task_h37": solve_task_h37,
+    "task_h38": solve_task_h38,
+    "task_h39": solve_task_h39,
+    "task_h40": solve_task_h40,
 }
 
 
