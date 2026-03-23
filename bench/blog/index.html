@@ -382,64 +382,66 @@
       margin: 2.5rem 0;
     }
 
-    /* ── Left TOC (reference: .left-toc) ─────────── */
-    /* Variables match reference blog-post.css */
-    article {
-      --toc-width: 240px;
-      --toc-gap: 34px;
-    }
-
-    .left-toc {
-      position: fixed;
-      top: 94px;
-      left: 24px;
-      width: var(--toc-width);
-      max-height: calc(100vh - 130px);
-      overflow-y: auto;
-      margin: 0;
-      padding-right: 20px;
-      border-right: 1px solid color-mix(in srgb, var(--fg4) 20%, transparent);
+    /* ── Inline TOC (top of article) ─────────────── */
+    .inline-toc {
+      margin: 0.5rem 0 2rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid color-mix(in srgb, var(--fg4) 15%, transparent);
+      border-radius: 6px;
+      background: color-mix(in srgb, var(--fg4) 3%, var(--bg));
       font-family: var(--font-serif);
-      font-size: 0.9rem;
-      line-height: 1.4;
-      color: var(--fg2);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--fg3);
     }
 
-    .left-toc ul {
+    .inline-toc .toc-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--fg4);
+      margin-bottom: 0.4rem;
+    }
+
+    .inline-toc ul {
       list-style: none;
       padding-left: 0;
       margin: 0;
+      columns: 2;
+      column-gap: 1.5rem;
     }
 
-    .left-toc li {
-      margin: 0 0 0.35rem 0;
+    .inline-toc li {
+      margin: 0 0 0.2rem 0;
+      break-inside: avoid;
     }
 
-    .left-toc a {
+    .inline-toc a {
       color: var(--fg4);
       text-decoration: none;
-      transition: color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+      transition: color 0.2s ease-in-out;
     }
 
-    .left-toc a:hover {
+    .inline-toc a:hover {
       color: var(--fg1);
       text-decoration: underline;
       text-decoration-color: color-mix(in srgb, var(--fg1) 20%, var(--bg) 20%);
       text-underline-offset: 2px;
     }
 
-    .left-toc a.active {
+    .inline-toc a.active {
       color: var(--fg1);
     }
 
-    .left-toc li.toc-h3 {
+    .inline-toc li.toc-h3 {
       padding-left: 0.75rem;
+      font-size: 0.75rem;
     }
 
-    /* Hide left TOC on narrow viewports (reference: @media max-width: 1170px) */
-    @media (max-width: 1170px) {
-      .left-toc {
-        display: none;
+    @media (max-width: 768px) {
+      .inline-toc ul {
+        columns: 1;
       }
     }
 
@@ -515,17 +517,85 @@
     /* ── Responsive (reference: @media max-width: 1170px) ── */
     @media (max-width: 768px) {
       .post-container {
-        padding-left: 1.3rem;
-        padding-right: 1.3rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
         max-width: 100%;
       }
 
       article {
-        max-width: min(100%, var(--content-w));
+        max-width: 100%;
+        padding: 0 0.5rem 60px;
+      }
+
+      .hero {
+        padding: 1rem 0.5rem 0;
       }
 
       .hero h1 {
-        font-size: 24px;
+        font-size: 22px;
+        max-width: 100%;
+      }
+
+      /* Nav: stack on very small screens */
+      nav.top-nav .nav-inner {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 10px 12px;
+      }
+
+      nav.top-nav .nav-links {
+        gap: 1rem;
+        font-size: 13px;
+      }
+
+      /* Wide figures: constrain to viewport */
+      figure.wide {
+        width: 100% !important;
+        max-width: 100vw !important;
+        left: 0 !important;
+        transform: none !important;
+      }
+
+      figure.wide figcaption {
+        padding: 0 0.25rem;
+      }
+
+      /* Tables: horizontal scroll */
+      article table {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        font-size: 0.85em;
+      }
+
+      /* Code blocks: wrap on mobile */
+      pre {
+        padding: 0.75rem 0.5rem;
+        font-size: 12px;
+      }
+
+      pre code {
+        font-size: 11px;
+        padding: 0 0.25rem;
+      }
+
+      /* Grid figures: stack vertically */
+      figure [style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Flex figure pairs: stack */
+      figure [style*="display: flex"] {
+        flex-direction: column !important;
+      }
+
+      figure [style*="display: flex"] img {
+        width: 100% !important;
+      }
+
+      /* Details/summary blocks */
+      details {
+        padding: 0.5em 0.75em !important;
       }
     }
 
@@ -597,7 +667,7 @@
     </header>
 
     <article class="content-top">
-      <nav class="left-toc">
+      <nav class="inline-toc">
         <ul id="toc-list"></ul>
       </nav>
       <div id="article-body"></div>

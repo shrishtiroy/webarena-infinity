@@ -424,7 +424,7 @@ def build_homepage(apps, host, base_port, demo_mode=False):
     <body>
 
     <header>
-      <a class="logo" href="/">
+      <a class="logo" href="https://webarena.dev/webarena-infinity">
         <div class="logo-mark">W</div>
         WebArena-Infinity
       </a>
@@ -625,7 +625,7 @@ def build_reports_page():
     </head>
     <body>
     <header>
-      <a class="logo" href="/">
+      <a class="logo" href="https://webarena.dev/webarena-infinity">
         <div class="logo-mark">W</div>
         WebArena-Infinity
       </a>

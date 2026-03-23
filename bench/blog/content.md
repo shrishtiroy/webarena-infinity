@@ -1,7 +1,6 @@
 ---
 title: "WebArena-Infinity: Generating Browser Environments with Verifiable Tasks at Scale"
-author: Shuyan Zhou
-affiliation: Duke University
+author: Shuyan Zhou, Duke University
 contact: {shuyanzhdot@gmail.com}
 date: March 2026
 ---
@@ -13,21 +12,21 @@ date: March 2026
 
 <figure class="wide">
   <div style="max-width: 80%; margin: 0 auto;">
-    <img src="figures/trajectory_collage.gif" alt="Collage of browser agent trajectories across generated environments">
+    <img src="figures/trajectory_collage.gif" alt="Collage of browser-use agent trajectories across generated environments">
   </div>
-  <figcaption>Browser agents navigating generated environments across diverse application domains.</figcaption>
+  <figcaption>browser-use agents navigating generated environments across diverse application domains.</figcaption>
 </figure>
 
-Realistic web environments with verifiable tasks are essential for training and evaluating general-purpose browser agents. However, constructing such environments remains prohibitively labor-intensive, requiring manual effort across sandbox creation, data curation, task design, and programmatic verifier authoring[^webarena][^osworld][^visualwebarena][^agentcompany]. The required expertise, often including significant programming effort, further limits scalability, confining large-scale environment construction largely to well-resourced organizations.
+Realistic web environments with verifiable tasks are essential for training and evaluating general-purpose browser-use agents. However, constructing such environments remains prohibitively labor-intensive, requiring manual effort across sandbox creation, data curation, task design, and programmatic verifier authoring[^webarena][^osworld][^visualwebarena][^agentcompany]. The required expertise, often including significant programming effort, further limits scalability, confining large-scale environment construction largely to well-resourced organizations.
 
-We aim to automate what has traditionally been a manual, expert-driven process. In this work, we propose an approach for automatically generating high-authenticity, high-complexity, and RL-ready environments—along with verifiable tasks—from static artifacts such as recorded workflows and user manuals using a multi-agent system. The resulting pipeline is both time- and cost-efficient: each environment can be generated within ten hours at a cost under $100, and the process is highly parallelizable.
+We aim to automate what has traditionally been a manual, expert-driven process. In this work, we propose an approach for automatically generating high-authenticity, high-complexity, and RL-ready environments, along with verifiable tasks, from static artifacts such as recorded workflows and user manuals using a multi-agent system. The resulting pipeline is both time- and cost-efficient: each environment can be generated within ten hours at a cost under $100, and the process is highly parallelizable.
 
 A key insight of our approach is that coding agents with *privileged access* to source code and execution artifacts (e.g., task trajectories) can drive targeted and effective improvements. Rather than treating environments as black boxes, these agents can directly inspect, debug, and modify both environment implementations and task logic.
-This capability enables an iterative, self-improving pipeline that performs cycles of generation, verification, and refinement ({@sec:approach}) to continuously improve (1) the functional correctness of the environment and (2) the correctness and difficulty of the verifiable tasks.
+This capability enables an iterative, self-improving pipeline that performs cycles of generation, verification, and refinement to continuously improve (1) the functional correctness of the environment and (2) the correctness and difficulty of the verifiable tasks ({@sec:approach}).
 
 We further introduce a lightweight environment protocol that supports fast resets, easy replication, and scalable deployment, making the resulting environments well-suited for RL training without sacrificing realism ({@sec:env-protocol}).
 
-Despite being fully automatically generated, our environments present a meaningful challenge for current browser agents. Strong models with a sophisticated harness (Gemini-3-Flash with Browser Use[^browseruse]) achieve an average success rate of 69.3%, while vision-based approaches such as Kimi-K2.5[^kimik25] and Qwen-3.5-Plus[^qwen35] achieve 45.9% and 49.1% respectively ({@sec:performance}). These results fall below their performance on established, manually constructed benchmarks such as WebArena and OSWorld, suggesting that our approach captures meaningful task complexity without manual design. Ablations further confirm the importance of key components ({@sec:ablations}).
+Despite being fully automatically generated, our environments present a meaningful challenge for current browser-use agents. Strong models with a sophisticated harness (Gemini-3-Flash with Browser Use[^browseruse]) achieve an average success rate of 69.3%, while vision-based approaches such as Kimi-K2.5[^kimik25] and Qwen-3.5-Plus[^qwen35] achieve 45.9% and 49.1% respectively ({@sec:performance}). These results fall below their performance on established, manually constructed benchmarks such as WebArena and OSWorld, suggesting that our approach captures meaningful task complexity without manual design. Ablations further confirm the importance of key components ({@sec:ablations}).
 
 In this initial release, we provide ten environments along with 1,260 verifiable tasks spanning multiple domains, including careers, DevOps, finance, healthcare, productivity, and project management. We additionally release 2,070 successful trajectories collected from various browser-use agents to support training and further research.
 
@@ -43,7 +42,7 @@ In this initial release, we provide ten environments along with 1,260 verifiable
   <figcaption>Overview of our approach</figcaption>
 </figure>
 
-Our approach coordinates two types of agents: a *coding agent*, which generates and repairs the web environment, tasks, and verifiers, and a *browser agent*, which executes tasks through the front-end UI in the same way as an end user. The pipeline proceeds in five stages. (1) The coding agent generates a web application conditioned on static artifacts such as recorded workflows and user manuals. (2) The coding agent produces functional testing tasks together with programmatic verifiers; the browser agent executes these tasks, and the coding agent audits failures, iterating up to N times to repair environment bugs. (3) The coding agent generates realistic, difficulty-graded tasks with verifiers, followed by the same evaluate-audit loop. (4) The coding agent analyzes the browser agent’s prior trajectories to synthesize progressively more challenging tasks over R rounds. (5) A final regression evaluation runs the full task suite to verify that edits introduced in later stages have not degraded functional correctness. We describe each component in detail below.
+Our approach coordinates two types of agents: a *coding agent*, which generates and repairs the web environment, tasks, and verifiers, and a *browser-use agent*, which executes tasks through the front-end UI in the same way as an end user. The pipeline proceeds in five stages. (1) The coding agent generates a web application conditioned on static artifacts such as recorded workflows and user manuals. (2) The coding agent produces functional testing tasks together with programmatic verifiers; the browser-use agent executes these tasks, and the coding agent audits failures, iterating up to N times to repair environment bugs. (3) The coding agent generates realistic, difficulty-graded tasks with verifiers, followed by the same evaluate-audit loop. (4) The coding agent analyzes the browser-use agent’s prior trajectories to synthesize progressively more challenging tasks over R rounds. (5) A final regression evaluation runs the full task suite to verify that edits introduced in later stages have not degraded functional correctness. We describe each component in detail below.
 
 ### Web Environment Generation
 Although coding agents can generate arbitrary websites, unconstrained generation often produces environments that lack the structural fidelity needed to approximate real-world deployment conditions. We therefore condition generation on artifacts derived from real applications, specifically product user manuals. User manuals provide a strong foundation for environment construction: they describe core concepts, document task workflows, and often specify UI layout and interaction patterns (e.g., “click the top-right button to access settings”).
@@ -51,10 +50,10 @@ Although coding agents can generate arbitrary websites, unconstrained generation
 We select ten functional sections from eight applications, each corresponding to a coherent subset of product capabilities (e.g., the planning and tracking module of GitLab). The coding agent is given a detailed generation prompt together with the relevant manual sections; the full prompt is provided in the appendix. We defer discussion of specific implementation choices, such as UI element constraints, to the following section.
 
 ### Functional Correctness Verification
-Although coding agents such as Claude Code may run many tests during web application generation, these checks do not guarantee functional correctness, particularlly front-end interaction. We therefore introduce a functional correctness verification stage in which the coding agent generates tasks and corresponding verifiers to test the basic functionality of the website.
-A browser agent then executes these tasks through the front-end UI to assess whether they can be completed successfully in practice. These tasks are intentionally simple and fundamental; a capable browser agent should be able to complete them reliably. In our experiments, this set of tasks achieves a pass rate above 90% on average. We therefore use performance on this stage as an indicator of the website’s functional correctness.
+Although coding agents such as Claude Code may run many tests during web application generation, these checks do not guarantee functional correctness, particularly front-end interaction. We therefore introduce a functional correctness verification stage in which the coding agent generates tasks and corresponding verifiers to test the basic functionality of the website.
+A browser-use agent then executes these tasks through the front-end UI to assess whether they can be completed successfully in practice. These tasks are intentionally simple and fundamental; a capable browser-use agent should be able to complete them reliably. In our experiments, this set of tasks achieves a pass rate above 90% on average. We therefore use performance on this stage as an indicator of the website’s functional correctness.
 
-**Auditing:** After the browser agent completes the tasks, we launch a separate coding agent as an auditing agent to review the recorded trajectories, with particular attention to failed cases, and produce an audit summary. The auditing agent determines whether each failure is attributable to an implementation bug or to limitations of the browser agent. It then fixes confirmed environment bugs accordingly. The auditing process terminates once the auditing agent concludes that the remaining failures are best explained by browser-agent error rather than implementation issues.
+**Auditing:** After the browser-use agent completes the tasks, we launch a separate coding agent as an auditing agent to review the recorded trajectories, with particular attention to failed cases, and produce an audit summary. The auditing agent determines whether each failure is attributable to an implementation bug or to limitations of the browser-use agent. It then fixes confirmed environment bugs accordingly. The auditing process terminates once the auditing agent concludes that the remaining failures are best explained by browser-agent error rather than implementation issues.
 
 As a concrete example, one of the generated function tasks inside GitLab Plan & Track environment tests whether a user can delete an issue:
 
@@ -87,7 +86,7 @@ As a concrete example, one of the generated function tasks inside GitLab Plan & 
 </figure>
 
 
-While the backend logic supports this action, the browser agent failed to attempt this task due to missing the `delete` UI element.
+While the backend logic supports this action, the browser-use agent failed to attempt this task due to missing the `delete` UI element.
 The auditing agent identified this by reading the failed trajectory and applied the fix:
 
 <pre style="background-color: var(--bg_code); border-radius: 0.2rem; padding: 1rem 2rem 1rem 1rem; overflow-x: auto;"><code><span style="color:#656d76">  html += '&lt;button class="btn btn-outline" data-action="edit-issue" ...&gt;Edit&lt;/button&gt;';</span>
@@ -151,7 +150,7 @@ The procedure for realistic task generation and auditing closely follows that of
 </figure>
 
 ### Configurations
-We use Claude Code (Opus 4.6, high-effort setting with planning mode) as the coding agent, and Gemini-3-Flash with the Browser Use harness as the browser agent. We additionally equip the coding agent with a frontend-design skill to support web development. We note that stronger browser use agent can further improve the generation quality. However, such improvements introduce additional computational cost and reduce iteration efficiency.
+We use Claude Code (Opus 4.6, high-effort setting with planning mode) as the coding agent, and Gemini-3-Flash with the Browser Use harness as the browser-use agent. We additionally equip the coding agent with a frontend-design skill to support web development. We note that a stronger browser-use agent can further improve the generation quality. However, such improvements introduce additional computational cost and reduce iteration efficiency.
 
 ---
 
@@ -159,8 +158,8 @@ We use Claude Code (Opus 4.6, high-effort setting with planning mode) as the cod
 In this section, we highlight several key design choices that improve generation quality and make the environments more suitable for RL training at scale.
 
 ### Text-based Interaction as a First-Class Citizen
-We deliberately design our environments to be compatible with browser agents that rely primarily on text-based observations, such as enhanced accessibility trees. This choice is motivated by the observation that language models remain more robust and generalize better when operating over textual representations. 
-To support this, we encourage the use of accessibility best practices and browser-native UI elements that can be fully represented in the DOM (e.g., popups, dropdowns). This ensures that critical interface elements and interactions are consistently exposed to the agent. In addition, we disable vision input when using the browser agent to improve efficiency and execution speed, making the agent purely text-based.
+We deliberately design our environments to be compatible with browser-use agents that rely primarily on text-based observations, such as enhanced accessibility trees. This choice is motivated by the observation that language models remain more robust and generalize better when operating over textual representations. 
+To support this, we encourage the use of accessibility best practices and browser-native UI elements that can be fully represented in the DOM (e.g., popups, dropdowns). This ensures that critical interface elements and interactions are consistently exposed to the agent. In addition, we disable vision input when using the browser-use agent to improve efficiency and execution speed, making the agent purely text-based.
 
 ### Enhancing Verifier Reliability
 Verifier correctness is a critical requirement for RL training. To ensure reliability, we introduce two layers of guardrails: (1) Programmatic Sanity Check: We first run a program with privileged backend access to directly manipulate the application state and then invoke the same verifier used for agent evaluation. Since this execution path should be correct by construction, any failure indicates a likely issue with the verifier itself. This procedure is integrated into the environment generation pipeline, allowing the coding agent to automatically detect and fix verifier inconsistencies. (2) Automatic Auditing: As described earlier, we further employ an auditing agent to analyze failed task trajectories and identify whether failures stem from environment bugs or agent limitations. This provides an additional layer of validation for both task design and verifier correctness.
@@ -172,17 +171,18 @@ Given full access to both application state and functionality, we design verifie
 
 ### The Environment Protocol {#env-protocol}
 
-We design our environments to be lightweight, easily replicable, and efficiently resettable, without sacrificing realism. The core idea is a *state-sync protocol* that decouples application state from the UI rendering layer, enabling fast and reliable resets without requiring heavy infrastructure.
-Each environment is implemented as a self-contained directory of static HTML/CSS/JS files, served by a lightweight Python HTTP server. The server exposes a minimal API:
+We design our environments to be lightweight, easily replicable, and efficiently resettable, without sacrificing realism. Each environment is a self-contained directory of static HTML/CSS/JS files, served by a lightweight Python HTTP server with no database or external dependencies.
 
-<pre style="background-color: var(--bg_code); border-radius: 0.2rem; padding: 1rem 1.5rem; overflow-x: auto; line-height: 1.7;"><code><span style="color:#1a7f37; font-weight:600;">GET</span>  <span style="color:#0550ae">/api/state</span>   <span style="color:#656d76">→ current app state (JSON)</span>
-<span style="color:#9a6700; font-weight:600;">PUT</span>  <span style="color:#0550ae">/api/state</span>   <span style="color:#656d76">→ browser pushes state on every mutation</span>
-<span style="color:#cf222e; font-weight:600;">POST</span> <span style="color:#0550ae">/api/reset</span>   <span style="color:#656d76">→ restore seed state, send SSE reset event</span>
-<span style="color:#1a7f37; font-weight:600;">GET</span>  <span style="color:#0550ae">/api/events</span>  <span style="color:#656d76">→ SSE stream for reset notifications</span>
-<span style="color:#1a7f37; font-weight:600;">GET</span>  <span style="color:#0550ae">/*</span>           <span style="color:#656d76">→ static file serving</span></code></pre>
-On initial load and after every user interaction, the browser serializes and pushes its full state to the server. The server records the first such update as an immutable *seed snapshot*. Upon reset, the server restores this snapshot in memory and broadcasts a reset event via Server-Sent Events (SSE). The browser listens for this event, reloads the seed state, and navigates back to the initial page. This design eliminates the need for database rollbacks, container restarts, or filesystem cleanup.
+The key design decision is that the browser owns all application state. On every user interaction, the browser serializes its full state and pushes it to the server, which simply stores the latest copy in memory. This turns the server into a passive state mirror that verifiers can query without touching the UI — cleanly separating task verification from task execution. The server also captures the first state push as an immutable *seed snapshot*, which is all that is needed for resets: restore the snapshot in memory and notify the browser via Server-Sent Events to reload. No database rollbacks, container restarts, or filesystem cleanup required.
 
-Because the system has no database, no external service dependencies, and no persistent storage beyond in-memory state, each environment is fully defined by its source directory. Replicating an environment reduces to copying files, and running multiple instances simply requires launching separate server processes on different ports. This design makes it straightforward to scale to many parallel RL rollouts on a single machine.
+This contract is implemented through a minimal API:
+
+<pre style="background-color: var(--bg_code); border-radius: 0.2rem; padding: 1rem 1.5rem; overflow-x: auto; line-height: 1.7;"><code><span style="color:#9a6700; font-weight:600;">PUT</span>  <span style="color:#0550ae">/api/state</span>   <span style="color:#656d76">→ browser pushes state on every mutation</span>
+<span style="color:#1a7f37; font-weight:600;">GET</span>  <span style="color:#0550ae">/api/state</span>   <span style="color:#656d76">→ verifiers read current state (JSON)</span>
+<span style="color:#cf222e; font-weight:600;">POST</span> <span style="color:#0550ae">/api/reset</span>   <span style="color:#656d76">→ restore seed snapshot, notify browser via SSE</span>
+<span style="color:#1a7f37; font-weight:600;">GET</span>  <span style="color:#0550ae">/api/events</span>  <span style="color:#656d76">→ SSE stream the browser listens to for resets</span></code></pre>
+
+Because the entire environment is defined by its source directory and a few hundred lines of server code, replication reduces to copying files, and running multiple instances simply requires launching separate processes on different ports. This makes it straightforward to scale to many parallel RL rollouts on a single machine.
 
 ---
 
@@ -294,7 +294,7 @@ We present summary statistics for the ten environments included in our initial r
   <figcaption>Overall and breakdown success rate (%) of three browser-use agents </figcaption>
 </figure> 
 
-**Browser-use Agents** We evaluate a text-based browser agent using the Browser Use harness with `gemini-3-flash-preview` as the underlying model. The Browser Use harness supports both ID-based interaction and the ability to write and execute JavaScript, providing additional flexibility for complex operations. We also evaluate two vision-based agents, `kimi-k2.5` and `qwen-3.5-plus`. For these agents, we implement error-handling strategies, such as retry mechanisms, to mitigate limitations introduced by comparatively less sophisticated interaction harnesses.
+**Browser-use Agents** We evaluate a text-based browser-use agent using the Browser Use harness with `gemini-3-flash-preview` as the underlying model. The Browser Use harness supports both ID-based interaction and the ability to write and execute JavaScript, providing additional flexibility for complex operations. We also evaluate two vision-based agents, `kimi-k2.5` and `qwen-3.5-plus`. For these agents, we implement error-handling strategies, such as retry mechanisms, to mitigate limitations introduced by comparatively less sophisticated interaction harnesses.
 
 Across 1,260 real tasks spanning ten environments, Gemini-3-Flash with Browser Use achieves 69.3% (873/1260), followed by Qwen-3.5-Plus at 49.1% (619/1260) and Kimi-K2.5 at 45.9% (578/1260). Performance varies considerably across environments, with PayPal My Wallet being the easiest environment for all agents. While Kimi-K2.5 underperforms Qwen-3.5-Plus overall, it surpasses Qwen-3.5-Plus by a significant margin on Gmail-related applications.
 
@@ -319,7 +319,7 @@ In this section, we perform ablation studies to validate the necessity and impac
 
 A central design decision in our pipeline is conditioning environment generation on artifacts. A natural question is: *how much does the richness of source artifacts matter?* To answer this, we conduct a controlled ablation comparing environments generated from full product documentation against those generated from a brief, high-level application description. We select five applications and generate paired environments with all other pipeline parameters held constant.
 
-We evaluate the impact along three metrics, namely the function complexity, task diversity, and feature authenticity.
+We evaluate the impact along three metrics, namely functional complexity, task diversity, and feature authenticity.
 <details style="background: #f0f4fa; border-left: 3px solid #4a7ec2; border-radius: 4px; padding: 0.75em 1em; margin: 0.75em 0;">
 <summary style="cursor: pointer; color: #4a7ec2; font-weight: 600;">Expand to see the detailed metric definitions</summary>
 <p><strong>Functional Complexity.</strong> We use Claude to extract distinct user-facing capabilities from each generated application's source code and count the number of unique functional operations implemented.</p>
@@ -350,6 +350,7 @@ We plot the success rate of the browser-use agent on functional testing tasks be
 To better understand the nature of the issues uncovered, we analyze the auditing agent’s reports and categorize each identified failure. The distribution indicates that the auditing procedure does not simply attribute all failures to limitations of the browser-use agent.
 Environment- and task-side errors, including application bugs, verifier bugs, and impossible tasks, account for 45% of all findings, while the remaining 55% are attributed to browser-agent limitations.
 These results highlight the effectiveness of the auditing procedure in improving environment quality, as unresolved issues—particularly incorrect reward signals—would otherwise compromise downstream training.
+At the same time, we emphasize that the generated websites are by no means bug-free; rather, auditing makes them more likely to implement the functionalities required for the generated tasks correctly.
 
 
 ### Self-Challenging Increases Task Difficulty and Complexity [toc: Effectiveness of Self-Challenging]
@@ -361,7 +362,7 @@ These results highlight the effectiveness of the auditing procedure in improving
 </figure>
 
 We compute the average success rate of Gemini-3-Flash with Browser Use across real tasks at different difficulty levels and observe a monotonic decrease in performance. In particular, the self-challenging stage produces tasks that are substantially more difficult than those generated in the initial round.
-The browser agent’s average success rate drops from 54.2% on the original hard tasks to 41.9% on hardened tasks. This gap indicates that, while the original hard tasks are generated solely based on the website implementation, incorporating prior execution trajectories enables the coding agent to further identify and target weaknesses beyond this initial difficulty frontier.
+The browser-use agent’s average success rate drops from 54.2% on the original hard tasks to 41.9% on hardened tasks. This gap indicates that, while the original hard tasks are generated solely based on the website implementation, incorporating prior execution trajectories enables the coding agent to further identify and target weaknesses beyond this initial difficulty frontier.
 
 ### Limited Functional Regression Across Iterations [toc: Regression Test]
 <figure>
