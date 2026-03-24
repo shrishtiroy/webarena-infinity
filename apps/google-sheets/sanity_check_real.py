@@ -812,11 +812,385 @@ def solve_task_h20(state):
     state["namedRanges"]["TeamStatus"] = "Employees!G2:G26"
 
 
+# -- Hardening round 1 solve functions (task_h21 - task_h40) ------------------
+
+def solve_task_h21(state):
+    """Create Department Summary sheet with dept counts."""
+    from collections import Counter
+    emp_sheet = state["sheets"][1]
+    dept_counter = Counter()
+    for r in range(2, 27):
+        cell = emp_sheet["cells"].get(f"B{r}")
+        if cell and cell.get("value"):
+            dept_counter[str(cell["value"])] += 1
+
+    ds = create_empty_sheet("Department Summary")
+    for i, dept in enumerate(sorted(dept_counter.keys())):
+        row = i + 1
+        ds["cells"][f"A{row}"] = {"value": dept, "formula": None, "format": {"bold": True}}
+        ds["cells"][f"B{row}"] = {"value": dept_counter[dept], "formula": None, "format": {}}
+    state["sheets"].append(ds)
+    state["activeSheet"] = len(state["sheets"]) - 1
+
+
+def solve_task_h22(state):
+    """Bold+underline lowest salary employee, red bg on salary, status Under Review."""
+    sheet = state["sheets"][1]
+    min_sal = None
+    min_row = None
+    for r in range(2, 27):
+        cell = sheet["cells"].get(f"D{r}")
+        if cell and isinstance(cell.get("value"), (int, float)):
+            if min_sal is None or cell["value"] < min_sal:
+                min_sal = cell["value"]
+                min_row = r
+
+    if min_row:
+        sheet["cells"][f"A{min_row}"].setdefault("format", {})["bold"] = True
+        sheet["cells"][f"A{min_row}"]["format"]["underline"] = True
+        sheet["cells"][f"D{min_row}"].setdefault("format", {})["backgroundColor"] = "#ffc7ce"
+        sheet["cells"][f"G{min_row}"]["value"] = "Under Review"
+
+
+def solve_task_h23(state):
+    """Bold product names where stock < reorder, CF for zero stock."""
+    sheet = state["sheets"][2]
+    for r in range(2, 32):
+        d_cell = sheet["cells"].get(f"D{r}")
+        e_cell = sheet["cells"].get(f"E{r}")
+        if d_cell and e_cell:
+            stock = d_cell.get("value", 0)
+            reorder = e_cell.get("value", 0)
+            if isinstance(stock, (int, float)) and isinstance(reorder, (int, float)):
+                if stock < reorder:
+                    b_cell = sheet["cells"].get(f"B{r}")
+                    if b_cell:
+                        b_cell.setdefault("format", {})["bold"] = True
+
+    sheet["conditionalFormats"].append({
+        "range": "D2:D31",
+        "type": "equal_to",
+        "value": "0",
+        "value2": "",
+        "backgroundColor": "#cc0000",
+        "fontColor": "#ffffff"
+    })
+
+
+def solve_task_h24(state):
+    """Sort employees by salary desc, freeze, add rank column."""
+    sheet = state["sheets"][1]
+    sort_sheet_by_col(sheet, "D", "desc")
+    sheet["frozenRows"] = 1
+    sheet["frozenCols"] = 1
+    sheet["cells"]["H1"] = {"value": "Rank", "formula": None, "format": {"bold": True}}
+    for r in range(2, 27):
+        sheet["cells"][f"H{r}"] = {"value": r - 1, "formula": None, "format": {}}
+
+
+def solve_task_h25(state):
+    """Disambiguate two Docking Station products by unit cost."""
+    sheet = state["sheets"][2]
+    # Docking Station USB-C: row 14, cost $95 (cheaper)
+    # Docking Station TB4: row 15, cost $140 (more expensive)
+    # More expensive: stock=25, bold
+    sheet["cells"]["D15"]["value"] = 25
+    sheet["cells"]["B15"].setdefault("format", {})["bold"] = True
+    # Cheaper: italic + strikethrough
+    sheet["cells"]["B14"].setdefault("format", {})["italic"] = True
+    sheet["cells"]["B14"]["format"]["strikethrough"] = True
+
+
+def solve_task_h26(state):
+    """Add Commission formula column on Sales."""
+    sheet = state["sheets"][0]
+    sheet["cells"]["I1"] = {"value": "Commission", "formula": None, "format": {"bold": True}}
+    total_commission = 0
+    for r in range(2, 42):
+        g_cell = sheet["cells"].get(f"G{r}")
+        g_val = g_cell["value"] if g_cell and isinstance(g_cell.get("value"), (int, float)) else 0
+        comm = g_val * 0.05
+        total_commission += comm
+        sheet["cells"][f"I{r}"] = {
+            "value": comm,
+            "formula": f"=G{r}*0.05",
+            "format": {"numberFormat": "currency"}
+        }
+    sheet["cells"]["I42"] = {
+        "value": total_commission,
+        "formula": "=SUM(I2:I41)",
+        "format": {"bold": True, "numberFormat": "currency"}
+    }
+
+
+def solve_task_h27(state):
+    """Change On Leave→Returning (blue bg), Contractor→Vendor (orange bg)."""
+    sheet = state["sheets"][1]
+    for r in range(2, 27):
+        g_cell = sheet["cells"].get(f"G{r}")
+        if g_cell:
+            val = g_cell.get("value", "")
+            if val == "On Leave":
+                g_cell["value"] = "Returning"
+                g_cell.setdefault("format", {})["backgroundColor"] = "#cfe2f3"
+            elif val == "Contractor":
+                g_cell["value"] = "Vendor"
+                g_cell.setdefault("format", {})["backgroundColor"] = "#fce5cd"
+
+
+def solve_task_h28(state):
+    """Find highest total salary dept, highlight its salary cells green, label in A27/B27."""
+    from collections import defaultdict
+    sheet = state["sheets"][1]
+    dept_totals = defaultdict(float)
+    dept_rows = defaultdict(list)
+    for r in range(2, 27):
+        dept_cell = sheet["cells"].get(f"B{r}")
+        sal_cell = sheet["cells"].get(f"D{r}")
+        if dept_cell and sal_cell:
+            dept = str(dept_cell.get("value", ""))
+            sal = sal_cell.get("value", 0)
+            if isinstance(sal, (int, float)):
+                dept_totals[dept] += sal
+                dept_rows[dept].append(r)
+
+    top_dept = max(dept_totals, key=dept_totals.get)
+    for r in dept_rows[top_dept]:
+        sheet["cells"][f"D{r}"].setdefault("format", {})["backgroundColor"] = "#c6efce"
+
+    sheet["cells"]["A27"] = {"value": "Highest Dept", "formula": None, "format": {"bold": True}}
+    sheet["cells"]["B27"] = {"value": top_dept, "formula": None, "format": {}}
+
+
+def solve_task_h29(state):
+    """Four CF rules on Inventory stock, named range, freeze."""
+    sheet = state["sheets"][2]
+    cf = sheet["conditionalFormats"]
+    cf.append({"range": "D2:D31", "type": "equal_to", "value": "0", "value2": "", "backgroundColor": "#ff0000"})
+    cf.append({"range": "D2:D31", "type": "between", "value": "1", "value2": "10", "backgroundColor": "#fce5cd"})
+    cf.append({"range": "D2:D31", "type": "between", "value": "11", "value2": "19", "backgroundColor": "#ffff00"})
+    cf.append({"range": "D2:D31", "type": "greater_than", "value": "100", "value2": "", "backgroundColor": "#c6efce"})
+    state["namedRanges"]["StockLevels"] = "Inventory!D2:D31"
+    sheet["frozenRows"] = 1
+
+
+def solve_task_h30(state):
+    """KPI Dashboard with 5 cross-sheet formula rows."""
+    sales = state["sheets"][0]
+    emp = state["sheets"][1]
+    total_rev = sum_col(sales, "G", 2, 41)
+    avg_sale = avg_col(sales, "G", 2, 41)
+    max_sale = max_col(sales, "G", 2, 41)
+    headcount = counta_col(emp, "A", 2, 26)
+    avg_salary = avg_col(emp, "D", 2, 26)
+
+    kpi = create_empty_sheet("KPI Dashboard")
+    kpi["cells"]["A1"] = {"value": "Total Revenue", "formula": None, "format": {"bold": True}}
+    kpi["cells"]["B1"] = {"value": total_rev, "formula": "=SUM(Sales!G2:G41)", "format": {"numberFormat": "currency"}}
+    kpi["cells"]["A2"] = {"value": "Average Sale", "formula": None, "format": {"bold": True}}
+    kpi["cells"]["B2"] = {"value": avg_sale, "formula": "=AVERAGE(Sales!G2:G41)", "format": {"numberFormat": "currency"}}
+    kpi["cells"]["A3"] = {"value": "Max Sale", "formula": None, "format": {"bold": True}}
+    kpi["cells"]["B3"] = {"value": max_sale, "formula": "=MAX(Sales!G2:G41)", "format": {"numberFormat": "currency"}}
+    kpi["cells"]["A4"] = {"value": "Headcount", "formula": None, "format": {"bold": True}}
+    kpi["cells"]["B4"] = {"value": headcount, "formula": "=COUNTA(Employees!A2:A26)", "format": {}}
+    kpi["cells"]["A5"] = {"value": "Avg Salary", "formula": None, "format": {"bold": True}}
+    kpi["cells"]["B5"] = {"value": avg_salary, "formula": "=AVERAGE(Employees!D2:D26)", "format": {"numberFormat": "currency"}}
+    state["sheets"].append(kpi)
+    state["activeSheet"] = len(state["sheets"]) - 1
+
+
+def solve_task_h31(state):
+    """Replace PeriphCo Supply, delete col H, sort by name, freeze."""
+    sheet = state["sheets"][2]
+    find_replace(sheet, "PeriphCo Supply", "PeriphCo International")
+    sheet["cells"] = shift_cells_delete_col(sheet["cells"], "H")
+    sort_sheet_by_col(sheet, "B", "asc")
+    sheet["frozenRows"] = 1
+
+
+def solve_task_h32(state):
+    """Duplicate Sales as Sales Analysis, sort by total desc, freeze, bar chart."""
+    copy = deepcopy(state["sheets"][0])
+    copy["name"] = "Sales Analysis"
+    state["sheets"].insert(1, copy)
+    sort_sheet_by_col(state["sheets"][1], "G", "desc")
+    state["sheets"][1]["frozenRows"] = 1
+    state["sheets"][1]["charts"].append({
+        "id": "chart-sanity-h32",
+        "type": "bar",
+        "dataRange": "G1:G41",
+        "title": "Top Sales by Amount",
+        "xAxisLabel": "",
+        "yAxisLabel": "",
+        "showLegend": True,
+        "legendPosition": "top",
+        "position": {"x": 250, "y": 50},
+        "size": {"width": 450, "height": 300}
+    })
+    state["activeSheet"] = 1
+
+
+def solve_task_h33(state):
+    """Move Employees to first, rename to Team, create Archive sheet."""
+    emp = state["sheets"].pop(1)
+    emp["name"] = "Team"
+    state["sheets"].insert(0, emp)
+    state["activeSheet"] = 0
+
+    archive = create_empty_sheet("Archive")
+    hdr_fmt = {"bold": True, "backgroundColor": "#e0e0e0"}
+    archive["cells"]["A1"] = {"value": "Sheet Name", "formula": None, "format": dict(hdr_fmt)}
+    archive["cells"]["B1"] = {"value": "Row Count", "formula": None, "format": dict(hdr_fmt)}
+    archive["cells"]["C1"] = {"value": "Status", "formula": None, "format": dict(hdr_fmt)}
+    archive["cells"]["A2"] = {"value": "Team", "formula": None, "format": {}}
+    archive["cells"]["B2"] = {"value": 25, "formula": None, "format": {}}
+    archive["cells"]["C2"] = {"value": "Active", "formula": None, "format": {}}
+    archive["cells"]["A3"] = {"value": "Sales", "formula": None, "format": {}}
+    archive["cells"]["B3"] = {"value": 40, "formula": None, "format": {}}
+    archive["cells"]["C3"] = {"value": "Active", "formula": None, "format": {}}
+    archive["cells"]["A4"] = {"value": "Inventory", "formula": None, "format": {}}
+    archive["cells"]["B4"] = {"value": 30, "formula": None, "format": {}}
+    archive["cells"]["C4"] = {"value": "Active", "formula": None, "format": {}}
+    state["sheets"].append(archive)
+
+
+def solve_task_h34(state):
+    """Gray bg on TechDist Global supplier cells, bar chart, freeze."""
+    sheet = state["sheets"][2]
+    for r in range(2, 32):
+        g_cell = sheet["cells"].get(f"G{r}")
+        if g_cell and str(g_cell.get("value", "")) == "TechDist Global":
+            g_cell.setdefault("format", {})["backgroundColor"] = "#e0e0e0"
+
+    sheet["charts"].append({
+        "id": "chart-sanity-h34",
+        "type": "bar",
+        "dataRange": "B1:D31",
+        "title": "Stock Levels",
+        "xAxisLabel": "",
+        "yAxisLabel": "",
+        "showLegend": True,
+        "legendPosition": "top",
+        "position": {"x": 250, "y": 50},
+        "size": {"width": 450, "height": 300}
+    })
+    sheet["frozenRows"] = 1
+
+
+def solve_task_h35(state):
+    """Bulk data validation + underline on status cells + named range."""
+    sheet = state["sheets"][1]
+    validation = {"type": "list", "values": "Active,On Leave,Contractor,Terminated,Remote"}
+    for r in range(2, 27):
+        cell = sheet["cells"].get(f"G{r}")
+        if cell:
+            cell["validation"] = dict(validation)
+            cell.setdefault("format", {})["underline"] = True
+    state["namedRanges"]["StatusColumn"] = "Employees!G2:G26"
+
+
+def solve_task_h36(state):
+    """Freeze headers + light blue bg on all 3 sheets, create named ranges."""
+    header_cols = {
+        0: list("ABCDEFGH"),  # Sales
+        1: list("ABCDEFG"),   # Employees
+        2: list("ABCDEFGH"),  # Inventory
+    }
+    for si, cols in header_cols.items():
+        sheet = state["sheets"][si]
+        sheet["frozenRows"] = 1
+        for col in cols:
+            cell = sheet["cells"].get(f"{col}1")
+            if cell:
+                cell.setdefault("format", {})["backgroundColor"] = "#cfe2f3"
+
+    state["namedRanges"]["SalesHeaders"] = "Sales!A1:H1"
+    state["namedRanges"]["EmployeeHeaders"] = "Employees!A1:G1"
+    state["namedRanges"]["InventoryHeaders"] = "Inventory!A1:H1"
+
+
+def solve_task_h37(state):
+    """MAX/MIN formulas + labels + colored bg + currency + named range."""
+    sheet = state["sheets"][1]
+    mx = max_col(sheet, "D", 2, 26)
+    mn = min_col(sheet, "D", 2, 26)
+
+    sheet["cells"]["C27"] = {"value": "Highest Salary", "formula": None, "format": {"bold": True}}
+    sheet["cells"]["D27"] = {
+        "value": mx, "formula": "=MAX(D2:D26)",
+        "format": {"backgroundColor": "#c6efce", "numberFormat": "currency"}
+    }
+    sheet["cells"]["C28"] = {"value": "Lowest Salary", "formula": None, "format": {"bold": True}}
+    sheet["cells"]["D28"] = {
+        "value": mn, "formula": "=MIN(D2:D26)",
+        "format": {"backgroundColor": "#ffc7ce", "numberFormat": "currency"}
+    }
+    state["namedRanges"]["SalaryRange"] = "Employees!D2:D26"
+
+
+def solve_task_h38(state):
+    """Filter hide West, replace Wireless Mouse, blue B1 text, named range."""
+    sheet = state["sheets"][0]
+    sheet["filterMode"] = True
+    sheet["filters"]["D"] = {"type": "values", "hiddenValues": ["West"]}
+    find_replace(sheet, "Wireless Mouse", "Wireless Mouse Pro")
+    sheet["cells"]["B1"].setdefault("format", {})["fontColor"] = "#0000ff"
+    state["namedRanges"]["SalesRegion"] = "Sales!D2:D41"
+
+
+def solve_task_h39(state):
+    """Merge + Performance Summary + MIN/MAX/SUM formulas + CF on totals."""
+    sheet = state["sheets"][0]
+    sheet["mergedCells"].append("A44:D44")
+    sheet["cells"]["A44"] = {
+        "value": "Performance Summary", "formula": None,
+        "format": {"bold": True, "horizontalAlign": "center"}
+    }
+    mn_qty = min_col(sheet, "E", 2, 41)
+    mx_price = max_col(sheet, "F", 2, 41)
+    total_rev = sum_col(sheet, "G", 2, 41)
+    sheet["cells"]["E44"] = {"value": mn_qty, "formula": "=MIN(E2:E41)", "format": {}}
+    sheet["cells"]["F44"] = {"value": mx_price, "formula": "=MAX(F2:F41)", "format": {"numberFormat": "currency"}}
+    sheet["cells"]["G44"] = {"value": total_rev, "formula": "=SUM(G2:G41)", "format": {"numberFormat": "currency"}}
+    sheet["conditionalFormats"].append({
+        "range": "G2:G41",
+        "type": "greater_than",
+        "value": "10000",
+        "value2": "",
+        "backgroundColor": "#c6efce"
+    })
+
+
+def solve_task_h40(state):
+    """Executive Summary with title merge + 4 formula rows."""
+    sales = state["sheets"][0]
+    emp = state["sheets"][1]
+    inv = state["sheets"][2]
+    total_rev = sum_col(sales, "G", 2, 41)
+    total_payroll = sum_col(emp, "D", 2, 26)
+    avg_salary = avg_col(emp, "D", 2, 26)
+    inv_items = counta_col(inv, "B", 2, 31)
+
+    es = create_empty_sheet("Executive Summary")
+    es["cells"]["A1"] = {"value": "Company Dashboard", "formula": None, "format": {"bold": True}}
+    es["mergedCells"].append("A1:B1")
+    es["cells"]["A3"] = {"value": "Total Revenue", "formula": None, "format": {"bold": True}}
+    es["cells"]["B3"] = {"value": total_rev, "formula": "=SUM(Sales!G2:G41)", "format": {"numberFormat": "currency"}}
+    es["cells"]["A4"] = {"value": "Total Payroll", "formula": None, "format": {"bold": True}}
+    es["cells"]["B4"] = {"value": total_payroll, "formula": "=SUM(Employees!D2:D26)", "format": {"numberFormat": "currency"}}
+    es["cells"]["A5"] = {"value": "Average Salary", "formula": None, "format": {"bold": True}}
+    es["cells"]["B5"] = {"value": avg_salary, "formula": "=AVERAGE(Employees!D2:D26)", "format": {"numberFormat": "currency"}}
+    es["cells"]["A6"] = {"value": "Inventory Items", "formula": None, "format": {"bold": True}}
+    es["cells"]["B6"] = {"value": inv_items, "formula": "=COUNTA(Inventory!B2:B31)", "format": {}}
+    state["sheets"].append(es)
+    state["activeSheet"] = len(state["sheets"]) - 1
+
+
 # -- solver registry ----------------------------------------------------------
 
 SOLVERS = {}
 for _prefix in ("e", "m", "h"):
-    for _i in range(1, 21):
+    for _i in range(1, 41):
         _key = f"task_{_prefix}{_i}"
         _fn = f"solve_task_{_prefix}{_i}"
         if _fn in globals():

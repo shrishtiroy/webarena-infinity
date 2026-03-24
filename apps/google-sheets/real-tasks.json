@@ -358,5 +358,125 @@
     "difficulty": "hard",
     "instruction": "On the Employees sheet, replace all 'Active' statuses with 'Current' and 'On Leave' with 'Away', add conditional formatting on the Status column (G2:G26) to highlight 'Away' cells with yellow (#ffff00), and create a named range 'TeamStatus' for Employees!G2:G26.",
     "verify": "real-tasks/task_h20.py"
+  },
+  {
+    "id": "task_h21",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet called 'Department Summary'. List each unique department from the Employees sheet alphabetically in column A starting from A1 (one per row). In column B, enter the number of employees in each department. Bold all the department names in column A.",
+    "verify": "real-tasks/task_h21.py"
+  },
+  {
+    "id": "task_h22",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, find the employee with the lowest salary. Bold and underline their name, set their salary cell's background to light red (#ffc7ce), and change their status to 'Under Review'.",
+    "verify": "real-tasks/task_h22.py"
+  },
+  {
+    "id": "task_h23",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, bold the product name of every item whose current stock is below its reorder level. Then add a conditional formatting rule on D2:D31 to highlight values equal to 0 with a dark red background (#cc0000) and white text (#ffffff).",
+    "verify": "real-tasks/task_h23.py"
+  },
+  {
+    "id": "task_h24",
+    "difficulty": "hard",
+    "instruction": "Sort the Employees sheet by salary from highest to lowest. Freeze the top row and first column. Add 'Rank' as a bold header in H1, and number each employee from 1 to 25 in cells H2 through H26.",
+    "verify": "real-tasks/task_h24.py"
+  },
+  {
+    "id": "task_h25",
+    "difficulty": "hard",
+    "instruction": "The Inventory sheet has two Docking Station products. For the one with the higher unit cost, set its stock to 25 and bold its product name. For the one with the lower unit cost, italicize its product name and apply strikethrough.",
+    "verify": "real-tasks/task_h25.py"
+  },
+  {
+    "id": "task_h26",
+    "difficulty": "hard",
+    "instruction": "On the Sales sheet, add 'Commission' as a bold header in I1. In each data row (I2 through I41), enter a formula calculating 5% of that row's Total in column G. Format all commission cells as currency. In I42, enter a SUM formula for all commissions and bold it.",
+    "verify": "real-tasks/task_h26.py"
+  },
+  {
+    "id": "task_h27",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, change every 'On Leave' status to 'Returning' and set a light blue background (#cfe2f3) on those status cells. Change every 'Contractor' status to 'Vendor' and set a light orange background (#fce5cd) on those status cells.",
+    "verify": "real-tasks/task_h27.py"
+  },
+  {
+    "id": "task_h28",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, find the department with the highest total salary spend. Highlight all salary cells for employees in that department with a green background (#c6efce). In A27, type 'Highest Dept' (bold) and in B27, type the department name.",
+    "verify": "real-tasks/task_h28.py"
+  },
+  {
+    "id": "task_h29",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, add four conditional formatting rules on D2:D31: red background (#ff0000) for values equal to 0, orange background (#fce5cd) for values between 1 and 10, yellow background (#ffff00) for values between 11 and 19, and green background (#c6efce) for values above 100. Create a named range 'StockLevels' pointing to Inventory!D2:D31 and freeze the header row.",
+    "verify": "real-tasks/task_h29.py"
+  },
+  {
+    "id": "task_h30",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet called 'KPI Dashboard'. Add these rows with bold labels in column A and formulas in column B: A1 'Total Revenue' with =SUM(Sales!G2:G41) in B1, A2 'Average Sale' with =AVERAGE(Sales!G2:G41) in B2, A3 'Max Sale' with =MAX(Sales!G2:G41) in B3, A4 'Headcount' with =COUNTA(Employees!A2:A26) in B4, A5 'Avg Salary' with =AVERAGE(Employees!D2:D26) in B5. Format B1, B2, B3, and B5 as currency.",
+    "verify": "real-tasks/task_h30.py"
+  },
+  {
+    "id": "task_h31",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, replace all 'PeriphCo Supply' supplier names with 'PeriphCo International'. Delete the Last Restocked column (H). Sort the sheet by product name alphabetically and freeze the header row.",
+    "verify": "real-tasks/task_h31.py"
+  },
+  {
+    "id": "task_h32",
+    "difficulty": "hard",
+    "instruction": "Duplicate the Sales sheet and rename the copy to 'Sales Analysis'. On the copy, sort by Total (column G) from highest to lowest. Freeze the header row and insert a bar chart titled 'Top Sales by Amount' using data range G1:G41.",
+    "verify": "real-tasks/task_h32.py"
+  },
+  {
+    "id": "task_h33",
+    "difficulty": "hard",
+    "instruction": "Move the Employees sheet to be the first tab and rename it to 'Team'. Create a new sheet called 'Archive' with bold headers 'Sheet Name' in A1, 'Row Count' in B1, and 'Status' in C1, all with a gray background (#e0e0e0). Enter 'Team' in A2, 25 in B2, 'Active' in C2. Enter 'Sales' in A3, 40 in B3, 'Active' in C3. Enter 'Inventory' in A4, 30 in B4, 'Active' in C4.",
+    "verify": "real-tasks/task_h33.py"
+  },
+  {
+    "id": "task_h34",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, set the background of every supplier cell in column G to light gray (#e0e0e0) for items supplied by 'TechDist Global'. Insert a bar chart titled 'Stock Levels' using data range B1:D31. Freeze the header row.",
+    "verify": "real-tasks/task_h34.py"
+  },
+  {
+    "id": "task_h35",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, add data validation to every status cell (G2 through G26) as a dropdown with options 'Active', 'On Leave', 'Contractor', 'Terminated', 'Remote'. Underline all the status values in G2 through G26 and create a named range 'StatusColumn' pointing to Employees!G2:G26.",
+    "verify": "real-tasks/task_h35.py"
+  },
+  {
+    "id": "task_h36",
+    "difficulty": "hard",
+    "instruction": "Freeze the header row on all three sheets. On each sheet, set the background of all header cells in row 1 to light blue (#cfe2f3). Create named ranges 'SalesHeaders' for Sales!A1:H1, 'EmployeeHeaders' for Employees!A1:G1, and 'InventoryHeaders' for Inventory!A1:H1.",
+    "verify": "real-tasks/task_h36.py"
+  },
+  {
+    "id": "task_h37",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, enter =MAX(D2:D26) in D27 and =MIN(D2:D26) in D28. Type 'Highest Salary' in C27 (bold) and 'Lowest Salary' in C28 (bold). Set D27's background to green (#c6efce) and D28's background to red (#ffc7ce). Format both D27 and D28 as currency. Create a named range 'SalaryRange' pointing to Employees!D2:D26.",
+    "verify": "real-tasks/task_h37.py"
+  },
+  {
+    "id": "task_h38",
+    "difficulty": "hard",
+    "instruction": "On the Sales sheet, enable filter mode and set a filter on the Region column (D) to hide 'West' sales. Replace all 'Wireless Mouse' product names with 'Wireless Mouse Pro'. Set the Product header (B1) text color to blue (#0000ff). Create a named range 'SalesRegion' pointing to Sales!D2:D41.",
+    "verify": "real-tasks/task_h38.py"
+  },
+  {
+    "id": "task_h39",
+    "difficulty": "hard",
+    "instruction": "On the Sales sheet, merge cells A44:D44 and type 'Performance Summary' in A44 (bold, centered). In E44, enter =MIN(E2:E41). In F44, enter =MAX(F2:F41) formatted as currency. In G44, enter =SUM(G2:G41) formatted as currency. Add a conditional formatting rule on G2:G41 to highlight values above 10000 with a green background (#c6efce).",
+    "verify": "real-tasks/task_h39.py"
+  },
+  {
+    "id": "task_h40",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet called 'Executive Summary'. In A1, type 'Company Dashboard' (bold) and merge cells A1:B1. In A3 type 'Total Revenue' (bold), B3 with formula =SUM(Sales!G2:G41) formatted as currency. In A4 type 'Total Payroll' (bold), B4 with formula =SUM(Employees!D2:D26) formatted as currency. In A5 type 'Average Salary' (bold), B5 with formula =AVERAGE(Employees!D2:D26) formatted as currency. In A6 type 'Inventory Items' (bold), B6 with formula =COUNTA(Inventory!B2:B31).",
+    "verify": "real-tasks/task_h40.py"
   }
 ]
