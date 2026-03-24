@@ -1,1 +1,362 @@
-[]
+[
+  {
+    "id": "task_e1",
+    "difficulty": "easy",
+    "instruction": "Update Amara Okafor's status to 'Active' on the Employees sheet.",
+    "verify": "real-tasks/task_e1.py"
+  },
+  {
+    "id": "task_e2",
+    "difficulty": "easy",
+    "instruction": "Rename the Sales sheet to 'Revenue'.",
+    "verify": "real-tasks/task_e2.py"
+  },
+  {
+    "id": "task_e3",
+    "difficulty": "easy",
+    "instruction": "Freeze the top row on the Sales sheet so the headers stay visible.",
+    "verify": "real-tasks/task_e3.py"
+  },
+  {
+    "id": "task_e4",
+    "difficulty": "easy",
+    "instruction": "Delete the Inventory sheet from the workbook.",
+    "verify": "real-tasks/task_e4.py"
+  },
+  {
+    "id": "task_e5",
+    "difficulty": "easy",
+    "instruction": "Add a new sheet called 'Summary' to the workbook.",
+    "verify": "real-tasks/task_e5.py"
+  },
+  {
+    "id": "task_e6",
+    "difficulty": "easy",
+    "instruction": "Switch to the Employees sheet.",
+    "verify": "real-tasks/task_e6.py"
+  },
+  {
+    "id": "task_e7",
+    "difficulty": "easy",
+    "instruction": "Bold Priya Sharma's name on the Employees sheet.",
+    "verify": "real-tasks/task_e7.py"
+  },
+  {
+    "id": "task_e8",
+    "difficulty": "easy",
+    "instruction": "Right-align the Totals label on the Sales sheet.",
+    "verify": "real-tasks/task_e8.py"
+  },
+  {
+    "id": "task_e9",
+    "difficulty": "easy",
+    "instruction": "Clear the salesperson name from the first sale on the Sales sheet.",
+    "verify": "real-tasks/task_e9.py"
+  },
+  {
+    "id": "task_e10",
+    "difficulty": "easy",
+    "instruction": "Update the Wireless Charger Pad stock to 50 on the Inventory sheet.",
+    "verify": "real-tasks/task_e10.py"
+  },
+  {
+    "id": "task_e11",
+    "difficulty": "easy",
+    "instruction": "Rename the Employees sheet to 'Team'.",
+    "verify": "real-tasks/task_e11.py"
+  },
+  {
+    "id": "task_e12",
+    "difficulty": "easy",
+    "instruction": "Turn on filter mode on the Sales sheet.",
+    "verify": "real-tasks/task_e12.py"
+  },
+  {
+    "id": "task_e13",
+    "difficulty": "easy",
+    "instruction": "Underline the Laptop Pro 15 product name on the Inventory sheet.",
+    "verify": "real-tasks/task_e13.py"
+  },
+  {
+    "id": "task_e14",
+    "difficulty": "easy",
+    "instruction": "Add a 'Notes' column header in cell I1 on the Sales sheet.",
+    "verify": "real-tasks/task_e14.py"
+  },
+  {
+    "id": "task_e15",
+    "difficulty": "easy",
+    "instruction": "Apply strikethrough to the Wireless Charger Pad name on the Inventory sheet.",
+    "verify": "real-tasks/task_e15.py"
+  },
+  {
+    "id": "task_e16",
+    "difficulty": "easy",
+    "instruction": "Freeze the first two columns on the Employees sheet.",
+    "verify": "real-tasks/task_e16.py"
+  },
+  {
+    "id": "task_e17",
+    "difficulty": "easy",
+    "instruction": "Create a named range called 'TotalRevenue' pointing to cell G42 on the Sales sheet.",
+    "verify": "real-tasks/task_e17.py"
+  },
+  {
+    "id": "task_e18",
+    "difficulty": "easy",
+    "instruction": "Merge cells A44 through D44 on the Sales sheet.",
+    "verify": "real-tasks/task_e18.py"
+  },
+  {
+    "id": "task_e19",
+    "difficulty": "easy",
+    "instruction": "Duplicate the Sales sheet.",
+    "verify": "real-tasks/task_e19.py"
+  },
+  {
+    "id": "task_e20",
+    "difficulty": "easy",
+    "instruction": "Change Oliver Grant's salary to 200000 on the Employees sheet.",
+    "verify": "real-tasks/task_e20.py"
+  },
+  {
+    "id": "task_m1",
+    "difficulty": "medium",
+    "instruction": "On the Employees sheet, add a formula in cell D27 that totals all employee salaries.",
+    "verify": "real-tasks/task_m1.py"
+  },
+  {
+    "id": "task_m2",
+    "difficulty": "medium",
+    "instruction": "Sort the Inventory sheet by stock level from lowest to highest.",
+    "verify": "real-tasks/task_m2.py"
+  },
+  {
+    "id": "task_m3",
+    "difficulty": "medium",
+    "instruction": "Add a conditional formatting rule on the Inventory sheet to highlight stock values below 20 with a red background (#ffc7ce).",
+    "verify": "real-tasks/task_m3.py"
+  },
+  {
+    "id": "task_m4",
+    "difficulty": "medium",
+    "instruction": "Insert a bar chart on the Sales sheet using the Quantity column (E1:E41) titled 'Sales Volume'.",
+    "verify": "real-tasks/task_m4.py"
+  },
+  {
+    "id": "task_m5",
+    "difficulty": "medium",
+    "instruction": "Use Find and Replace to change all 'Engineering' department entries to 'Product' on the Employees sheet.",
+    "verify": "real-tasks/task_m5.py"
+  },
+  {
+    "id": "task_m6",
+    "difficulty": "medium",
+    "instruction": "Make Priya Sharma's name on the Employees sheet bold, italic, and underlined.",
+    "verify": "real-tasks/task_m6.py"
+  },
+  {
+    "id": "task_m7",
+    "difficulty": "medium",
+    "instruction": "Add data validation to Priya Sharma's status cell on the Employees sheet as a dropdown with options 'Active', 'On Leave', 'Contractor', and 'Terminated'.",
+    "verify": "real-tasks/task_m7.py"
+  },
+  {
+    "id": "task_m8",
+    "difficulty": "medium",
+    "instruction": "Duplicate the Employees sheet and rename the copy to 'Employees Backup'.",
+    "verify": "real-tasks/task_m8.py"
+  },
+  {
+    "id": "task_m9",
+    "difficulty": "medium",
+    "instruction": "Set a filter on the Sales sheet to hide all sales from the West region.",
+    "verify": "real-tasks/task_m9.py"
+  },
+  {
+    "id": "task_m10",
+    "difficulty": "medium",
+    "instruction": "Add conditional formatting on the Employees sheet to highlight salaries above 150000 with a green background (#c6efce) and dark green text (#006100).",
+    "verify": "real-tasks/task_m10.py"
+  },
+  {
+    "id": "task_m11",
+    "difficulty": "medium",
+    "instruction": "Move the Inventory sheet to be the first tab in the workbook.",
+    "verify": "real-tasks/task_m11.py"
+  },
+  {
+    "id": "task_m12",
+    "difficulty": "medium",
+    "instruction": "Insert a line chart on the Sales sheet using data range A1:G5 titled 'January Sales'.",
+    "verify": "real-tasks/task_m12.py"
+  },
+  {
+    "id": "task_m13",
+    "difficulty": "medium",
+    "instruction": "Add conditional formatting on the Inventory sheet to flag out-of-stock items by highlighting stock cells equal to 0 with a red background (#ff0000).",
+    "verify": "real-tasks/task_m13.py"
+  },
+  {
+    "id": "task_m14",
+    "difficulty": "medium",
+    "instruction": "On the Employees sheet, enter the average salary formula in cell D28 and format the cell as currency.",
+    "verify": "real-tasks/task_m14.py"
+  },
+  {
+    "id": "task_m15",
+    "difficulty": "medium",
+    "instruction": "Replace all occurrences of 'North' with 'Northern' on the Sales sheet.",
+    "verify": "real-tasks/task_m15.py"
+  },
+  {
+    "id": "task_m16",
+    "difficulty": "medium",
+    "instruction": "On the Sales sheet, freeze the header row and turn on filter mode.",
+    "verify": "real-tasks/task_m16.py"
+  },
+  {
+    "id": "task_m17",
+    "difficulty": "medium",
+    "instruction": "Create two named ranges: 'AllSalaries' pointing to Employees!D2:D26 and 'AllStock' pointing to Inventory!D2:D31.",
+    "verify": "real-tasks/task_m17.py"
+  },
+  {
+    "id": "task_m18",
+    "difficulty": "medium",
+    "instruction": "Remove the Salesperson column from the Sales sheet.",
+    "verify": "real-tasks/task_m18.py"
+  },
+  {
+    "id": "task_m19",
+    "difficulty": "medium",
+    "instruction": "Sort the Inventory sheet alphabetically by product name.",
+    "verify": "real-tasks/task_m19.py"
+  },
+  {
+    "id": "task_m20",
+    "difficulty": "medium",
+    "instruction": "Set the Date header on the Sales sheet to red text (#ff0000) with a light gray background (#e0e0e0).",
+    "verify": "real-tasks/task_m20.py"
+  },
+  {
+    "id": "task_h1",
+    "difficulty": "hard",
+    "instruction": "Create a salary summary on the Employees sheet: add 'Total' in A27 with the formula =SUM(D2:D26) in D27, 'Average' in A28 with =AVERAGE(D2:D26) in D28, and 'Minimum' in A29 with =MIN(D2:D26) in D29. Bold all three labels and format the formula cells as currency.",
+    "verify": "real-tasks/task_h1.py"
+  },
+  {
+    "id": "task_h2",
+    "difficulty": "hard",
+    "instruction": "Sort the Employees sheet by department alphabetically, freeze the header row, and add conditional formatting on the Status column (G2:G26) to highlight cells containing 'On Leave' with a yellow background (#ffff00).",
+    "verify": "real-tasks/task_h2.py"
+  },
+  {
+    "id": "task_h3",
+    "difficulty": "hard",
+    "instruction": "Reorganize the workbook: rename 'Sales' to 'Revenue Data', rename 'Employees' to 'Team Directory', rename 'Inventory' to 'Stock Management', and move 'Stock Management' to be the first tab.",
+    "verify": "real-tasks/task_h3.py"
+  },
+  {
+    "id": "task_h4",
+    "difficulty": "hard",
+    "instruction": "Set up the Inventory sheet for analysis: freeze the header row, enable filter mode, add conditional formatting to highlight stock below 20 in red (#ffc7ce), and insert a pie chart from data range C1:D31 titled 'Stock Distribution'.",
+    "verify": "real-tasks/task_h4.py"
+  },
+  {
+    "id": "task_h5",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, bold every employee name in column A (rows 2 through 26) and italicize every department in column B (rows 2 through 26).",
+    "verify": "real-tasks/task_h5.py"
+  },
+  {
+    "id": "task_h6",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet called 'Dashboard', type 'Total Revenue' in A1 and 'Employee Count' in A2, enter the formula =SUM(Sales!G2:G41) in B1 and =COUNTA(Employees!A2:A26) in B2, and bold both labels.",
+    "verify": "real-tasks/task_h6.py"
+  },
+  {
+    "id": "task_h7",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, replace all 'Accessories' with 'Add-ons' and all 'Peripherals' with 'Hardware', then sort the sheet by category alphabetically.",
+    "verify": "real-tasks/task_h7.py"
+  },
+  {
+    "id": "task_h8",
+    "difficulty": "hard",
+    "instruction": "Add three conditional formatting rules to the Inventory stock column (D2:D31): highlight values above 100 with green (#c6efce), below 20 with light red (#ffc7ce), and equal to 0 with red (#ff0000).",
+    "verify": "real-tasks/task_h8.py"
+  },
+  {
+    "id": "task_h9",
+    "difficulty": "hard",
+    "instruction": "Delete the Inventory sheet, rename the Sales sheet to 'Main Data', and create two new sheets called 'Analysis' and 'Charts'.",
+    "verify": "real-tasks/task_h9.py"
+  },
+  {
+    "id": "task_h10",
+    "difficulty": "hard",
+    "instruction": "Add extra summary rows on the Sales sheet: type 'Count' in A45 with =COUNT(E2:E41) in E45, and 'Avg Price' in A46 with =AVERAGE(F2:F41) in F46. Bold both labels.",
+    "verify": "real-tasks/task_h10.py"
+  },
+  {
+    "id": "task_h11",
+    "difficulty": "hard",
+    "instruction": "Freeze the header row on all three sheets in the workbook.",
+    "verify": "real-tasks/task_h11.py"
+  },
+  {
+    "id": "task_h12",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, change all 'Contractor' statuses to 'External' and all 'On Leave' statuses to 'Away'.",
+    "verify": "real-tasks/task_h12.py"
+  },
+  {
+    "id": "task_h13",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet named 'Low Stock Alert' with headers 'Product' in A1, 'Current Stock' in B1, and 'Reorder Level' in C1. Bold all three headers and set their background to light blue (#cfe2f3).",
+    "verify": "real-tasks/task_h13.py"
+  },
+  {
+    "id": "task_h14",
+    "difficulty": "hard",
+    "instruction": "On the Sales sheet, insert a bar chart with data range E1:E41 titled 'Sales Quantities' and a scatter chart with data range E1:F41 titled 'Price vs Quantity'.",
+    "verify": "real-tasks/task_h14.py"
+  },
+  {
+    "id": "task_h15",
+    "difficulty": "hard",
+    "instruction": "Create three named ranges on the Employees sheet: 'Salaries' for D2:D26, 'Departments' for B2:B26, and 'StartDates' for E2:E26.",
+    "verify": "real-tasks/task_h15.py"
+  },
+  {
+    "id": "task_h16",
+    "difficulty": "hard",
+    "instruction": "Sort the Sales sheet by quantity in descending order, freeze the header row, and add conditional formatting to highlight totals above 5000 in the Total column (G2:G41) with a green background (#c6efce).",
+    "verify": "real-tasks/task_h16.py"
+  },
+  {
+    "id": "task_h17",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, enter =SUM(D2:D26) in D27, format it as bold currency, add conditional formatting on salaries (D2:D26) to highlight values above 130000 with green (#c6efce), and freeze the top row and the first column.",
+    "verify": "real-tasks/task_h17.py"
+  },
+  {
+    "id": "task_h18",
+    "difficulty": "hard",
+    "instruction": "On the Sales sheet, merge cells A44:D44, type 'Summary Statistics' in A44 and bold it, then enter =COUNT(E2:E41) in E44, =AVERAGE(F2:F41) in F44, and =MAX(G2:G41) in G44.",
+    "verify": "real-tasks/task_h18.py"
+  },
+  {
+    "id": "task_h19",
+    "difficulty": "hard",
+    "instruction": "Duplicate the Employees sheet, rename the copy to 'Salary Analysis', sort it by salary from highest to lowest, and add conditional formatting to highlight salaries below 70000 with a red background (#ffc7ce).",
+    "verify": "real-tasks/task_h19.py"
+  },
+  {
+    "id": "task_h20",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, replace all 'Active' statuses with 'Current' and 'On Leave' with 'Away', add conditional formatting on the Status column (G2:G26) to highlight 'Away' cells with yellow (#ffff00), and create a named range 'TeamStatus' for Employees!G2:G26.",
+    "verify": "real-tasks/task_h20.py"
+  }
+]
