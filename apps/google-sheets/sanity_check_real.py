@@ -1186,11 +1186,572 @@ def solve_task_h40(state):
     state["activeSheet"] = len(state["sheets"]) - 1
 
 
+# -- Hardening round 2 solve functions (task_h41 - task_h60) ------------------
+
+def solve_task_h41(state):
+    """Bulk conditional formatting on Inventory based on stock status."""
+    sheet = state["sheets"][2]
+    for r in range(2, 32):
+        d_cell = sheet["cells"].get(f"D{r}")
+        e_cell = sheet["cells"].get(f"E{r}")
+        b_cell = sheet["cells"].get(f"B{r}")
+        if not d_cell or not e_cell or not b_cell:
+            continue
+        stock = d_cell.get("value", 0)
+        reorder = e_cell.get("value", 0)
+        if not isinstance(stock, (int, float)) or not isinstance(reorder, (int, float)):
+            continue
+        if stock == 0:
+            b_cell.setdefault("format", {})["fontColor"] = "#ff0000"
+            b_cell["format"]["strikethrough"] = True
+        elif stock < reorder:
+            b_cell.setdefault("format", {})["bold"] = True
+            d_cell.setdefault("format", {})["backgroundColor"] = "#fce5cd"
+        elif stock > 100:
+            b_cell.setdefault("format", {})["italic"] = True
+            d_cell.setdefault("format", {})["backgroundColor"] = "#c6efce"
+
+
+def solve_task_h42(state):
+    """Create new sheet for smallest department with employee list."""
+    from collections import Counter
+    emp_sheet = state["sheets"][1]
+    dept_counter = Counter()
+    dept_employees = {}
+    for r in range(2, 27):
+        dept = str(emp_sheet["cells"].get(f"B{r}", {}).get("value", ""))
+        if not dept:
+            continue
+        dept_counter[dept] += 1
+        if dept not in dept_employees:
+            dept_employees[dept] = []
+        name = emp_sheet["cells"].get(f"A{r}", {}).get("value", "")
+        title = emp_sheet["cells"].get(f"C{r}", {}).get("value", "")
+        salary = emp_sheet["cells"].get(f"D{r}", {}).get("value", 0)
+        dept_employees[dept].append((name, title, salary))
+
+    smallest_dept = min(dept_counter, key=dept_counter.get)
+    emps = dept_employees[smallest_dept]
+
+    ds = create_empty_sheet(smallest_dept)
+    ds["cells"]["A1"] = {"value": "Name", "formula": None, "format": {"bold": True}}
+    ds["cells"]["B1"] = {"value": "Title", "formula": None, "format": {"bold": True}}
+    ds["cells"]["C1"] = {"value": "Salary", "formula": None, "format": {"bold": True}}
+
+    highest_sal = max(emps, key=lambda x: x[2])
+    for i, (name, title, salary) in enumerate(emps):
+        row = i + 2
+        fmt = {"bold": True} if name == highest_sal[0] else {}
+        ds["cells"][f"A{row}"] = {"value": name, "formula": None, "format": fmt}
+        ds["cells"][f"B{row}"] = {"value": title, "formula": None, "format": {}}
+        ds["cells"][f"C{row}"] = {"value": salary, "formula": None, "format": {"numberFormat": "currency"}}
+
+    state["sheets"].append(ds)
+    state["activeSheet"] = len(state["sheets"]) - 1
+
+
+def solve_task_h43(state):
+    """Highlight supplier cells of most expensive item, create named range."""
+    sheet = state["sheets"][2]
+    max_cost = -1
+    max_supplier = None
+    for r in range(2, 32):
+        f_cell = sheet["cells"].get(f"F{r}")
+        if f_cell and isinstance(f_cell.get("value"), (int, float)):
+            if f_cell["value"] > max_cost:
+                max_cost = f_cell["value"]
+                max_supplier = str(sheet["cells"].get(f"G{r}", {}).get("value", ""))
+
+    for r in range(2, 32):
+        g_cell = sheet["cells"].get(f"G{r}")
+        if g_cell and str(g_cell.get("value", "")) == max_supplier:
+            g_cell.setdefault("format", {})["backgroundColor"] = "#fff2cc"
+
+    state["namedRanges"]["PremiumSupplier"] = "Inventory!G2:G31"
+
+
+def solve_task_h44(state):
+    """Color salary cells by comparison to dept average."""
+    from collections import defaultdict
+    sheet = state["sheets"][1]
+    dept_salaries = defaultdict(list)
+    for r in range(2, 27):
+        dept = str(sheet["cells"].get(f"B{r}", {}).get("value", ""))
+        sal = sheet["cells"].get(f"D{r}", {}).get("value", 0)
+        if isinstance(sal, (int, float)):
+            dept_salaries[dept].append((r, sal))
+
+    dept_avgs = {d: sum(s for _, s in rows) / len(rows) for d, rows in dept_salaries.items()}
+
+    above_count = 0
+    below_count = 0
+    for dept, rows in dept_salaries.items():
+        avg = dept_avgs[dept]
+        for r, sal in rows:
+            if sal > avg:
+                above_count += 1
+                sheet["cells"][f"D{r}"].setdefault("format", {})["fontColor"] = "#006100"
+            elif sal < avg:
+                below_count += 1
+                sheet["cells"][f"D{r}"].setdefault("format", {})["fontColor"] = "#ff0000"
+
+    sheet["cells"]["A27"] = {"value": "Above Avg", "formula": None, "format": {"bold": True}}
+    sheet["cells"]["B27"] = {"value": above_count, "formula": None, "format": {}}
+    sheet["cells"]["A28"] = {"value": "Below Avg", "formula": None, "format": {"bold": True}}
+    sheet["cells"]["B28"] = {"value": below_count, "formula": None, "format": {}}
+
+
+def solve_task_h45(state):
+    """Create Region Analysis sheet with revenue per region."""
+    from collections import defaultdict
+    sales = state["sheets"][0]
+    region_totals = defaultdict(float)
+    for r in range(2, 42):
+        d_cell = sales["cells"].get(f"D{r}")
+        g_cell = sales["cells"].get(f"G{r}")
+        if d_cell and g_cell and isinstance(g_cell.get("value"), (int, float)):
+            region = str(d_cell.get("value", ""))
+            region_totals[region] += g_cell["value"]
+
+    sorted_regions = sorted(region_totals.keys())
+    max_rev = max(region_totals.values())
+
+    ra = create_empty_sheet("Region Analysis")
+    ra["cells"]["A1"] = {"value": "Region", "formula": None, "format": {"bold": True}}
+    ra["cells"]["B1"] = {"value": "Total Revenue", "formula": None, "format": {"bold": True}}
+
+    for i, region in enumerate(sorted_regions):
+        row = i + 2
+        ra["cells"][f"A{row}"] = {"value": region, "formula": None, "format": {}}
+        fmt = {"numberFormat": "currency"}
+        if abs(region_totals[region] - max_rev) < 0.01:
+            fmt["backgroundColor"] = "#c6efce"
+        ra["cells"][f"B{row}"] = {"value": region_totals[region], "formula": None, "format": fmt}
+
+    state["sheets"].append(ra)
+    state["activeSheet"] = len(state["sheets"]) - 1
+
+
+def solve_task_h46(state):
+    """Disambiguate two Laptop products by stock level."""
+    sheet = state["sheets"][2]
+    laptop_rows = []
+    for r in range(2, 32):
+        b_cell = sheet["cells"].get(f"B{r}")
+        if b_cell and "Laptop" in str(b_cell.get("value", "")) and "Bag" not in str(b_cell.get("value", "")) and "Stand" not in str(b_cell.get("value", "")):
+            stock = sheet["cells"].get(f"D{r}", {}).get("value", 0)
+            laptop_rows.append((r, stock))
+
+    laptop_rows.sort(key=lambda x: x[1])
+    low_row = laptop_rows[0][0]
+    high_row = laptop_rows[-1][0]
+
+    # Higher stock: bold name + green stock bg
+    sheet["cells"][f"B{high_row}"].setdefault("format", {})["bold"] = True
+    sheet["cells"][f"D{high_row}"].setdefault("format", {})["backgroundColor"] = "#c6efce"
+
+    # Lower stock: underline name + reorder=25 + orange stock bg
+    sheet["cells"][f"B{low_row}"].setdefault("format", {})["underline"] = True
+    sheet["cells"][f"E{low_row}"]["value"] = 25
+    sheet["cells"][f"D{low_row}"].setdefault("format", {})["backgroundColor"] = "#fce5cd"
+
+
+def solve_task_h47(state):
+    """Tenure-based name cell formatting on Employees."""
+    sheet = state["sheets"][1]
+    for r in range(2, 27):
+        e_cell = sheet["cells"].get(f"E{r}")
+        if not e_cell:
+            continue
+        date_str = str(e_cell.get("value", ""))
+        parts = date_str.split("/")
+        if len(parts) != 3:
+            continue
+        try:
+            year = int(parts[2])
+        except ValueError:
+            continue
+
+        a_cell = sheet["cells"].get(f"A{r}")
+        if not a_cell:
+            continue
+        if year < 2020:
+            a_cell.setdefault("format", {})["backgroundColor"] = "#cfe2f3"
+        elif year >= 2023:
+            a_cell.setdefault("format", {})["backgroundColor"] = "#fff2cc"
+
+    sheet["cells"]["A28"] = {"value": "Tenure Legend", "formula": None, "format": {"bold": True}}
+    sheet["cells"]["B28"] = {"value": "Blue=Pre-2020, Yellow=2023+", "formula": None, "format": {}}
+
+
+def solve_task_h48(state):
+    """Create Workbook Index sheet + 3 named ranges."""
+    idx = create_empty_sheet("Workbook Index")
+    hdr_fmt = {"bold": True, "backgroundColor": "#e0e0e0"}
+    idx["cells"]["A1"] = {"value": "Sheet", "formula": None, "format": dict(hdr_fmt)}
+    idx["cells"]["B1"] = {"value": "Rows", "formula": None, "format": dict(hdr_fmt)}
+    idx["cells"]["C1"] = {"value": "Columns", "formula": None, "format": dict(hdr_fmt)}
+
+    data = [("Sales", 40, 8), ("Employees", 25, 7), ("Inventory", 30, 8)]
+    for i, (name, rows, cols) in enumerate(data):
+        row = i + 2
+        idx["cells"][f"A{row}"] = {"value": name, "formula": None, "format": {}}
+        idx["cells"][f"B{row}"] = {"value": rows, "formula": None, "format": {}}
+        idx["cells"][f"C{row}"] = {"value": cols, "formula": None, "format": {}}
+
+    state["sheets"].append(idx)
+    state["activeSheet"] = len(state["sheets"]) - 1
+    state["namedRanges"]["SalesData"] = "Sales!A2:H41"
+    state["namedRanges"]["EmployeeData"] = "Employees!A2:G26"
+    state["namedRanges"]["InventoryData"] = "Inventory!A2:H31"
+
+
+def solve_task_h49(state):
+    """Create Reorder Report sheet with items below reorder level."""
+    inv = state["sheets"][2]
+    below_reorder = []
+    for r in range(2, 32):
+        b_cell = inv["cells"].get(f"B{r}")
+        d_cell = inv["cells"].get(f"D{r}")
+        e_cell = inv["cells"].get(f"E{r}")
+        if b_cell and d_cell and e_cell:
+            stock = d_cell.get("value", 0)
+            reorder = e_cell.get("value", 0)
+            if isinstance(stock, (int, float)) and isinstance(reorder, (int, float)):
+                if stock < reorder:
+                    product = str(b_cell.get("value", ""))
+                    shortage = reorder - stock
+                    below_reorder.append((product, stock, reorder, shortage))
+
+    below_reorder.sort(key=lambda x: x[3], reverse=True)
+
+    rr = create_empty_sheet("Reorder Report")
+    hdr_fmt = {"bold": True, "backgroundColor": "#ffc7ce"}
+    rr["cells"]["A1"] = {"value": "Product", "formula": None, "format": dict(hdr_fmt)}
+    rr["cells"]["B1"] = {"value": "Current Stock", "formula": None, "format": dict(hdr_fmt)}
+    rr["cells"]["C1"] = {"value": "Reorder Level", "formula": None, "format": dict(hdr_fmt)}
+    rr["cells"]["D1"] = {"value": "Shortage", "formula": None, "format": dict(hdr_fmt)}
+
+    for i, (product, stock, reorder, shortage) in enumerate(below_reorder):
+        row = i + 2
+        rr["cells"][f"A{row}"] = {"value": product, "formula": None, "format": {}}
+        rr["cells"][f"B{row}"] = {"value": stock, "formula": None, "format": {}}
+        rr["cells"][f"C{row}"] = {"value": reorder, "formula": None, "format": {}}
+        rr["cells"][f"D{row}"] = {"value": shortage, "formula": None, "format": {}}
+
+    state["sheets"].append(rr)
+    state["activeSheet"] = len(state["sheets"]) - 1
+
+
+def solve_task_h50(state):
+    """Sort Sales by total desc, freeze, filter East, CF, bar chart."""
+    sheet = state["sheets"][0]
+    sort_sheet_by_col(sheet, "G", "desc")
+    sheet["frozenRows"] = 1
+    sheet["filterMode"] = True
+    sheet["filters"]["D"] = {"type": "values", "hiddenValues": ["East"]}
+    sheet["conditionalFormats"].append({
+        "range": "G2:G41", "type": "greater_than",
+        "value": "8000", "value2": "", "backgroundColor": "#c6efce"
+    })
+    sheet["conditionalFormats"].append({
+        "range": "G2:G41", "type": "less_than",
+        "value": "500", "value2": "", "backgroundColor": "#ffc7ce"
+    })
+    sheet["charts"].append({
+        "id": "chart-sanity-h50", "type": "bar", "dataRange": "G1:G41",
+        "title": "Revenue Distribution", "xAxisLabel": "", "yAxisLabel": "",
+        "showLegend": True, "legendPosition": "top",
+        "position": {"x": 250, "y": 50}, "size": {"width": 450, "height": 300}
+    })
+
+
+def solve_task_h51(state):
+    """Validation + replace Contractor→Remote + CF + named range."""
+    sheet = state["sheets"][1]
+    validation = {"type": "list", "values": "Active,On Leave,Remote,Contractor,Terminated"}
+    for r in range(2, 27):
+        cell = sheet["cells"].get(f"G{r}")
+        if cell:
+            cell["validation"] = dict(validation)
+            if cell.get("value") == "Contractor":
+                cell["value"] = "Remote"
+
+    sheet["conditionalFormats"].append({
+        "range": "G2:G26", "type": "text_contains",
+        "value": "On Leave", "value2": "", "backgroundColor": "#ffff00"
+    })
+    sheet["conditionalFormats"].append({
+        "range": "G2:G26", "type": "text_contains",
+        "value": "Remote", "value2": "", "backgroundColor": "#cfe2f3"
+    })
+    state["namedRanges"]["EmployeeStatus"] = "Employees!G2:G26"
+
+
+def solve_task_h52(state):
+    """Create Supplier Summary sheet."""
+    from collections import defaultdict
+    inv = state["sheets"][2]
+    supplier_data = defaultdict(lambda: {"count": 0, "stock": 0})
+    for r in range(2, 32):
+        g_cell = inv["cells"].get(f"G{r}")
+        d_cell = inv["cells"].get(f"D{r}")
+        if g_cell and g_cell.get("value"):
+            supplier = str(g_cell["value"])
+            supplier_data[supplier]["count"] += 1
+            if d_cell and isinstance(d_cell.get("value"), (int, float)):
+                supplier_data[supplier]["stock"] += d_cell["value"]
+
+    sorted_suppliers = sorted(supplier_data.keys())
+    max_stock = max(v["stock"] for v in supplier_data.values())
+
+    ss = create_empty_sheet("Supplier Summary")
+    hdr_fmt = {"bold": True, "backgroundColor": "#cfe2f3"}
+    ss["cells"]["A1"] = {"value": "Supplier", "formula": None, "format": dict(hdr_fmt)}
+    ss["cells"]["B1"] = {"value": "Product Count", "formula": None, "format": dict(hdr_fmt)}
+    ss["cells"]["C1"] = {"value": "Total Stock", "formula": None, "format": dict(hdr_fmt)}
+
+    for i, supplier in enumerate(sorted_suppliers):
+        row = i + 2
+        data = supplier_data[supplier]
+        fmt = {"bold": True} if abs(data["stock"] - max_stock) < 0.01 else {}
+        ss["cells"][f"A{row}"] = {"value": supplier, "formula": None, "format": fmt}
+        ss["cells"][f"B{row}"] = {"value": data["count"], "formula": None, "format": {}}
+        ss["cells"][f"C{row}"] = {"value": data["stock"], "formula": None, "format": {}}
+
+    state["sheets"].append(ss)
+    state["activeSheet"] = len(state["sheets"]) - 1
+
+
+def solve_task_h53(state):
+    """Disambiguate two Keyboard products by stock level."""
+    sheet = state["sheets"][2]
+    keyboard_rows = []
+    for r in range(2, 32):
+        b_cell = sheet["cells"].get(f"B{r}")
+        if b_cell and "Keyboard" in str(b_cell.get("value", "")):
+            stock = sheet["cells"].get(f"D{r}", {}).get("value", 0)
+            keyboard_rows.append((r, stock))
+
+    keyboard_rows.sort(key=lambda x: x[1])
+    low_row = keyboard_rows[0][0]
+    high_row = keyboard_rows[-1][0]
+
+    # Higher stock: bold name + green unit cost bg
+    sheet["cells"][f"B{high_row}"].setdefault("format", {})["bold"] = True
+    sheet["cells"][f"F{high_row}"].setdefault("format", {})["backgroundColor"] = "#c6efce"
+
+    # Lower stock: italic name + reorder=25 + red unit cost bg
+    sheet["cells"][f"B{low_row}"].setdefault("format", {})["italic"] = True
+    sheet["cells"][f"E{low_row}"]["value"] = 25
+    sheet["cells"][f"F{low_row}"].setdefault("format", {})["backgroundColor"] = "#ffc7ce"
+
+
+def solve_task_h54(state):
+    """Multi-step formatting overhaul on Employees."""
+    sheet = state["sheets"][1]
+    # Headers light blue
+    for col in "ABCDEFG":
+        cell = sheet["cells"].get(f"{col}1")
+        if cell:
+            cell.setdefault("format", {})["backgroundColor"] = "#cfe2f3"
+
+    for r in range(2, 27):
+        # Bold names
+        a_cell = sheet["cells"].get(f"A{r}")
+        if a_cell:
+            a_cell.setdefault("format", {})["bold"] = True
+        # Right-align salaries
+        d_cell = sheet["cells"].get(f"D{r}")
+        if d_cell:
+            d_cell.setdefault("format", {})["horizontalAlign"] = "right"
+        # Italic emails
+        f_cell = sheet["cells"].get(f"F{r}")
+        if f_cell:
+            f_cell.setdefault("format", {})["italic"] = True
+
+    sheet["conditionalFormats"].append({
+        "range": "D2:D26", "type": "greater_than",
+        "value": "120000", "value2": "", "fontColor": "#006100"
+    })
+    sheet["frozenRows"] = 1
+    sheet["frozenCols"] = 1
+
+
+def solve_task_h55(state):
+    """Find largest dept, label, highlight names, CF on salaries."""
+    from collections import Counter, defaultdict
+    sheet = state["sheets"][1]
+    dept_counter = Counter()
+    dept_rows = defaultdict(list)
+    for r in range(2, 27):
+        dept = str(sheet["cells"].get(f"B{r}", {}).get("value", ""))
+        if dept:
+            dept_counter[dept] += 1
+            dept_rows[dept].append(r)
+
+    largest_dept = max(dept_counter, key=dept_counter.get)
+    largest_count = dept_counter[largest_dept]
+
+    sheet["cells"]["A27"] = {"value": "Largest Dept", "formula": None, "format": {"bold": True}}
+    sheet["cells"]["B27"] = {"value": largest_dept, "formula": None, "format": {}}
+    sheet["cells"]["C27"] = {"value": largest_count, "formula": None, "format": {}}
+
+    for r in dept_rows[largest_dept]:
+        sheet["cells"][f"A{r}"].setdefault("format", {})["backgroundColor"] = "#c6efce"
+
+    sheet["conditionalFormats"].append({
+        "range": "D2:D26", "type": "greater_than",
+        "value": "100000", "value2": "", "backgroundColor": "#c6efce"
+    })
+
+
+def solve_task_h56(state):
+    """Q1 2024 summary on Sales sheet."""
+    sheet = state["sheets"][0]
+    q1_qty = 0
+    q1_rev = 0
+    for r in range(2, 42):
+        a_cell = sheet["cells"].get(f"A{r}")
+        if not a_cell:
+            continue
+        date_str = str(a_cell.get("value", ""))
+        parts = date_str.split("/")
+        if len(parts) != 3:
+            continue
+        try:
+            month = int(parts[0])
+            year = int(parts[2])
+        except ValueError:
+            continue
+        if year == 2024 and 1 <= month <= 3:
+            e_cell = sheet["cells"].get(f"E{r}")
+            g_cell = sheet["cells"].get(f"G{r}")
+            if e_cell and isinstance(e_cell.get("value"), (int, float)):
+                q1_qty += e_cell["value"]
+            if g_cell and isinstance(g_cell.get("value"), (int, float)):
+                q1_rev += g_cell["value"]
+
+    sheet["mergedCells"].append("A44:C44")
+    sheet["cells"]["A44"] = {
+        "value": "Q1 2024", "formula": None,
+        "format": {"bold": True, "horizontalAlign": "center"}
+    }
+    sheet["cells"]["E44"] = {"value": q1_qty, "formula": None, "format": {}}
+    sheet["cells"]["G44"] = {"value": q1_rev, "formula": None, "format": {"numberFormat": "currency"}}
+    sheet["frozenRows"] = 1
+
+
+def solve_task_h57(state):
+    """Dept validation + merge + formula + italic + named range."""
+    sheet = state["sheets"][1]
+    validation = {"type": "list", "values": "Engineering,Sales,Marketing,HR,Finance,Operations"}
+    for r in range(2, 27):
+        cell = sheet["cells"].get(f"B{r}")
+        if cell:
+            cell["validation"] = dict(validation)
+            cell.setdefault("format", {})["italic"] = True
+
+    sheet["mergedCells"].append("A27:B27")
+    sheet["cells"]["A27"] = {"value": "Department Count", "formula": None, "format": {"bold": True}}
+    dept_count = counta_col(sheet, "B", 2, 26)
+    sheet["cells"]["C27"] = {"value": dept_count, "formula": "=COUNTA(B2:B26)", "format": {}}
+    state["namedRanges"]["DeptColumn"] = "Employees!B2:B26"
+
+
+def solve_task_h58(state):
+    """Bold 2024-restocked products, chart, CF, freeze on Inventory."""
+    sheet = state["sheets"][2]
+    for r in range(2, 32):
+        h_cell = sheet["cells"].get(f"H{r}")
+        b_cell = sheet["cells"].get(f"B{r}")
+        if not h_cell or not b_cell:
+            continue
+        date_str = str(h_cell.get("value", ""))
+        parts = date_str.split("/")
+        if len(parts) != 3:
+            continue
+        try:
+            year = int(parts[2])
+        except ValueError:
+            continue
+        if year == 2024:
+            b_cell.setdefault("format", {})["bold"] = True
+
+    sheet["charts"].append({
+        "id": "chart-sanity-h58", "type": "bar", "dataRange": "D1:E31",
+        "title": "Stock vs Reorder", "xAxisLabel": "", "yAxisLabel": "",
+        "showLegend": True, "legendPosition": "top",
+        "position": {"x": 250, "y": 50}, "size": {"width": 450, "height": 300}
+    })
+    sheet["conditionalFormats"].append({
+        "range": "D2:D31", "type": "less_than",
+        "value": "10", "value2": "", "backgroundColor": "#ff0000"
+    })
+    sheet["conditionalFormats"].append({
+        "range": "D2:D31", "type": "greater_than",
+        "value": "200", "value2": "", "backgroundColor": "#0000ff"
+    })
+    sheet["frozenRows"] = 1
+    sheet["frozenCols"] = 1
+
+
+def solve_task_h59(state):
+    """Restock items at/below reorder level to 2x reorder, bold names."""
+    sheet = state["sheets"][2]
+    restocked_count = 0
+    for r in range(2, 32):
+        d_cell = sheet["cells"].get(f"D{r}")
+        e_cell = sheet["cells"].get(f"E{r}")
+        b_cell = sheet["cells"].get(f"B{r}")
+        if not d_cell or not e_cell or not b_cell:
+            continue
+        stock = d_cell.get("value", 0)
+        reorder = e_cell.get("value", 0)
+        if isinstance(stock, (int, float)) and isinstance(reorder, (int, float)):
+            if stock <= reorder:
+                d_cell["value"] = 2 * reorder
+                b_cell.setdefault("format", {})["bold"] = True
+                restocked_count += 1
+
+    sheet["cells"]["A32"] = {"value": "Items Restocked", "formula": None, "format": {"bold": True}}
+    sheet["cells"]["B32"] = {"value": restocked_count, "formula": None, "format": {}}
+
+
+def solve_task_h60(state):
+    """Duplicate Inventory as Restocking Plan, sort, format, named range."""
+    copy = deepcopy(state["sheets"][2])
+    copy["name"] = "Restocking Plan"
+    state["sheets"].insert(3, copy)
+    sort_sheet_by_col(state["sheets"][3], "D", "asc")
+    state["sheets"][3]["frozenRows"] = 1
+
+    rp_cells = state["sheets"][3]["cells"]
+    for r in range(2, 32):
+        d_cell = rp_cells.get(f"D{r}")
+        e_cell = rp_cells.get(f"E{r}")
+        b_cell = rp_cells.get(f"B{r}")
+        if not d_cell or not e_cell or not b_cell:
+            continue
+        stock = d_cell.get("value", 0)
+        reorder = e_cell.get("value", 0)
+        if not isinstance(stock, (int, float)) or not isinstance(reorder, (int, float)):
+            continue
+        if stock < reorder:
+            b_cell.setdefault("format", {})["bold"] = True
+            d_cell.setdefault("format", {})["backgroundColor"] = "#ffc7ce"
+        elif stock > 100:
+            d_cell.setdefault("format", {})["backgroundColor"] = "#c6efce"
+
+    state["namedRanges"]["RestockPlan"] = "'Restocking Plan'!B2:E31"
+    state["activeSheet"] = 3
+
+
 # -- solver registry ----------------------------------------------------------
 
 SOLVERS = {}
 for _prefix in ("e", "m", "h"):
-    for _i in range(1, 41):
+    for _i in range(1, 61):
         _key = f"task_{_prefix}{_i}"
         _fn = f"solve_task_{_prefix}{_i}"
         if _fn in globals():

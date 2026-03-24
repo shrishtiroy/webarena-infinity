@@ -478,5 +478,125 @@
     "difficulty": "hard",
     "instruction": "Create a new sheet called 'Executive Summary'. In A1, type 'Company Dashboard' (bold) and merge cells A1:B1. In A3 type 'Total Revenue' (bold), B3 with formula =SUM(Sales!G2:G41) formatted as currency. In A4 type 'Total Payroll' (bold), B4 with formula =SUM(Employees!D2:D26) formatted as currency. In A5 type 'Average Salary' (bold), B5 with formula =AVERAGE(Employees!D2:D26) formatted as currency. In A6 type 'Inventory Items' (bold), B6 with formula =COUNTA(Inventory!B2:B31).",
     "verify": "real-tasks/task_h40.py"
+  },
+  {
+    "id": "task_h41",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, format items based on their stock situation: for out-of-stock items (stock equals 0), apply red text (#ff0000) and strikethrough to the product name. For items whose stock is below their reorder level but greater than zero, bold the product name and set the stock cell background to orange (#fce5cd). For items with stock above 100, italicize the product name and set the stock cell background to light green (#c6efce).",
+    "verify": "real-tasks/task_h41.py"
+  },
+  {
+    "id": "task_h42",
+    "difficulty": "hard",
+    "instruction": "Find the department on the Employees sheet with the fewest employees. Create a new sheet named after that department. Add bold headers 'Name' in A1, 'Title' in B1, and 'Salary' in C1. List the department's employees starting from row 2 with their name, title, and salary formatted as currency. Bold the name of the highest-paid employee among them.",
+    "verify": "real-tasks/task_h42.py"
+  },
+  {
+    "id": "task_h43",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, identify the item with the highest unit cost. Set the background of every supplier cell in column G that shares that item's supplier to light yellow (#fff2cc). Create a named range 'PremiumSupplier' pointing to Inventory!G2:G31.",
+    "verify": "real-tasks/task_h43.py"
+  },
+  {
+    "id": "task_h44",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, compare each employee's salary to their department's average. Set the salary cell text color to dark green (#006100) for employees earning above their department average and to red (#ff0000) for those earning below. In A27, type 'Above Avg' (bold) with the count of above-average employees in B27. In A28, type 'Below Avg' (bold) with the count of below-average employees in B28.",
+    "verify": "real-tasks/task_h44.py"
+  },
+  {
+    "id": "task_h45",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet called 'Region Analysis'. Add bold headers 'Region' in A1 and 'Total Revenue' in B1. For each unique region on the Sales sheet, list the region name in column A starting from row 2 and its total revenue in column B formatted as currency, sorted alphabetically by region name. Set the background of the highest revenue cell in column B to green (#c6efce).",
+    "verify": "real-tasks/task_h45.py"
+  },
+  {
+    "id": "task_h46",
+    "difficulty": "hard",
+    "instruction": "The Inventory sheet has two Laptop products. For the one with higher stock, bold its product name and set its stock cell background to green (#c6efce). For the one with lower stock, underline its product name, change its reorder level to 25, and set its stock cell background to orange (#fce5cd).",
+    "verify": "real-tasks/task_h46.py"
+  },
+  {
+    "id": "task_h47",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, set the name cell background to light blue (#cfe2f3) for employees who started before 2020 based on the Start Date column. Set the name cell background to light yellow (#fff2cc) for employees who started in 2023 or later. Type 'Tenure Legend' (bold) in A28 and 'Blue=Pre-2020, Yellow=2023+' in B28.",
+    "verify": "real-tasks/task_h47.py"
+  },
+  {
+    "id": "task_h48",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet called 'Workbook Index' with bold headers 'Sheet' in A1, 'Rows' in B1, and 'Columns' in C1, all with gray background (#e0e0e0). Enter 'Sales' in A2, 40 in B2, 8 in C2; 'Employees' in A3, 25 in B3, 7 in C3; 'Inventory' in A4, 30 in B4, 8 in C4. Create named ranges 'SalesData' for Sales!A2:H41, 'EmployeeData' for Employees!A2:G26, and 'InventoryData' for Inventory!A2:H31.",
+    "verify": "real-tasks/task_h48.py"
+  },
+  {
+    "id": "task_h49",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet called 'Reorder Report'. Add bold headers 'Product' in A1, 'Current Stock' in B1, 'Reorder Level' in C1, and 'Shortage' in D1, all with red background (#ffc7ce). List every Inventory item whose stock is below its reorder level, starting from row 2, with the shortage calculated as reorder level minus current stock. Sort the entries by shortage from highest to lowest.",
+    "verify": "real-tasks/task_h49.py"
+  },
+  {
+    "id": "task_h50",
+    "difficulty": "hard",
+    "instruction": "On the Sales sheet, sort by Total (column G) from highest to lowest. Freeze the header row. Enable filter mode and hide sales from the 'East' region. Add two conditional formatting rules on G2:G41: green (#c6efce) for values above 8000 and red (#ffc7ce) for values below 500. Insert a bar chart titled 'Revenue Distribution' using data range G1:G41.",
+    "verify": "real-tasks/task_h50.py"
+  },
+  {
+    "id": "task_h51",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, add data validation to all status cells (G2 through G26) as a dropdown with options 'Active', 'On Leave', 'Remote', 'Contractor', 'Terminated'. Change every 'Contractor' status to 'Remote'. Add conditional formatting on G2:G26 to highlight 'On Leave' with yellow (#ffff00) and 'Remote' with light blue (#cfe2f3). Create a named range 'EmployeeStatus' for Employees!G2:G26.",
+    "verify": "real-tasks/task_h51.py"
+  },
+  {
+    "id": "task_h52",
+    "difficulty": "hard",
+    "instruction": "Create a new sheet called 'Supplier Summary'. Add bold headers 'Supplier' in A1, 'Product Count' in B1, and 'Total Stock' in C1 with light blue background (#cfe2f3). List each unique supplier from the Inventory sheet alphabetically in column A starting from row 2, with the count of products in B and total stock in C. Bold the supplier name with the highest total stock.",
+    "verify": "real-tasks/task_h52.py"
+  },
+  {
+    "id": "task_h53",
+    "difficulty": "hard",
+    "instruction": "The Inventory sheet has two Keyboard products. For the one with higher stock, bold its product name and set the unit cost cell background to green (#c6efce). For the one with lower stock, italicize its product name, change its reorder level to 25, and set the unit cost cell background to red (#ffc7ce).",
+    "verify": "real-tasks/task_h53.py"
+  },
+  {
+    "id": "task_h54",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, set all header cells (A1 through G1) to light blue background (#cfe2f3). Bold all employee names in column A (rows 2 through 26). Set all salary cells (D2 through D26) to right-aligned. Italicize every email in column F (rows 2 through 26). Add conditional formatting on D2:D26 to highlight values above 120000 with green text (#006100). Freeze the top row and first column.",
+    "verify": "real-tasks/task_h54.py"
+  },
+  {
+    "id": "task_h55",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, find the department with the most employees. Type 'Largest Dept' (bold) in A27 and the department name in B27. Type the employee count in C27. Set the name cell background to light green (#c6efce) for every employee in that department. Add conditional formatting on D2:D26 to highlight salaries above 100000 with green (#c6efce).",
+    "verify": "real-tasks/task_h55.py"
+  },
+  {
+    "id": "task_h56",
+    "difficulty": "hard",
+    "instruction": "On the Sales sheet, merge cells A44:C44 and type 'Q1 2024' (bold, centered). In E44, enter the total quantity of all sales from January through March 2024. In G44, enter the total revenue for those Q1 sales formatted as currency. Freeze the header row.",
+    "verify": "real-tasks/task_h56.py"
+  },
+  {
+    "id": "task_h57",
+    "difficulty": "hard",
+    "instruction": "On the Employees sheet, add data validation to every department cell (B2 through B26) as a dropdown with options 'Engineering', 'Sales', 'Marketing', 'HR', 'Finance', 'Operations'. Merge cells A27:B27 and type 'Department Count' (bold). Enter the formula =COUNTA(B2:B26) in C27. Italicize all department cells (B2 through B26). Create a named range 'DeptColumn' for Employees!B2:B26.",
+    "verify": "real-tasks/task_h57.py"
+  },
+  {
+    "id": "task_h58",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, bold every product name whose last restock date (column H) is from 2024. Insert a bar chart titled 'Stock vs Reorder' using data range D1:E31. Add conditional formatting on D2:D31 to highlight values below 10 with red background (#ff0000) and values above 200 with blue background (#0000ff). Freeze the header row and first column.",
+    "verify": "real-tasks/task_h58.py"
+  },
+  {
+    "id": "task_h59",
+    "difficulty": "hard",
+    "instruction": "On the Inventory sheet, for every item whose stock is at or below its reorder level, set the stock to double the reorder level and bold the product name. Leave all other items unchanged. Type 'Items Restocked' (bold) in A32 and the count of restocked items in B32.",
+    "verify": "real-tasks/task_h59.py"
+  },
+  {
+    "id": "task_h60",
+    "difficulty": "hard",
+    "instruction": "Duplicate the Inventory sheet and rename the copy to 'Restocking Plan'. On the copy, sort by stock level from lowest to highest. Freeze the header row. For items whose stock is below their reorder level, bold the product name and set the stock cell background to red (#ffc7ce). For items with stock above 100, set the stock cell background to green (#c6efce). Create a named range 'RestockPlan' for 'Restocking Plan'!B2:E31.",
+    "verify": "real-tasks/task_h60.py"
   }
 ]
