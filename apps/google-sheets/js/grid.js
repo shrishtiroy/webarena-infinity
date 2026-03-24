@@ -24,6 +24,7 @@ const Grid = (function() {
     let clipboard = null;
     let clipboardMode = null; // 'copy' or 'cut'
     let autofillStart = null;
+    let formulaViewMode = false;
 
     function init() {
         gridContainer = document.getElementById('grid-container');
@@ -180,8 +181,11 @@ const Grid = (function() {
                 let style = `left:${cx}px;top:${ry}px;width:${cellW}px;height:${cellH}px;`;
                 if (format.bold) style += 'font-weight:bold;';
                 if (format.italic) style += 'font-style:italic;';
-                if (format.underline) style += 'text-decoration:underline;';
-                if (format.strikethrough) style += 'text-decoration:line-through;';
+                // Combine text-decoration values
+                const textDecs = [];
+                if (format.underline) textDecs.push('underline');
+                if (format.strikethrough) textDecs.push('line-through');
+                if (textDecs.length > 0) style += `text-decoration:${textDecs.join(' ')};`;
                 if (format.fontColor) style += `color:${format.fontColor};`;
                 if (format.backgroundColor) style += `background-color:${format.backgroundColor};`;
                 if (format.horizontalAlign) style += `text-align:${format.horizontalAlign};`;
@@ -189,6 +193,11 @@ const Grid = (function() {
                     const va = format.verticalAlign === 'top' ? 'flex-start' : format.verticalAlign === 'bottom' ? 'flex-end' : 'center';
                     style += `align-items:${va};display:flex;`;
                 }
+                // Border CSS
+                if (format.borderTop) style += `border-top:${format.borderTop};`;
+                if (format.borderBottom) style += `border-bottom:${format.borderBottom};`;
+                if (format.borderLeft) style += `border-left:${format.borderLeft};`;
+                if (format.borderRight) style += `border-right:${format.borderRight};`;
 
                 // Conditional formatting
                 const cfStyle = getConditionalFormatStyle(addr, value, sheet);
@@ -199,7 +208,7 @@ const Grid = (function() {
                 if (isActive) classes += ' active';
                 if (isSelected) classes += ' selected';
 
-                const displayVal = isEditing ? '' : formatDisplayValue(value, format);
+                const displayVal = isEditing ? '' : (formulaViewMode && cellData && cellData.formula ? cellData.formula : formatDisplayValue(value, format));
 
                 html += `<div class="${classes}" data-addr="${addr}" data-col="${col}" data-row="${r}" style="${style}">`;
                 if (isEditing) {
@@ -1071,6 +1080,7 @@ const Grid = (function() {
 
     function getActiveCell() { return activeCell; }
     function getEditingCell() { return editingCell; }
+    function setFormulaViewMode(val) { formulaViewMode = val; }
 
     function pasteValuesOnly() {
         if (!clipboard || clipboard.length === 0) return;
@@ -1127,7 +1137,7 @@ const Grid = (function() {
 
     return {
         TOTAL_ROWS, TOTAL_COLS, DEFAULT_COL_WIDTH, DEFAULT_ROW_HEIGHT,
-        init, render, getActiveCell, getEditingCell,
+        init, render, getActiveCell, getEditingCell, setFormulaViewMode,
         setActiveCell, startEditing, commitEdit, cancelEdit,
         getSelectedAddresses, getSelectionBounds,
         doCopy, doCut, doPaste, pasteValuesOnly, pasteFormulasOnly, pasteFormattingOnly,

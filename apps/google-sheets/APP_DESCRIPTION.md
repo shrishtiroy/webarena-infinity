@@ -49,6 +49,7 @@ This is a single-page application with one main view containing:
 - Cross-sheet references (Sheet2!A1)
 - Functions: SUM, AVERAGE, COUNT, COUNTA, MIN, MAX, ROUND, ABS
 - Logic functions: IF, AND, OR, NOT
+- Lookup functions: VLOOKUP (search value, range, column index, exact/approximate match)
 - Text functions: CONCATENATE, LEN, TRIM, UPPER, LOWER, LEFT, RIGHT, MID
 - Date functions: NOW, TODAY
 - Dependency graph with automatic recalculation

@@ -726,7 +726,7 @@ const App = (function() {
             case 'view-freeze-cols': AppState.setFrozenCols(si, colLetterToIndex(ac.col)); render(); break;
             case 'view-unfreeze': AppState.setFrozenRows(si, 0); AppState.setFrozenCols(si, 0); render(); break;
             case 'view-gridlines': showGridlines = !showGridlines; document.getElementById('grid-container')?.classList.toggle('no-gridlines'); break;
-            case 'view-formula-view': formulaViewMode = !formulaViewMode; render(); break;
+            case 'view-formula-view': formulaViewMode = !formulaViewMode; Grid.setFormulaViewMode(formulaViewMode); render(); break;
 
             case 'insert-row-above': AppState.insertRow(si, ac.row - 1); render(); break;
             case 'insert-row-below': AppState.insertRow(si, ac.row); render(); break;

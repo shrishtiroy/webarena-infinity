@@ -220,14 +220,22 @@ const FormulaEngine = (function() {
             if (!peek() || peek().value !== '(') throw new Error('#NAME?');
             consume(); // (
             const args = [];
+            let vlookupRangeStr = null;
             if (peek() && peek().value !== ')') {
                 args.push(parseExpr());
                 while (peek() && peek().value === ',') {
                     consume();
+                    // For VLOOKUP, capture the range string before it gets resolved
+                    if (fname === 'VLOOKUP' && args.length === 1 && peek() && peek().type === 'range') {
+                        vlookupRangeStr = peek().value;
+                    }
                     args.push(parseExpr());
                 }
             }
             if (peek() && peek().value === ')') consume();
+            if (fname === 'VLOOKUP') {
+                return callVLookup(args, vlookupRangeStr, sheetIndex);
+            }
             return callFunction(fname, args, sheetIndex);
         }
 
@@ -332,17 +340,7 @@ const FormulaEngine = (function() {
                 return !args[0];
             }
             case 'VLOOKUP': {
-                const searchVal = args[0];
-                const range = args[1];
-                const colIdx = Number(args[2]);
-                const exactMatch = args.length > 3 ? !args[3] : true;
-
-                if (!Array.isArray(range)) throw new Error('#VALUE!');
-                // Need to figure out the range dimensions
-                // range is a flat array from resolveRange, we need to know columns
-                // We'll re-parse from the original token... simplified approach:
-                // assume the range was passed as an array of values in row-major order
-                // We need to get the original range string to know dimensions
+                // Handled in parseFunction via callVLookup
                 throw new Error('#N/A');
             }
             case 'CONCATENATE': {
@@ -435,6 +433,59 @@ const FormulaEngine = (function() {
         });
 
         return [...noDeps, ...withDeps];
+    }
+
+    function callVLookup(args, rangeStr, sheetIndex) {
+        const searchVal = args[0];
+        const colIdx = Number(args[2]);
+        const exactMatch = args.length > 3 ? !args[3] : true;
+
+        if (!rangeStr) throw new Error('#N/A');
+
+        const rangeCells = expandRange(rangeStr, sheetIndex);
+        if (rangeCells.length === 0) throw new Error('#N/A');
+
+        const rRows = {};
+        const rCols = {};
+        rangeCells.forEach(c => {
+            const p = parseAddress(c.addr);
+            if (p) {
+                rRows[p.row] = true;
+                rCols[p.col] = true;
+            }
+        });
+        const rowKeys = Object.keys(rRows).map(Number).sort((a, b) => a - b);
+        const colKeys = Object.keys(rCols).sort((a, b) => colLetterToIndex(a) - colLetterToIndex(b));
+
+        if (colIdx < 1 || colIdx > colKeys.length) throw new Error('#REF!');
+
+        const si = rangeCells[0].sheetIndex;
+
+        for (let ri = 0; ri < rowKeys.length; ri++) {
+            const cellVal = AppState.getCellValue(si, colKeys[0] + rowKeys[ri]);
+            if (exactMatch) {
+                if (cellVal == searchVal || String(cellVal) === String(searchVal)) {
+                    const result = AppState.getCellValue(si, colKeys[colIdx - 1] + rowKeys[ri]);
+                    return result === undefined ? 0 : result;
+                }
+            } else {
+                if (typeof cellVal === 'number' && typeof searchVal === 'number') {
+                    if (cellVal <= searchVal) {
+                        if (ri === rowKeys.length - 1 || (() => {
+                            const nextVal = AppState.getCellValue(si, colKeys[0] + rowKeys[ri + 1]);
+                            return typeof nextVal !== 'number' || nextVal > searchVal;
+                        })()) {
+                            const result = AppState.getCellValue(si, colKeys[colIdx - 1] + rowKeys[ri]);
+                            return result === undefined ? 0 : result;
+                        }
+                    }
+                } else if (String(cellVal) === String(searchVal)) {
+                    const result = AppState.getCellValue(si, colKeys[colIdx - 1] + rowKeys[ri]);
+                    return result === undefined ? 0 : result;
+                }
+            }
+        }
+        throw new Error('#N/A');
     }
 
     return {
